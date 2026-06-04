@@ -15,36 +15,31 @@ export async function POST(request: Request) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
+    const workbook = XLSX.read(buffer, { type: 'buffer' });
+    const result = await processWorkbook(workbook, source);
 
+    const durationMs = Date.now() - startTime;
+    const status = result.summary.errors > 0 ? (result.summary.created + result.summary.updated > 0 ? 'partial' : 'error') : 'success';
     try {
-      // Parse Excel directly from buffer — no temp file needed
-      const workbook = XLSX.read(buffer, { type: 'buffer' });
-      const result = await processWorkbook(workbook, source);
-
-      // Log to SyncLog
-      const durationMs = Date.now() - startTime;
-      const status = result.summary.errors > 0 ? (result.summary.created + result.summary.updated > 0 ? 'partial' : 'error') : 'success';
-      try {
-        await db.syncLog.create({
-          data: {
-            source: 'manual_upload',
-            status,
-            created: result.summary.created,
-            updated: result.summary.updated,
-            unchanged: result.summary.unchanged,
-            errors: result.summary.errors,
-            details: JSON.stringify(result.summary.changes.slice(0, 100)),
-            fileName: file.name,
-            triggerBy: 'user',
-            durationMs,
-          },
-        });
-      } catch (logErr) {
-        console.error('Failed to write sync log:', logErr);
-      }
-
-      return NextResponse.json(result);
+      await db.syncLog.create({
+        data: {
+          source: 'manual_upload',
+          status,
+          created: result.summary.created,
+          updated: result.summary.updated,
+          unchanged: result.summary.unchanged,
+          errors: result.summary.errors,
+          details: JSON.stringify(result.summary.changes.slice(0, 100)),
+          fileName: file.name,
+          triggerBy: 'user',
+          durationMs,
+        },
+      });
+    } catch (logErr) {
+      console.error('Failed to write sync log:', logErr);
     }
+
+    return NextResponse.json(result);
   } catch (error) {
     console.error('Sync upload error:', error);
 
