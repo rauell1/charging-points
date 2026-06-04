@@ -38,11 +38,11 @@ const categoryConfig: Record<string, { icon: React.ElementType; color: string; l
 export function MilestonesTimeline() {
   const { data: milestones, isLoading } = useQuery<Milestone[]>({
     queryKey: ['milestones'],
-    queryFn: () => fetch('/api/milestones').then((r) => r.json()),
+    queryFn: () => fetch('/api/milestones').then((r) => { if (!r.ok) throw new Error('Failed to fetch milestones'); return r.json(); }),
   });
 
   const grouped = useMemo(() => {
-    if (!milestones) return { completed: [], in_progress: [], upcoming: [] };
+    if (!milestones || !Array.isArray(milestones)) return { completed: [], in_progress: [], upcoming: [] };
     return {
       completed: milestones.filter((m) => m.status === 'completed'),
       in_progress: milestones.filter((m) => m.status === 'in_progress'),
@@ -51,13 +51,13 @@ export function MilestonesTimeline() {
   }, [milestones]);
 
   const progress = useMemo(() => {
-    if (!milestones) return 0;
+    if (!milestones || !Array.isArray(milestones) || milestones.length === 0) return 0;
     const completed = milestones.filter((m) => m.status === 'completed').length;
     return Math.round((completed / milestones.length) * 100);
   }, [milestones]);
 
   const allMilestones = useMemo(() => {
-    if (!milestones) return [];
+    if (!milestones || !Array.isArray(milestones)) return [];
     return [...milestones].sort(
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
     );

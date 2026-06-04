@@ -59,7 +59,7 @@ export function StationMap() {
 
   const { data: stations, isLoading } = useQuery<Station[]>({
     queryKey: ['stations'],
-    queryFn: () => fetch('/api/stations').then((r) => r.json()),
+    queryFn: () => fetch('/api/stations').then((r) => { if (!r.ok) throw new Error('Failed to fetch stations'); return r.json(); }),
   });
 
   const filteredStations = useMemo(() => {

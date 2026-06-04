@@ -40,7 +40,7 @@ const queryClient = new QueryClient({
 function InfoBadges() {
   const { data } = useQuery<{ overview: { hubCount: number; pointCount: number } }>({
     queryKey: ['analytics-badges'],
-    queryFn: () => fetch('/api/analytics').then((r) => r.json()),
+    queryFn: () => fetch('/api/analytics').then((r) => { if (!r.ok) throw new Error('Failed to fetch analytics'); return r.json(); }),
   });
   const hubCount = data?.overview?.hubCount || 0;
   const pointCount = data?.overview?.pointCount || 0;

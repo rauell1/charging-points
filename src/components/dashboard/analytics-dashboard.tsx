@@ -50,7 +50,7 @@ const VEHICLE_COLORS: Record<string, string> = {
 export function AnalyticsDashboard() {
   const { data, isLoading } = useQuery<AnalyticsData>({
     queryKey: ['analytics'],
-    queryFn: () => fetch('/api/analytics').then((r) => r.json()),
+    queryFn: () => fetch('/api/analytics').then((r) => { if (!r.ok) throw new Error('Failed to fetch analytics'); return r.json(); }),
   });
 
   if (isLoading) {

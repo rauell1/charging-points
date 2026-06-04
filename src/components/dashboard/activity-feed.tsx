@@ -20,7 +20,7 @@ interface Activity {
 export function ActivityFeed() {
   const { data: activities, isLoading } = useQuery<Activity[]>({
     queryKey: ['activities'],
-    queryFn: () => fetch('/api/activities').then((r) => r.json()),
+    queryFn: () => fetch('/api/activities').then((r) => { if (!r.ok) throw new Error('Failed to fetch activities'); return r.json(); }),
   });
 
   if (isLoading) {

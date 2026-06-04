@@ -61,7 +61,7 @@ function StatCard({
 export function OverviewCards() {
   const { data, isLoading } = useQuery<{ overview: OverviewStats }>({
     queryKey: ['analytics'],
-    queryFn: () => fetch('/api/analytics').then((r) => r.json()),
+    queryFn: () => fetch('/api/analytics').then((r) => { if (!r.ok) throw new Error('Failed to fetch analytics'); return r.json(); }),
   });
 
   if (isLoading) {

@@ -125,17 +125,17 @@ export function StationTable() {
 
   const { data: stations, isLoading } = useQuery<Station[]>({
     queryKey: ['stations'],
-    queryFn: () => fetch('/api/stations').then((r) => r.json()),
+    queryFn: () => fetch('/api/stations').then((r) => { if (!r.ok) throw new Error('Failed to fetch stations'); return r.json(); }),
   });
 
   const { data: detailData, isLoading: detailLoading } = useQuery<StationDetail>({
     queryKey: ['station-detail', selectedStation?.id],
-    queryFn: () => fetch(`/api/stations/${selectedStation!.id}`).then((r) => r.json()),
+    queryFn: () => fetch(`/api/stations/${selectedStation!.id}`).then((r) => { if (!r.ok) throw new Error('Failed to fetch station detail'); return r.json(); }),
     enabled: !!selectedStation?.id,
   });
 
   const filteredStations = useMemo(() => {
-    if (!stations) return [];
+    if (!stations || !Array.isArray(stations)) return [];
     if (filter === 'all') return stations;
     if (filter === 'hub') return stations.filter((s) => s.type === 'hub');
     if (filter === 'point') return stations.filter((s) => s.type === 'point');
