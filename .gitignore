@@ -42,8 +42,10 @@ next-env.d.ts
 # database
 /prisma/*.db
 /prisma/*.db-journal
+/db/*.db
 /db/*.db-journal
 *.sqlite
+!/prisma/custom.db
 
 # Agent Context & tools
 /agent-ctx/
