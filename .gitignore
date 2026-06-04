@@ -1,0 +1,50 @@
+# dependencies
+/node_modules
+/.pnp
+/.pnp.js
+/bun.lockb
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# local env files
+.env*.local
+.env
+!.env.example
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# logs
+*.log
+
+# database
+/prisma/*.db
+/prisma/*.db-journal
+/db/*.db
+/db/*.db-journal
+*.sqlite
+
+# Agent Context & tools
+/agent-ctx/

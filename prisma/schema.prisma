@@ -1,0 +1,121 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model ChargingStation {
+  id              String   @id @default(cuid())
+  chargerId       String   @unique
+  name            String
+  type            String   // "hub", "point", "kiosk"
+  status          String   @default("planned") // "operational", "construction", "blocked", "archived", "closed", "planned"
+  address         String
+  neighborhood    String
+  city            String   @default("Nairobi")
+  country         String   @default("Kenya")
+  latitude        Float?
+  longitude       Float?
+  chargerCount    Int      @default(0)
+  totalKw         Float    @default(0)
+  connectorType   String?   // e.g. "Type 6", "Type 2"
+  powerOutputKw   Float?
+  solarPowered    Boolean  @default(false)
+  partner         String?
+  siteManager     String?
+  managerPhone    String?
+  services        String   // JSON array: ["charging", "rental", "after_sales"]
+  operatingHours  String?
+  paymentMethods  String?   // JSON array: ["mpesa", "cash", "card"]
+  launchDate      DateTime?
+  dynamicsCode   String?
+  notes           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  activities  ActivityLog[]
+  sessions    ChargingSession[]
+}
+
+model PipelineSite {
+  id               String   @id @default(cuid())
+  siteId           String   @unique
+  landmark         String
+  neighborhood     String
+  city             String   @default("Nairobi")
+  latitude         Float?
+  longitude        Float?
+  estimatedPoints  Int      @default(1)
+  electricityAccess String
+  landlordType     String
+  bikeTraffic      String
+  securityLevel    String
+  priorityScore    Float    @default(0)
+  priorityBucket   String
+  status           String   @default("new")
+  agentName        String?
+  agentType        String?
+  partnerName      String?
+  partnerPhone     String?
+  partnerEmail     String?
+  mountType        String?
+  deploymentPhase  String?
+  deploymentCost   Float?
+  monthlyRent      Float?
+  agentComment     String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Milestone {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  date        DateTime
+  category    String   // "hub", "point", "kiosk", "expansion", "partnership", "funding", "product"
+  status      String   @default("upcoming") // "completed", "upcoming", "in_progress"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ActivityLog {
+  id         String   @id @default(cuid())
+  stationId  String?
+  title      String
+  description String
+  createdAt  DateTime @default(now())
+
+  station ChargingStation? @relation(fields: [stationId], references: [id], onDelete: SetNull)
+}
+
+model ChargingSession {
+  id               String   @id @default(cuid())
+  stationId        String
+  vehicleType      String   // "motorcycle", "tuk_tuk", "light_car"
+  chargingMinutes  Int
+  rangeKm          Float
+  energyKwh        Float?
+  costKes          Float?
+  date             DateTime @default(now())
+  createdAt        DateTime @default(now())
+
+  station ChargingStation @relation(fields: [stationId], references: [id], onDelete: Cascade)
+}
+
+model SyncLog {
+  id          String   @id @default(cuid())
+  source      String   // "manual_upload", "rescan", "api_push", "webhook", "scheduled"
+  status      String   @default("success") // "success", "partial", "error"
+  created     Int      @default(0)
+  updated     Int      @default(0)
+  unchanged   Int      @default(0)
+  errors      Int      @default(0)
+  details     String?  // JSON with change details
+  fileName    String?
+  triggerBy   String?  // "system", "api", user email, etc
+  durationMs  Int      @default(0)
+  createdAt   DateTime @default(now())
+}

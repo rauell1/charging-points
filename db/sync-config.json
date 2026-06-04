@@ -1,0 +1,8 @@
+{
+  "apiKey": "roam-sync-key-2025",
+  "enabled": true,
+  "schedule": "every 6 hours",
+  "webhookUrl": "",
+  "lastSync": null,
+  "lastSyncStatus": null
+}
