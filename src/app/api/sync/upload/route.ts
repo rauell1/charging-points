@@ -172,6 +172,8 @@ async function processLiveData(rows: Record<string, unknown>[], result: SyncResu
       const existing = await db.chargingStation.findUnique({ where: { chargerId } });
       const data = {
         name, type, status: 'operational',
+        address: name,
+        neighborhood: 'Nairobi',
         latitude: lat, longitude: lng,
         services: JSON.stringify(services),
         operatingHours: openTime && closeTime ? `${openTime} - ${closeTime}` : undefined,
@@ -238,13 +240,21 @@ async function processMultiRowSheet(
       }
 
       const existing = await db.chargingStation.findUnique({ where: { chargerId: normalizedId } });
+      const stationName = get(row, 'Station Name', 'Site Name') ?? name;
+      const area = get(row, 'Site Name', 'Area') ?? 'Nairobi';
+      const chargerCount = parseInt(get(row, 'Total') ?? '0') || 0;
+      const totalKw = parseFloat(get(row, 'Total kW') ?? '0') || 0;
+
       const data = {
         name, type, status,
-        neighborhood: get(row, 'Area') ?? undefined,
+        address: stationName,
+        neighborhood: area,
         partner: get(row, 'Partner') ?? undefined,
         siteManager: get(row, 'Full Name') ?? undefined,
-        managerPhone: get(row, 'Phone Number') ?? undefined,
+        managerPhone: get(row, 'Phone Number') ? String(get(row, 'Phone Number')) : undefined,
         dynamicsCode: get(row, 'Dynamics Project Code') ?? undefined,
+        chargerCount,
+        totalKw,
         latitude: lat, longitude: lng,
         services: JSON.stringify(type === 'hub' ? ['charging', 'rental'] : ['charging']),
       };
