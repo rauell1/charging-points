@@ -1,9 +1,6 @@
 import { db } from '@/lib/db';
 import { NextResponse } from 'next/server';
 import * as XLSX from 'xlsx';
-import { writeFile, unlink } from 'fs/promises';
-import { join } from 'path';
-import { randomUUID } from 'crypto';
 
 export async function POST(request: Request) {
   const startTime = Date.now();
@@ -17,14 +14,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
 
-    // Save file temporarily
     const buffer = Buffer.from(await file.arrayBuffer());
-    const tmpPath = join('/tmp', `sync-${randomUUID()}.xlsx`);
-    await writeFile(tmpPath, buffer);
 
     try {
-      // Parse Excel
-      const workbook = XLSX.readFile(tmpPath);
+      // Parse Excel directly from buffer — no temp file needed
+      const workbook = XLSX.read(buffer, { type: 'buffer' });
       const result = await processWorkbook(workbook, source);
 
       // Log to SyncLog
@@ -50,9 +44,6 @@ export async function POST(request: Request) {
       }
 
       return NextResponse.json(result);
-    } finally {
-      // Cleanup temp file
-      try { await unlink(tmpPath); } catch { /* ignore */ }
     }
   } catch (error) {
     console.error('Sync upload error:', error);
