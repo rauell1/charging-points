@@ -101,41 +101,47 @@ async function processWorkbook(workbook: XLSX.WorkBook, source: string): Promise
     timestamp: new Date().toISOString(),
   };
 
-  // Detect which workbook this is based on sheet names
-  const hasRP = sheetNames.some(n => n.includes('RP'));
-  const hasRH = sheetNames.some(n => n.includes('RH'));
-
-  if (hasRP) {
-    const rpSheetName = sheetNames.find(n => n.includes('RP'))!;
-    const rpSheet = workbook.Sheets[rpSheetName];
-    const rpRows = XLSX.utils.sheet_to_json<Record<string, unknown>>(rpSheet);
-    await processRoamPoints(rpRows, result);
+  // Live data sheet — clean headers (Locations Database workbook)
+  if (sheetNames.includes('Live data')) {
+    const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(workbook.Sheets['Live data']);
+    await processLiveData(rows, result);
   }
 
-  if (hasRH) {
-    const rhSheetName = sheetNames.find(n => n.includes('RH'))!;
-    const rhSheet = workbook.Sheets[rhSheetName];
-    const rhRows = XLSX.utils.sheet_to_json<Record<string, unknown>>(rhSheet);
-    await processRoamHubs(rhRows, result);
-  }
+  // RH - KE / RP - KE sheets — 2-row headers, actual column names in row index 1
+  const rhSheet = sheetNames.find(n => /^RH\s*-/.test(n));
+  const rpSheet = sheetNames.find(n => /^RP\s*-/.test(n));
+  if (rhSheet) await processMultiRowSheet(workbook.Sheets[rhSheet], 'hub', 'Roam Charger ID', result);
+  if (rpSheet) await processMultiRowSheet(workbook.Sheets[rpSheet], 'point', 'Roam Charge Station ID', result);
 
-  // Check for SITES sheet (Motorcycle Charging Sites)
+  // SITES sheet — uses Site_ID (underscore), pipeline/prospective data
   if (sheetNames.includes('SITES')) {
-    const sitesSheet = workbook.Sheets['SITES'];
-    const sitesRows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sitesSheet);
+    const sitesRows = XLSX.utils.sheet_to_json<Record<string, unknown>>(workbook.Sheets['SITES']);
     await processSitesSheet(sitesRows, result);
   }
 
+  // Legacy RP/RH detection (simple single-row headers)
+  const hasLegacyRP = !rpSheet && sheetNames.some(n => n.includes('RP'));
+  const hasLegacyRH = !rhSheet && sheetNames.some(n => n.includes('RH'));
+  if (hasLegacyRP) {
+    const name = sheetNames.find(n => n.includes('RP'))!;
+    await processRoamPoints(XLSX.utils.sheet_to_json<Record<string, unknown>>(workbook.Sheets[name]), result);
+  }
+  if (hasLegacyRH) {
+    const name = sheetNames.find(n => n.includes('RH'))!;
+    await processRoamHubs(XLSX.utils.sheet_to_json<Record<string, unknown>>(workbook.Sheets[name]), result);
+  }
+
   // Auto-detect generic sheets with charging data
-  if (!hasRP && !hasRH && !sheetNames.includes('SITES')) {
+  const handled = new Set(['Live data', rhSheet, rpSheet, 'SITES'].filter(Boolean));
+  if (!handled.size || (!sheetNames.includes('Live data') && !rhSheet && !rpSheet && !sheetNames.includes('SITES'))) {
     for (const name of sheetNames) {
       if (['CONFIG', 'LOOKUPS', 'AGENTS', 'MULTI SITES PARTNERS', 'TBD'].includes(name)) continue;
+      if (handled.has(name)) continue;
       const sheet = workbook.Sheets[name];
       if (!sheet) continue;
       const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet);
       if (rows.length > 0) {
-        const firstRow = rows[0];
-        const keys = Object.keys(firstRow);
+        const keys = Object.keys(rows[0]);
         if (keys.some(k => /charger|station|site|point|hub/i.test(k))) {
           await processGenericSheet(rows, result, name);
         }
@@ -144,6 +150,116 @@ async function processWorkbook(workbook: XLSX.WorkBook, source: string): Promise
   }
 
   return result;
+}
+
+async function processLiveData(rows: Record<string, unknown>[], result: SyncResult) {
+  for (const row of rows) {
+    try {
+      const chargerId = extractString(row, ['code']);
+      if (!chargerId) continue;
+      const name = extractString(row, ['station']) ?? chargerId;
+      const lat = extractNumber(row, ['latitude', 'Latitude']);
+      const lng = extractNumber(row, ['longitude', 'Longitude']);
+      const type = chargerId.includes('-RH-') ? 'hub' : chargerId.includes('-RP-') ? 'point' : 'point';
+      const rawServices = extractString(row, ['services']) ?? '';
+      const services: string[] = [];
+      if (/charg/i.test(rawServices)) services.push('charging');
+      if (/rental/i.test(rawServices)) services.push('rental');
+      if (services.length === 0) services.push('charging');
+      const openTime = extractString(row, ['openTime']);
+      const closeTime = extractString(row, ['closeTime']);
+
+      const existing = await db.chargingStation.findUnique({ where: { chargerId } });
+      const data = {
+        name, type, status: 'operational',
+        latitude: lat, longitude: lng,
+        services: JSON.stringify(services),
+        operatingHours: openTime && closeTime ? `${openTime} - ${closeTime}` : undefined,
+        managerPhone: extractString(row, ['phone Number', 'phone']) ?? undefined,
+      };
+      if (existing) {
+        const changes = detectChanges(existing, data);
+        if (changes.length > 0) { await db.chargingStation.update({ where: { chargerId }, data }); result.summary.updated++; }
+        else result.summary.unchanged++;
+      } else {
+        await db.chargingStation.create({ data: { chargerId, ...data } });
+        result.summary.created++;
+        result.summary.changes.push({ action: 'created', chargerId, name });
+      }
+    } catch { result.summary.errors++; }
+  }
+}
+
+async function processMultiRowSheet(
+  sheet: XLSX.WorkSheet,
+  type: 'hub' | 'point',
+  idColumn: string,
+  result: SyncResult
+) {
+  // First row is section labels, second row has actual column names
+  const allRows = XLSX.utils.sheet_to_json<unknown[]>(sheet, { header: 1 }) as unknown[][];
+  if (allRows.length < 3) return;
+  const colNames = (allRows[1] as unknown[]).map(c => (c != null ? String(c) : ''));
+
+  function get(row: unknown[], ...keys: string[]): string | null {
+    for (const key of keys) {
+      const idx = colNames.indexOf(key);
+      if (idx >= 0 && row[idx] != null && String(row[idx]).trim() !== '') return String(row[idx]).trim();
+    }
+    return null;
+  }
+
+  for (let i = 2; i < allRows.length; i++) {
+    const row = allRows[i] as unknown[];
+    try {
+      const chargerId = get(row, idColumn, 'Roam Charger ID', 'Roam Charge Station ID');
+      if (!chargerId) continue;
+      const normalizedId = chargerId.startsWith('#') ? chargerId : `#${chargerId}`;
+      const name = get(row, 'Site Name', 'Station Name') ?? `${type === 'hub' ? 'Roam Hub' : 'Roam Point'} - ${chargerId}`;
+
+      // Coordinate field may be "lat, lng"
+      const coordRaw = get(row, 'Coordinate');
+      let lat: number | null = null, lng: number | null = null;
+      if (coordRaw) {
+        const parts = coordRaw.split(',');
+        if (parts.length === 2) { lat = parseFloat(parts[0]); lng = parseFloat(parts[1]); }
+        if (isNaN(lat!) || isNaN(lng!)) { lat = null; lng = null; }
+      }
+
+      let status = type === 'hub' ? 'operational' : 'planned';
+      const statusRaw = get(row, 'Status');
+      if (statusRaw) {
+        const s = statusRaw.toLowerCase();
+        if (s.includes('operational') || s.includes('active') || s.includes('live')) status = 'operational';
+        else if (s.includes('construction') || s.includes('install')) status = 'construction';
+        else if (s.includes('blocked') || s.includes('stalled')) status = 'blocked';
+        else if (s.includes('archived') || s.includes('closed')) status = 'archived';
+        else if (s.includes('planned') || s.includes('coming')) status = 'planned';
+      }
+
+      const existing = await db.chargingStation.findUnique({ where: { chargerId: normalizedId } });
+      const data = {
+        name, type, status,
+        neighborhood: get(row, 'Area') ?? undefined,
+        partner: get(row, 'Partner') ?? undefined,
+        siteManager: get(row, 'Full Name') ?? undefined,
+        managerPhone: get(row, 'Phone Number') ?? undefined,
+        dynamicsCode: get(row, 'Dynamics Project Code') ?? undefined,
+        latitude: lat, longitude: lng,
+        services: JSON.stringify(type === 'hub' ? ['charging', 'rental'] : ['charging']),
+      };
+
+      if (existing) {
+        const changes = detectChanges(existing, data);
+        if (changes.length > 0) { await db.chargingStation.update({ where: { chargerId: normalizedId }, data }); result.summary.updated++; }
+        else result.summary.unchanged++;
+      } else {
+        await db.chargingStation.create({ data: { chargerId: normalizedId, ...data } });
+        result.summary.created++;
+        result.summary.changes.push({ action: 'created', chargerId: normalizedId, name });
+      }
+    } catch (e) { console.error('Row error:', e); result.summary.errors++; }
+  }
 }
 
 async function processRoamPoints(
@@ -355,13 +471,13 @@ async function processSitesSheet(
 ) {
   for (const row of rows) {
     try {
-      const siteId = extractString(row, ['Site ID', 'Charger ID', 'ID', 'site_id']);
+      const siteId = extractString(row, ['Site_ID', 'Site ID', 'Charger ID', 'ID', 'site_id']);
       if (!siteId) continue;
 
       const normalizedId = siteId.startsWith('#') ? siteId : `#${siteId}`;
-      const name = extractString(row, ['Site Name', 'Name', 'name']) || `Site - ${siteId}`;
-      const address = extractString(row, ['Address', 'Location', 'address']);
-      const neighborhood = extractString(row, ['Neighborhood', 'Area', 'Landmark', 'neighborhood']);
+      const name = extractString(row, ['Landmark', 'Site Name', 'Name', 'name']) || `Site - ${siteId}`;
+      const address = extractString(row, ['Address', 'Location', 'address', 'Landmark']);
+      const neighborhood = extractString(row, ['Neighborhood', 'Area', 'Landmark', 'County', 'neighborhood']);
       const statusRaw = extractString(row, ['Status', 'status']);
 
       let status = 'planned';
