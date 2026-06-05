@@ -619,7 +619,7 @@ interface Change {
 function detectChanges(existing: Record<string, unknown>, newData: Record<string, unknown>): Change[] {
   const changes: Change[] = [];
   const fieldsToCompare = [
-    'name', 'status', 'address', 'neighborhood', 'latitude', 'longitude',
+    'name', 'type', 'status', 'address', 'neighborhood', 'latitude', 'longitude',
     'chargerCount', 'totalKw', 'connectorType', 'powerOutputKw', 'partner',
     'siteManager', 'managerPhone', 'notes', 'operatingHours',
   ];
