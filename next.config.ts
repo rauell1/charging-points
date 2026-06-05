@@ -7,9 +7,9 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   reactStrictMode: false,
-  allowedDevOrigins: [
-    "preview-chat-cb0e6d81-54ba-42b2-8d89-e06f43dbfaba.space-z.ai",
-  ],
+  turbopack: {
+    root: process.cwd(),
+  },
 };
 
 export default nextConfig;
