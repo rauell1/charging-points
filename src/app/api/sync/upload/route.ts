@@ -160,7 +160,7 @@ async function processLiveData(rows: Record<string, unknown>[], result: SyncResu
       const name = extractString(row, ['station']) ?? chargerId;
       const lat = extractNumber(row, ['latitude', 'Latitude']);
       const lng = extractNumber(row, ['longitude', 'Longitude']);
-      const type = chargerId.includes('-RH-') ? 'hub' : chargerId.includes('-RP-') ? 'point' : 'point';
+      const type = chargerId.startsWith('#RH') ? 'hub' : 'point';
       const rawServices = extractString(row, ['services']) ?? '';
       const services: string[] = [];
       if (/charg/i.test(rawServices)) services.push('charging');
@@ -228,7 +228,7 @@ async function processMultiRowSheet(
         if (isNaN(lat!) || isNaN(lng!)) { lat = null; lng = null; }
       }
 
-      let status = type === 'hub' ? 'operational' : 'planned';
+      let status = 'planned'; // empty status = planned (not yet deployed)
       const statusRaw = get(row, 'Status');
       if (statusRaw) {
         const s = statusRaw.toLowerCase();
