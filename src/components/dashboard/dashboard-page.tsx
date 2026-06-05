@@ -16,6 +16,14 @@ import { Button } from '@/components/ui/button';
 import { SyncDialog } from '@/components/dashboard/sync-dialog';
 import { useTheme } from 'next-themes';
 import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetClose,
+} from '@/components/ui/sheet';
+import {
   BatteryCharging,
   Zap,
   LayoutDashboard,
@@ -56,13 +64,13 @@ function ThemeToggle() {
     <Button
       variant="ghost"
       size="icon"
-      className="h-9 w-9 rounded-full hover:bg-[--roam-gray-light] dark:hover:bg-zinc-800 transition-colors"
+      className="h-9 w-9 rounded-full hover:bg-white/10 text-white transition-colors cursor-pointer"
       onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
     >
       {theme === 'dark' ? (
         <Sun className="h-4 w-4 text-[--roam-orange]" />
       ) : (
-        <Moon className="h-4 w-4 text-[--roam-black]" />
+        <Moon className="h-4 w-4 text-white" />
       )}
       <span className="sr-only">Toggle theme</span>
     </Button>
@@ -101,25 +109,59 @@ export default function Dashboard() {
     <QueryClientProvider client={queryClient}>
       <div className="min-h-screen flex flex-col bg-background">
         {/* Header */}
-        <header className="border-b border-gray-100 dark:border-zinc-800 bg-white dark:bg-[#0D0D0D] sticky top-0 z-50 shadow-sm h-14 md:h-16 flex items-center">
+        <header className="bg-[#0D0D0D]/80 backdrop-blur-md text-white border-b border-white/10 sticky top-0 z-50 shadow-none h-14 md:h-16 flex items-center">
           <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
-                  <div className="flex items-baseline">
-                    <span className="font-black text-2xl tracking-tighter text-[--roam-black] dark:text-white">ROAM</span>
-                    <span className="font-black text-2xl tracking-tighter text-[--roam-black] dark:text-white hidden sm:inline ml-1">ELECTRIC</span>
-                  </div>
-                  <Badge className="bg-[--roam-orange-light] text-[--roam-orange] dark:bg-[--roam-orange]/15 dark:text-[--roam-orange] text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full border-none hover:bg-[--roam-orange-light] hidden xs:flex">
-                    <span className="hidden md:inline">Charging Infrastructure Tracker</span>
-                    <span className="md:hidden">Tracker</span>
+                  <a href="https://www.roam-electric.com" target="_blank" rel="noopener noreferrer" className="flex items-center mr-1">
+                    <img 
+                      src="https://cdn.prod.website-files.com/68491dec0c89cd3226833f4f/68491dec0c89cd3226833f72_Logo%20Light.svg" 
+                      alt="Roam Electric Logo" 
+                      className="h-5 md:h-6 w-auto brightness-0 invert" 
+                    />
+                  </a>
+                  <Badge className="bg-[--roam-orange] text-white text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full border-none hover:bg-[--roam-orange] hidden md:flex">
+                    Charging Infrastructure Tracker
                   </Badge>
                 </div>
-                <Badge variant="secondary" className="text-[10px] hidden sm:flex bg-[--roam-gray-light] dark:bg-zinc-800 text-[--roam-gray-dark] dark:text-zinc-300 border-none">
+                <Badge variant="secondary" className="text-[10px] hidden lg:flex bg-white/10 text-white/90 border-none">
                   <span className="w-1.5 h-1.5 rounded-full bg-[--roam-orange] mr-1.5 animate-pulse" />
                   Live Tracking
                 </Badge>
               </div>
+
+              {/* Center navigation links for desktop */}
+              <nav className="hidden md:flex items-center gap-6">
+                {[
+                  { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+                  { id: 'stations', label: 'Stations', icon: Map },
+                  { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+                  { id: 'milestones', label: 'Milestones', icon: MilestoneIcon },
+                  { id: 'activity', label: 'Activity', icon: Rss },
+                ].map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activeTab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => setActiveTab(item.id)}
+                      className={`flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer py-1 relative hover:text-white ${
+                        isActive 
+                          ? 'text-[--roam-orange]' 
+                          : 'text-white/60'
+                      }`}
+                    >
+                      <Icon className="h-3.5 w-3.5" />
+                      {item.label}
+                      {isActive && (
+                        <span className="absolute bottom-[-16px] left-0 right-0 h-0.5 bg-[--roam-orange] rounded-full" />
+                      )}
+                    </button>
+                  );
+                })}
+              </nav>
+
               <div className="flex items-center gap-1.5">
                 <SyncDialog />
                 <div className="hidden sm:flex items-center gap-1.5">
@@ -128,13 +170,13 @@ export default function Dashboard() {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    <Button variant="outline" className="border border-[--roam-black] dark:border-zinc-700 text-[--roam-black] dark:text-zinc-200 hover:bg-[--roam-black] dark:hover:bg-zinc-800 hover:text-white rounded-full px-4 py-1.5 h-8 text-xs font-semibold transition-all">
+                    <Button variant="ghost" className="border border-white/20 text-white hover:bg-white hover:text-black rounded-full px-4 py-1.5 h-8 text-xs font-semibold transition-all">
                       <ExternalLink className="h-3 w-3" />
                       Website
                     </Button>
                   </a>
                   <a href="tel:+254740666555">
-                    <Button variant="outline" className="border border-[--roam-black] dark:border-zinc-700 text-[--roam-black] dark:text-zinc-200 hover:bg-[--roam-black] dark:hover:bg-zinc-800 hover:text-white rounded-full px-4 py-1.5 h-8 text-xs font-semibold transition-all">
+                    <Button variant="ghost" className="border border-white/20 text-white hover:bg-white hover:text-black rounded-full px-4 py-1.5 h-8 text-xs font-semibold transition-all">
                       <Phone className="h-3 w-3" />
                       Contact
                     </Button>
@@ -142,68 +184,140 @@ export default function Dashboard() {
                 </div>
                 
                 <ThemeToggle />
-
-                {/* Mobile hamburger menu */}
-                <Button variant="ghost" size="icon" className="sm:hidden h-9 w-9 rounded-full hover:bg-[--roam-gray-light] dark:hover:bg-zinc-850">
-                  <Menu className="h-5 w-5 text-[--roam-black] dark:text-white" />
-                </Button>
+ 
+                {/* Mobile hamburger navigation drawer */}
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button variant="ghost" size="icon" className="sm:hidden h-9 w-9 rounded-full hover:bg-white/10 text-white cursor-pointer">
+                      <Menu className="h-5 w-5 text-white" />
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="right" className="bg-[#0D0D0D]/95 backdrop-blur-md border-l border-white/10 text-white w-[260px] p-6 flex flex-col justify-between">
+                    <div className="space-y-6">
+                      <SheetHeader className="text-left">
+                        <SheetTitle className="text-white font-bold flex items-center gap-2">
+                          <img 
+                            src="https://cdn.prod.website-files.com/68491dec0c89cd3226833f4f/68491dec0c89cd3226833f72_Logo%20Light.svg" 
+                            alt="Roam Electric Logo" 
+                            className="h-5 w-auto brightness-0 invert" 
+                          />
+                        </SheetTitle>
+                      </SheetHeader>
+                      <div className="flex flex-col gap-2 mt-4">
+                        <SheetClose asChild>
+                          <Button
+                            variant="ghost"
+                            className={`w-full justify-start text-xs font-bold uppercase tracking-wider h-10 rounded-full ${
+                              activeTab === 'overview' ? 'text-[--roam-orange] bg-white/5' : 'text-white/70 hover:text-white hover:bg-white/5'
+                            }`}
+                            onClick={() => setActiveTab('overview')}
+                          >
+                            <LayoutDashboard className="h-4 w-4 mr-2.5" />
+                            Overview
+                          </Button>
+                        </SheetClose>
+                        <SheetClose asChild>
+                          <Button
+                            variant="ghost"
+                            className={`w-full justify-start text-xs font-bold uppercase tracking-wider h-10 rounded-full ${
+                              activeTab === 'stations' ? 'text-[--roam-orange] bg-white/5' : 'text-white/70 hover:text-white hover:bg-white/5'
+                            }`}
+                            onClick={() => setActiveTab('stations')}
+                          >
+                            <Map className="h-4 w-4 mr-2.5" />
+                            Stations
+                          </Button>
+                        </SheetClose>
+                        <SheetClose asChild>
+                          <Button
+                            variant="ghost"
+                            className={`w-full justify-start text-xs font-bold uppercase tracking-wider h-10 rounded-full ${
+                              activeTab === 'analytics' ? 'text-[--roam-orange] bg-white/5' : 'text-white/70 hover:text-white hover:bg-white/5'
+                            }`}
+                            onClick={() => setActiveTab('analytics')}
+                          >
+                            <BarChart3 className="h-4 w-4 mr-2.5" />
+                            Analytics
+                          </Button>
+                        </SheetClose>
+                        <SheetClose asChild>
+                          <Button
+                            variant="ghost"
+                            className={`w-full justify-start text-xs font-bold uppercase tracking-wider h-10 rounded-full ${
+                              activeTab === 'milestones' ? 'text-[--roam-orange] bg-white/5' : 'text-white/70 hover:text-white hover:bg-white/5'
+                            }`}
+                            onClick={() => setActiveTab('milestones')}
+                          >
+                            <MilestoneIcon className="h-4 w-4 mr-2.5" />
+                            Milestones
+                          </Button>
+                        </SheetClose>
+                        <SheetClose asChild>
+                          <Button
+                            variant="ghost"
+                            className={`w-full justify-start text-xs font-bold uppercase tracking-wider h-10 rounded-full ${
+                              activeTab === 'activity' ? 'text-[--roam-orange] bg-white/5' : 'text-white/70 hover:text-white hover:bg-white/5'
+                            }`}
+                            onClick={() => setActiveTab('activity')}
+                          >
+                            <Rss className="h-4 w-4 mr-2.5" />
+                            Activity
+                          </Button>
+                        </SheetClose>
+                      </div>
+                    </div>
+                    <div className="space-y-3 pt-6 border-t border-white/10">
+                      <a
+                        href="https://www.roam-electric.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full block"
+                      >
+                        <Button variant="ghost" className="w-full border border-white/20 text-white hover:bg-white hover:text-black rounded-full text-xs font-semibold">
+                          <ExternalLink className="h-3.5 w-3.5 mr-2" />
+                          Website
+                        </Button>
+                      </a>
+                      <a href="tel:+254740666555" className="w-full block">
+                        <Button variant="ghost" className="w-full border border-white/20 text-white hover:bg-white hover:text-black rounded-full text-xs font-semibold">
+                          <Phone className="h-3.5 w-3.5 mr-2" />
+                          Contact
+                        </Button>
+                      </a>
+                    </div>
+                  </SheetContent>
+                </Sheet>
               </div>
             </div>
           </div>
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-6">
+        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
+          {/* Brand Hero Title */}
+          <div className="mb-8 border-l-4 border-[--roam-orange] pl-4 md:pl-6 py-2">
+            <h1 className="text-3xl md:text-5xl font-black tracking-tighter uppercase text-[--roam-black] dark:text-white leading-none mb-3 font-display">
+              CHARGING INFRASTRUCTURE
+            </h1>
+            <p className="text-[--roam-gray-dark] dark:text-[--roam-gray-mid] max-w-3xl text-xs sm:text-sm md:text-base leading-relaxed">
+              Monitoring Roam Electric's charging network across East Africa. Real-time telemetry, mapping, and milestone tracking for the Roam Hub and Roam Point network, powering clean mobility.
+            </p>
+          </div>
+
           {/* Overview KPIs */}
-          <div className="mb-4 md:mb-6">
+          <div className="mb-6">
             <OverviewCards />
           </div>
 
           {/* Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 border-b border-gray-100 dark:border-zinc-800">
-              <TabsList className="w-full sm:w-auto bg-transparent rounded-none h-auto p-0 flex gap-4 md:gap-6 justify-start overflow-x-auto border-none">
-                <TabsTrigger
-                  value="overview"
-                  className="text-xs gap-1.5 px-0 py-2.5 rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-black] dark:data-[state=active]:text-white text-[--roam-gray-mid] hover:text-[--roam-black] dark:hover:text-white font-medium data-[state=active]:font-semibold transition-all cursor-pointer"
-                >
-                  <LayoutDashboard className={`h-3.5 w-3.5 ${activeTab === 'overview' ? 'text-[--roam-orange]' : 'text-[--roam-gray-mid]'}`} />
-                  <span>Overview</span>
-                </TabsTrigger>
-                <TabsTrigger
-                  value="stations"
-                  className="text-xs gap-1.5 px-0 py-2.5 rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-black] dark:data-[state=active]:text-white text-[--roam-gray-mid] hover:text-[--roam-black] dark:hover:text-white font-medium data-[state=active]:font-semibold transition-all cursor-pointer"
-                >
-                  <Map className={`h-3.5 w-3.5 ${activeTab === 'stations' ? 'text-[--roam-orange]' : 'text-[--roam-gray-mid]'}`} />
-                  <span>Stations</span>
-                </TabsTrigger>
-                <TabsTrigger
-                  value="analytics"
-                  className="text-xs gap-1.5 px-0 py-2.5 rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-black] dark:data-[state=active]:text-white text-[--roam-gray-mid] hover:text-[--roam-black] dark:hover:text-white font-medium data-[state=active]:font-semibold transition-all cursor-pointer"
-                >
-                  <BarChart3 className={`h-3.5 w-3.5 ${activeTab === 'analytics' ? 'text-[--roam-orange]' : 'text-[--roam-gray-mid]'}`} />
-                  <span>Analytics</span>
-                </TabsTrigger>
-                <TabsTrigger
-                  value="milestones"
-                  className="text-xs gap-1.5 px-0 py-2.5 rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-black] dark:data-[state=active]:text-white text-[--roam-gray-mid] hover:text-[--roam-black] dark:hover:text-white font-medium data-[state=active]:font-semibold transition-all cursor-pointer"
-                >
-                  <MilestoneIcon className={`h-3.5 w-3.5 ${activeTab === 'milestones' ? 'text-[--roam-orange]' : 'text-[--roam-gray-mid]'}`} />
-                  <span>Milestones</span>
-                </TabsTrigger>
-                <TabsTrigger
-                  value="activity"
-                  className="text-xs gap-1.5 px-0 py-2.5 rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-black] dark:data-[state=active]:text-white text-[--roam-gray-mid] hover:text-[--roam-black] dark:hover:text-white font-medium data-[state=active]:font-semibold transition-all cursor-pointer"
-                >
-                  <Rss className={`h-3.5 w-3.5 ${activeTab === 'activity' ? 'text-[--roam-orange]' : 'text-[--roam-gray-mid]'}`} />
-                  <span>Activity</span>
-                </TabsTrigger>
-              </TabsList>
-
-              {/* Info Badges - Dynamic */}
-              <div className="pb-2 sm:pb-0">
-                <InfoBadges />
-              </div>
+            {/* Operational Network Status sub-header */}
+            <div className="flex items-center justify-between border-b border-gray-200/60 dark:border-zinc-800 pb-3 mb-6">
+              <span className="text-xs font-bold uppercase tracking-wider text-[--roam-gray-dark] dark:text-zinc-300 flex items-center gap-2 font-display">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                Operational Network Status
+              </span>
+              <InfoBadges />
             </div>
 
             {/* Overview Tab */}
@@ -260,10 +374,13 @@ export default function Dashboard() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-6 text-xs">
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
-                <div className="flex items-baseline">
-                  <span className="font-black text-xl tracking-tighter text-white">ROAM</span>
-                  <span className="font-black text-xl tracking-tighter text-white ml-0.5">ELECTRIC</span>
-                </div>
+                <a href="https://www.roam-electric.com" target="_blank" rel="noopener noreferrer" className="flex items-center">
+                  <img 
+                    src="https://cdn.prod.website-files.com/68491dec0c89cd3226833f4f/68491dec0c89cd3226833f72_Logo%20Light.svg" 
+                    alt="Roam Electric Logo" 
+                    className="h-5 w-auto" 
+                  />
+                </a>
                 <div className="text-center sm:text-left">
                   <p className="text-white/50 text-xs font-semibold uppercase tracking-wider">Charging Infrastructure Tracker</p>
                   <p className="text-white/40 mt-1">Data sourced from{' '}

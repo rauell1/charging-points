@@ -69,7 +69,7 @@ export function AnalyticsDashboard() {
     return (
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className="h-[320px] rounded-2xl" />
+          <Skeleton key={i} className="h-[320px] rounded-lg" />
         ))}
       </div>
     );
@@ -127,10 +127,10 @@ export function AnalyticsDashboard() {
     <div className="space-y-4">
       {/* Summary Cards Row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Card className="border border-gray-100 dark:border-zinc-850 rounded-2xl bg-white dark:bg-[#141414] shadow-sm">
+        <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-[#141414] shadow-none">
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
-              <div className="rounded-xl p-2 bg-[--roam-orange]/10 flex-shrink-0">
+              <div className="rounded-lg p-2 bg-[--roam-orange]/10 flex-shrink-0">
                 <BatteryCharging className="h-4 w-4 text-[--roam-orange]" />
               </div>
               <div>
@@ -140,10 +140,10 @@ export function AnalyticsDashboard() {
             </div>
           </CardContent>
         </Card>
-        <Card className="border border-gray-100 dark:border-zinc-850 rounded-2xl bg-white dark:bg-[#141414] shadow-sm">
+        <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-[#141414] shadow-none">
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
-              <div className="rounded-xl p-2 bg-[--roam-black]/10 dark:bg-white/10 flex-shrink-0">
+              <div className="rounded-lg p-2 bg-[--roam-black]/10 dark:bg-white/10 flex-shrink-0">
                 <Zap className="h-4 w-4 text-[--roam-black] dark:text-white" />
               </div>
               <div>
@@ -153,10 +153,10 @@ export function AnalyticsDashboard() {
             </div>
           </CardContent>
         </Card>
-        <Card className="border border-gray-100 dark:border-zinc-850 rounded-2xl bg-white dark:bg-[#141414] shadow-sm">
+        <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-[#141414] shadow-none">
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
-              <div className="rounded-xl p-2 bg-zinc-100 dark:bg-zinc-800 flex-shrink-0">
+              <div className="rounded-lg p-2 bg-zinc-100 dark:bg-zinc-800 flex-shrink-0">
                 <Radio className="h-4 w-4 text-zinc-500 dark:text-zinc-400" />
               </div>
               <div>
@@ -166,10 +166,10 @@ export function AnalyticsDashboard() {
             </div>
           </CardContent>
         </Card>
-        <Card className="border border-gray-100 dark:border-zinc-850 rounded-2xl bg-white dark:bg-[#141414] shadow-sm">
+        <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-[#141414] shadow-none">
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
-              <div className="rounded-xl p-2 bg-[--roam-orange]/10 flex-shrink-0">
+              <div className="rounded-lg p-2 bg-[--roam-orange]/10 flex-shrink-0">
                 <MapPin className="h-4 w-4 text-[--roam-orange]" />
               </div>
               <div>
@@ -184,9 +184,9 @@ export function AnalyticsDashboard() {
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Daily Sessions Trend */}
-        <Card className="border border-gray-100 dark:border-zinc-850 rounded-2xl bg-white dark:bg-[#141414] shadow-sm">
-          <CardHeader className="pb-3 border-b border-gray-50 dark:border-zinc-800">
-            <CardTitle className="text-sm font-semibold uppercase tracking-widest text-[--roam-gray-dark] dark:text-zinc-200 flex items-center gap-2">
+        <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-[#141414] shadow-none">
+          <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800">
+            <CardTitle className="text-sm font-bold uppercase tracking-widest text-[--roam-gray-dark] dark:text-zinc-200 flex items-center gap-2 font-display">
               <TrendingUp className="h-4 w-4 text-[--roam-orange]" /> Daily Charging Sessions (30 Days)
             </CardTitle>
           </CardHeader>
@@ -232,9 +232,9 @@ export function AnalyticsDashboard() {
         </Card>
 
         {/* Station Type Breakdown */}
-        <Card className="border border-gray-100 dark:border-zinc-850 rounded-2xl bg-white dark:bg-[#141414] shadow-sm">
-          <CardHeader className="pb-3 border-b border-gray-50 dark:border-zinc-800">
-            <CardTitle className="text-sm font-semibold uppercase tracking-widest text-[--roam-gray-dark] dark:text-zinc-200 flex items-center gap-2">
+        <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-[#141414] shadow-none">
+          <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800">
+            <CardTitle className="text-sm font-bold uppercase tracking-widest text-[--roam-gray-dark] dark:text-zinc-200 flex items-center gap-2 font-display">
               <MapPin className="h-4 w-4 text-[--roam-orange]" /> Station Type Distribution
             </CardTitle>
           </CardHeader>
@@ -295,9 +295,9 @@ export function AnalyticsDashboard() {
         </Card>
 
         {/* Sessions by Station - Top 12 */}
-        <Card className="border border-gray-100 dark:border-zinc-850 rounded-2xl bg-white dark:bg-[#141414] shadow-sm">
-          <CardHeader className="pb-3 border-b border-gray-50 dark:border-zinc-800">
-            <CardTitle className="text-sm font-semibold uppercase tracking-widest text-[--roam-gray-dark] dark:text-zinc-200 flex items-center gap-2">
+        <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-[#141414] shadow-none">
+          <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800">
+            <CardTitle className="text-sm font-bold uppercase tracking-widest text-[--roam-gray-dark] dark:text-zinc-200 flex items-center gap-2 font-display">
               <BarChart3 className="h-4 w-4 text-[--roam-orange]" /> Top Stations by Sessions
             </CardTitle>
           </CardHeader>
@@ -332,9 +332,9 @@ export function AnalyticsDashboard() {
         </Card>
 
         {/* Vehicle Type Distribution */}
-        <Card className="border border-gray-100 dark:border-zinc-850 rounded-2xl bg-white dark:bg-[#141414] shadow-sm">
-          <CardHeader className="pb-3 border-b border-gray-50 dark:border-zinc-800">
-            <CardTitle className="text-sm font-semibold uppercase tracking-widest text-[--roam-gray-dark] dark:text-zinc-200 flex items-center gap-2">
+        <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-[#141414] shadow-none">
+          <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800">
+            <CardTitle className="text-sm font-bold uppercase tracking-widest text-[--roam-gray-dark] dark:text-zinc-200 flex items-center gap-2 font-display">
               <Zap className="h-4 w-4 text-[--roam-orange]" /> Vehicle Type Distribution
             </CardTitle>
           </CardHeader>

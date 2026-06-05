@@ -1,14 +1,15 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { MapPin, BatteryCharging, Zap, Radio, Filter } from 'lucide-react';
-import { GoogleMap, useLoadScript, Marker, InfoWindow } from '@react-google-maps/api';
+import { useTheme } from 'next-themes';
+import 'leaflet/dist/leaflet.css';
 
 interface Station {
   id: string;
@@ -37,98 +38,25 @@ const filterButtons: { value: MapFilter; label: string; icon: React.ElementType 
   { value: 'kiosk', label: 'Kiosks', icon: Radio },
 ];
 
-const mapStyles = [
-  {
-    elementType: 'geometry',
-    stylers: [{ color: '#f5f5f5' }],
-  },
-  {
-    elementType: 'labels.icon',
-    stylers: [{ visibility: 'off' }],
-  },
-  {
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#616161' }],
-  },
-  {
-    elementType: 'labels.text.stroke',
-    stylers: [{ color: '#f5f5f5' }],
-  },
-  {
-    featureType: 'administrative.land_parcel',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#bdbdbd' }],
-  },
-  {
-    featureType: 'poi',
-    elementType: 'geometry',
-    stylers: [{ color: '#eeeeee' }],
-  },
-  {
-    featureType: 'poi',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#757575' }],
-  },
-  {
-    featureType: 'poi.park',
-    elementType: 'geometry',
-    stylers: [{ color: '#e5e5e5' }],
-  },
-  {
-    featureType: 'poi.park',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#9e9e9e' }],
-  },
-  {
-    featureType: 'road',
-    elementType: 'geometry',
-    stylers: [{ color: '#ffffff' }],
-  },
-  {
-    featureType: 'road.arterial',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#757575' }],
-  },
-  {
-    featureType: 'road.highway',
-    elementType: 'geometry',
-    stylers: [{ color: '#dadada' }],
-  },
-  {
-    featureType: 'road.highway',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#616161' }],
-  },
-  {
-    featureType: 'road.local',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#9e9e9e' }],
-  },
-  {
-    featureType: 'transit.line',
-    elementType: 'geometry',
-    stylers: [{ color: '#e5e5e5' }],
-  },
-  {
-    featureType: 'transit.station',
-    elementType: 'geometry',
-    stylers: [{ color: '#eeeeee' }],
-  },
-  {
-    featureType: 'water',
-    elementType: 'geometry',
-    stylers: [{ color: '#c9c9c9' }],
-  },
-  {
-    featureType: 'water',
-    elementType: 'labels.text.fill',
-    stylers: [{ color: '#9e9e9e' }],
-  },
-];
-
 function StationMapInner() {
   const [mapFilter, setMapFilter] = useState<MapFilter>('all');
   const [selectedStation, setSelectedStation] = useState<Station | null>(null);
+  const { resolvedTheme } = useTheme();
+
+  const [L, setL] = useState<any>(null);
+  const mapRef = useRef<HTMLDivElement>(null);
+  const leafletMapRef = useRef<any>(null);
+  const tileLayerRef = useRef<any>(null);
+  const markersLayerRef = useRef<any>(null);
+
+  // Load Leaflet module dynamically on client side
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      import('leaflet').then((module) => {
+        setL(module.default);
+      });
+    }
+  }, []);
 
   const { data: stations, isLoading: queryLoading } = useQuery<Station[]>({
     queryKey: ['stations'],
@@ -138,12 +66,6 @@ function StationMapInner() {
     }),
   });
 
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
-
-  const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: apiKey,
-  });
-
   const filteredStations = useMemo(() => {
     if (!stations) return [];
     if (mapFilter === 'all') return stations;
@@ -151,72 +73,183 @@ function StationMapInner() {
     return stations.filter((s) => s.type === mapFilter);
   }, [stations, mapFilter]);
 
-  const mapCenter = { lat: -1.286389, lng: 36.817223 }; // Nairobi
+  // Initialize Map
+  useEffect(() => {
+    if (!L || !mapRef.current || leafletMapRef.current) return;
 
-  // Marker icons matching specifications
-  const getMarkerIcon = (type: string) => {
-    if (!isLoaded || typeof window === 'undefined' || !window.google) return undefined;
-    if (type === 'hub') {
-      return {
-        url: `data:image/svg+xml;utf-8,${encodeURIComponent(`
-          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+    // Initialize Leaflet map
+    const map = L.map(mapRef.current, {
+      center: [-1.286389, 36.817223], // Nairobi
+      zoom: 11,
+      zoomControl: true,
+      attributionControl: false,
+    });
+
+    leafletMapRef.current = map;
+    markersLayerRef.current = L.layerGroup().addTo(map);
+
+    // Initial tile layer setup
+    const isDark = resolvedTheme === 'dark';
+    const tileUrl = isDark 
+      ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+      : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+
+    const attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
+
+    tileLayerRef.current = L.tileLayer(tileUrl, {
+      maxZoom: 19,
+      attribution,
+    }).addTo(map);
+
+    return () => {
+      if (leafletMapRef.current) {
+        leafletMapRef.current.remove();
+        leafletMapRef.current = null;
+        tileLayerRef.current = null;
+        markersLayerRef.current = null;
+      }
+    };
+  }, [L, queryLoading]);
+
+  // Handle dark/light theme tile swapping
+  useEffect(() => {
+    if (!L || !leafletMapRef.current) return;
+
+    if (tileLayerRef.current) {
+      tileLayerRef.current.remove();
+    }
+
+    const isDark = resolvedTheme === 'dark';
+    const tileUrl = isDark 
+      ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+      : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+
+    const attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
+
+    tileLayerRef.current = L.tileLayer(tileUrl, {
+      maxZoom: 19,
+      attribution,
+    }).addTo(leafletMapRef.current);
+  }, [L, resolvedTheme]);
+
+  // Update Markers
+  useEffect(() => {
+    if (!L || !leafletMapRef.current || !markersLayerRef.current) return;
+
+    // Clear existing layers
+    markersLayerRef.current.clearLayers();
+
+    // Helper to generate marker icons
+    const getLeafletIcon = (type: string) => {
+      let html = '';
+      let size: [number, number] = [20, 20];
+      let anchor: [number, number] = [10, 20];
+      
+      if (type === 'hub') {
+        size = [32, 32];
+        anchor = [16, 32];
+        html = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" class="drop-shadow-md">
             <path fill="#E8621A" stroke="#FFFFFF" stroke-width="2" d="M16 2C9.4 2 4 7.4 4 14c0 7.2 11.2 16 12 16s12-8.8 12-16c0-6.6-5.4-12-12-12z"/>
             <circle cx="16" cy="14" r="5" fill="#FFFFFF"/>
           </svg>
-        `)}`,
-        scaledSize: new window.google.maps.Size(32, 32),
-        anchor: new window.google.maps.Point(16, 32),
-      };
-    } else if (type === 'point') {
-      return {
-        url: `data:image/svg+xml;utf-8,${encodeURIComponent(`
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+        `;
+      } else if (type === 'point') {
+        size = [24, 24];
+        anchor = [12, 24];
+        html = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="drop-shadow-md">
             <path fill="#0D0D0D" stroke="#FFFFFF" stroke-width="2" d="M12 2C7.6 2 4 5.6 4 10c0 5.2 8 12 8 12s8-6.8 8-12c0-4.4-3.6-8-8-8z"/>
             <circle cx="12" cy="10" r="3.5" fill="#FFFFFF"/>
           </svg>
-        `)}`,
-        scaledSize: new window.google.maps.Size(24, 24),
-        anchor: new window.google.maps.Point(12, 24),
-      };
-    } else {
-      return {
-        url: `data:image/svg+xml;utf-8,${encodeURIComponent(`
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
+        `;
+      } else {
+        size = [20, 20];
+        anchor = [10, 20];
+        html = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" class="drop-shadow-md">
             <path fill="#9A9A9A" stroke="#FFFFFF" stroke-width="1.5" d="M10 2C6.7 2 4 4.7 4 8c0 4.2 6 10 6 10s6-5.8 6-10c0-3.3-2.7-6-6-6z"/>
             <circle cx="10" cy="8" r="2.5" fill="#FFFFFF"/>
           </svg>
-        `)}`,
-        scaledSize: new window.google.maps.Size(20, 20),
-        anchor: new window.google.maps.Point(10, 20),
-      };
-    }
-  };
+        `;
+      }
 
-  if (!apiKey) {
-    return (
-      <Card className="border border-[--roam-orange] rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-sm">
-        <CardHeader className="pb-3 border-b border-gray-50 dark:border-zinc-800">
-          <CardTitle className="text-sm font-semibold uppercase tracking-widest text-[--roam-gray-dark] dark:text-zinc-200 flex items-center gap-2">
-            <MapPin className="h-4 w-4 text-[--roam-orange]" /> Station Map
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="h-[300px] md:h-[450px] flex flex-col items-center justify-center text-center p-6 gap-3">
-          <MapPin className="h-10 w-10 text-[--roam-orange] animate-bounce" />
-          <p className="text-sm font-medium text-[--roam-gray-dark] dark:text-zinc-300">
-            Map unavailable — add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to environment variables
-          </p>
-        </CardContent>
-      </Card>
+      return L.divIcon({
+        html,
+        className: 'custom-map-marker',
+        iconSize: size,
+        iconAnchor: anchor,
+        popupAnchor: [0, -size[1]],
+      });
+    };
+
+    const createPopupHtml = (station: Station) => {
+      const statusColorClass = 
+        station.status === 'operational'
+          ? 'bg-[#FFF0E8] text-[#E8621A] dark:bg-[--roam-orange]/20 dark:text-[--roam-orange]'
+          : station.status === 'construction'
+            ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-405'
+            : station.status === 'blocked'
+              ? 'bg-red-50 text-red-650 dark:bg-red-950/20 dark:text-red-450'
+              : 'bg-zinc-100 text-zinc-650 dark:bg-zinc-800 dark:text-zinc-400';
+
+      return `
+        <div class="p-1 min-w-[160px] font-sans">
+          <h4 class="font-bold text-xs uppercase tracking-wider text-stone-900 dark:text-white mb-0.5">${station.name}</h4>
+          <p class="text-[10px] text-stone-500 dark:text-stone-400 mb-1.5">${station.neighborhood || station.city}</p>
+          <div class="flex items-center gap-1.5 mt-1">
+            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full ${statusColorClass}">
+              ${station.status}
+            </span>
+            <span class="text-[10px] text-stone-600 dark:text-stone-300 font-semibold">
+              ${station.chargerCount} chargers
+            </span>
+          </div>
+        </div>
+      `;
+    };
+
+    // Add markers to the group layer
+    filteredStations.forEach((station) => {
+      if (station.latitude == null || station.longitude == null) return;
+
+      const marker = L.marker([station.latitude, station.longitude], {
+        icon: getLeafletIcon(station.type),
+      });
+
+      marker.bindPopup(createPopupHtml(station), {
+        closeButton: false,
+        className: 'custom-leaflet-popup',
+      });
+
+      marker.addTo(markersLayerRef.current);
+    });
+
+    // Handle map centering and bounds zoom-capped fitting
+    const validStations = filteredStations.filter(
+      (s) => s.latitude != null && s.longitude != null
     );
-  }
 
-  const isLoading = queryLoading || !isLoaded;
+    if (validStations.length > 0) {
+      const bounds = L.latLngBounds(
+        validStations.map((s) => [s.latitude!, s.longitude!])
+      );
+      leafletMapRef.current.fitBounds(bounds, {
+        padding: [30, 30],
+        maxZoom: 14,
+      });
+    } else {
+      leafletMapRef.current.setView([-1.286389, 36.817223], 11);
+    }
+  }, [L, filteredStations]);
+
+  const isLoading = queryLoading || !L;
 
   return (
-    <Card className="border border-gray-100 dark:border-zinc-850 rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-sm">
-      <CardHeader className="pb-3 border-b border-gray-50 dark:border-zinc-800">
+    <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden bg-white dark:bg-[#141414] shadow-none">
+      <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <CardTitle className="text-sm font-semibold uppercase tracking-widest text-[--roam-gray-dark] dark:text-zinc-200 flex items-center gap-2">
+          <CardTitle className="text-sm font-semibold uppercase tracking-widest text-[--roam-gray-dark] dark:text-zinc-200 flex items-center gap-2 font-display">
             <MapPin className="h-4 w-4 text-[--roam-orange]" /> Station Map
           </CardTitle>
           <div className="flex items-center w-full overflow-x-auto scrollbar-none flex-nowrap gap-1.5 pb-2 sm:pb-0 sm:w-auto">
@@ -238,72 +271,22 @@ function StationMapInner() {
           </div>
         </div>
       </CardHeader>
-      <CardContent className="p-0 relative">
+      <CardContent className="p-0 relative bg-zinc-50 dark:bg-zinc-950">
         {isLoading ? (
           <Skeleton className="h-[300px] md:h-[450px] w-full rounded-none" />
-        ) : loadError ? (
-          <div className="h-[300px] md:h-[450px] flex items-center justify-center p-6 text-red-500 text-sm font-medium">
-            Error loading Google Maps script. Check your API key.
-          </div>
         ) : (
-          <div className="relative w-full h-[300px] md:h-[450px]">
-            {/* Station count badge overlay */}
-            <div className="absolute top-3 right-3 z-10">
-              <Badge className="bg-[--roam-orange-light] text-[--roam-orange] dark:bg-[--roam-orange]/20 hover:bg-[--roam-orange-light] border-none text-xs font-semibold px-2.5 py-1">
-                {filteredStations.length} stations
-              </Badge>
-            </div>
+          <div 
+            ref={mapRef} 
+            className="w-full h-[300px] md:h-[450px] z-0" 
+          />
+        )}
 
-            <GoogleMap
-              mapContainerClassName="w-full h-full"
-              center={mapCenter}
-              zoom={11}
-              options={{
-                disableDefaultUI: true,
-                zoomControl: true,
-                styles: mapStyles,
-              }}
-            >
-              {filteredStations.map((station) => {
-                if (station.latitude == null || station.longitude == null) return null;
-                return (
-                  <Marker
-                    key={station.id}
-                    position={{ lat: station.latitude, lng: station.longitude }}
-                    icon={getMarkerIcon(station.type)}
-                    onClick={() => setSelectedStation(station)}
-                  />
-                );
-              })}
-
-              {selectedStation && selectedStation.latitude != null && selectedStation.longitude != null && (
-                <InfoWindow
-                  position={{ lat: selectedStation.latitude, lng: selectedStation.longitude }}
-                  onCloseClick={() => setSelectedStation(null)}
-                >
-                  <div className="text-zinc-900 p-1 min-w-[150px] font-sans">
-                    <h4 className="font-bold text-xs mb-1 uppercase tracking-wider text-[#0D0D0D]">{selectedStation.name}</h4>
-                    <p className="text-[10px] text-zinc-500 mb-1.5">{selectedStation.neighborhood || selectedStation.city}</p>
-                    <div className="flex items-center gap-1.5 mt-1">
-                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
-                        selectedStation.status === 'operational'
-                          ? 'bg-[#FFF0E8] text-[#E8621A]'
-                          : selectedStation.status === 'construction'
-                            ? 'bg-amber-50 text-amber-700'
-                            : selectedStation.status === 'blocked'
-                              ? 'bg-red-50 text-red-600'
-                              : 'bg-zinc-100 text-zinc-500'
-                      }`}>
-                        {selectedStation.status}
-                      </span>
-                      <span className="text-[10px] text-zinc-500 font-semibold">
-                        {selectedStation.chargerCount} chargers
-                      </span>
-                    </div>
-                  </div>
-                </InfoWindow>
-              )}
-            </GoogleMap>
+        {/* Station count badge overlay */}
+        {!isLoading && (
+          <div className="absolute top-3 right-3 z-10 pointer-events-none">
+            <Badge className="bg-[--roam-orange-light] text-[--roam-orange] dark:bg-[--roam-orange]/20 hover:bg-[--roam-orange-light] border-none text-xs font-semibold px-2.5 py-1">
+              {filteredStations.length} stations
+            </Badge>
           </div>
         )}
       </CardContent>

@@ -59,13 +59,13 @@ export function MilestonesTimeline() {
 
   if (isLoading) {
     return (
-      <Card className="border border-gray-100 dark:border-zinc-850 rounded-2xl bg-white dark:bg-[#141414] shadow-sm">
-        <CardHeader className="pb-3 border-b border-gray-50 dark:border-zinc-800">
+      <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-[#141414] shadow-none">
+        <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800">
           <Skeleton className="h-5 w-40" />
         </CardHeader>
         <CardContent className="space-y-4 pt-4">
           {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} className="h-16 rounded-xl" />
+            <Skeleton key={i} className="h-16 rounded-lg" />
           ))}
         </CardContent>
       </Card>
@@ -73,10 +73,10 @@ export function MilestonesTimeline() {
   }
 
   return (
-    <Card className="border border-gray-100 dark:border-zinc-850 rounded-2xl bg-white dark:bg-[#141414] shadow-sm">
-      <CardHeader className="pb-3 border-b border-gray-50 dark:border-zinc-800">
+    <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-[#141414] shadow-none">
+      <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-          <CardTitle className="text-sm font-semibold uppercase tracking-widest text-[--roam-gray-dark] dark:text-zinc-200 flex items-center gap-2">
+          <CardTitle className="text-sm font-bold uppercase tracking-widest text-[--roam-gray-dark] dark:text-zinc-200 flex items-center gap-2 font-display">
             <MilestoneIcon className="h-4 w-4 text-[--roam-orange]" /> Infrastructure Milestones
           </CardTitle>
           <div className="flex items-center gap-2">

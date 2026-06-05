@@ -32,13 +32,13 @@ function StatCard({
   icon: React.ElementType;
 }) {
   return (
-    <div className="bg-white dark:bg-[#141414] border border-gray-100 dark:border-zinc-800 rounded-2xl shadow-sm hover:shadow-md transition-all border-l-2 border-l-transparent hover:border-l-[--roam-orange]">
+    <div className="bg-white dark:bg-[#141414] border border-zinc-200 dark:border-zinc-800 rounded-lg transition-all border-l-2 border-l-transparent hover:border-l-[--roam-orange] hover:border-zinc-300 dark:hover:border-zinc-700">
       <div className="p-3 md:p-5 flex items-start justify-between gap-2">
         <div className="space-y-1 min-w-0">
           <p className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid]">
             {title}
           </p>
-          <p className="text-3xl font-black text-[--roam-black] dark:text-white leading-tight truncate">
+          <p className="text-3xl font-black text-[--roam-black] dark:text-white leading-tight truncate font-display">
             {value}
           </p>
           {subtitle && (

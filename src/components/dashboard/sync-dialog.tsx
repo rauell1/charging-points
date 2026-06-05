@@ -442,7 +442,7 @@ export function SyncDialog() {
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogTrigger asChild>
-        <Button className="bg-[--roam-orange] text-white hover:bg-[#c94d0e] rounded-full px-4 py-1.5 h-8 text-xs font-semibold gap-1.5 border-none transition-all cursor-pointer flex-shrink-0">
+        <Button className="bg-[--roam-orange] text-white hover:bg-[--roam-orange]/90 rounded-full px-4 py-1.5 h-8 text-xs font-semibold gap-1.5 border-none transition-all cursor-pointer flex-shrink-0">
           <CloudUpload className="h-3.5 w-3.5 text-white" />
           <span>Sync Data</span>
         </Button>
@@ -462,25 +462,25 @@ export function SyncDialog() {
           <TabsList className="w-full bg-transparent border-b rounded-none h-auto p-0 flex gap-4">
             <TabsTrigger
               value="upload"
-              className="rounded-none px-0 py-2 bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-black] dark:data-[state=active]:text-white text-[--roam-gray-mid] font-medium cursor-pointer"
+              className="rounded-none px-0 py-2 bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] dark:data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] font-medium cursor-pointer"
             >
               Upload
             </TabsTrigger>
             <TabsTrigger
               value="auto"
-              className="rounded-none px-0 py-2 bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-black] dark:data-[state=active]:text-white text-[--roam-gray-mid] font-medium cursor-pointer"
+              className="rounded-none px-0 py-2 bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] dark:data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] font-medium cursor-pointer"
             >
               Auto Sync
             </TabsTrigger>
             <TabsTrigger
               value="history"
-              className="rounded-none px-0 py-2 bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-black] dark:data-[state=active]:text-white text-[--roam-gray-mid] font-medium cursor-pointer"
+              className="rounded-none px-0 py-2 bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] dark:data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] font-medium cursor-pointer"
             >
               History
             </TabsTrigger>
             <TabsTrigger
               value="api"
-              className="rounded-none px-0 py-2 bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-black] dark:data-[state=active]:text-white text-[--roam-gray-mid] font-medium cursor-pointer"
+              className="rounded-none px-0 py-2 bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] dark:data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] font-medium cursor-pointer"
             >
               API Reference
             </TabsTrigger>

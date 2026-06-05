@@ -221,19 +221,19 @@ export function StationTable() {
         <TabsList className="w-full bg-transparent border-b rounded-none h-auto p-0 flex gap-4">
           <TabsTrigger
             value="overview"
-            className="rounded-none px-0 py-2 bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-black] dark:data-[state=active]:text-white text-[--roam-gray-mid] font-medium cursor-pointer"
+            className="rounded-none px-0 py-2 bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] dark:data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] font-medium cursor-pointer"
           >
             Overview
           </TabsTrigger>
           <TabsTrigger
             value="sessions"
-            className="rounded-none px-0 py-2 bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-black] dark:data-[state=active]:text-white text-[--roam-gray-mid] font-medium cursor-pointer"
+            className="rounded-none px-0 py-2 bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] dark:data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] font-medium cursor-pointer"
           >
             Sessions
           </TabsTrigger>
           <TabsTrigger
             value="activity"
-            className="rounded-none px-0 py-2 bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-black] dark:data-[state=active]:text-white text-[--roam-gray-mid] font-medium cursor-pointer"
+            className="rounded-none px-0 py-2 bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] dark:data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] font-medium cursor-pointer"
           >
             Activity
           </TabsTrigger>
@@ -243,21 +243,21 @@ export function StationTable() {
           <TabsContent value="overview" className="space-y-4 pr-2 mt-0">
             {/* Status and Quick Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <div className="rounded-xl border border-gray-100 dark:border-zinc-800 bg-white dark:bg-[#141414] p-3 text-center">
+              <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#141414] p-3 text-center">
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid]">Status</p>
                 <Badge className={`mt-1.5 ${(statusConfig[currentDetail.status] || statusConfig.planned).className}`}>
                   {(statusConfig[currentDetail.status] || statusConfig.planned).label}
                 </Badge>
               </div>
-              <div className="rounded-xl border border-gray-100 dark:border-zinc-800 bg-white dark:bg-[#141414] p-3 text-center">
+              <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#141414] p-3 text-center">
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid]">Chargers</p>
                 <p className="text-lg font-black text-[--roam-black] dark:text-white mt-1">{currentDetail.chargerCount}</p>
               </div>
-              <div className="rounded-xl border border-gray-100 dark:border-zinc-800 bg-white dark:bg-[#141414] p-3 text-center">
+              <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#141414] p-3 text-center">
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid]">Power Output</p>
                 <p className="text-lg font-black text-[--roam-black] dark:text-white mt-1">{currentDetail.powerOutputKw || currentDetail.totalKw || 0} kW</p>
               </div>
-              <div className="rounded-xl border border-gray-100 dark:border-zinc-800 bg-white dark:bg-[#141414] p-3 text-center">
+              <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#141414] p-3 text-center">
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid]">Sessions</p>
                 <p className="text-lg font-black text-[--roam-black] dark:text-white mt-1">
                   {currentDetail._count?.sessions ?? sessions.length ?? 0}
@@ -267,8 +267,8 @@ export function StationTable() {
 
             {/* Details Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card className="border border-gray-100 dark:border-zinc-850 rounded-xl bg-white dark:bg-[#141414] shadow-sm">
-                <CardHeader className="pb-2 border-b border-gray-50 dark:border-zinc-800">
+              <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-[#141414] shadow-none">
+                <CardHeader className="pb-2 border-b border-zinc-100 dark:border-zinc-800">
                   <CardTitle className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid]">Station Details</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2.5 text-xs pt-3">
@@ -334,8 +334,8 @@ export function StationTable() {
                 </CardContent>
               </Card>
 
-              <Card className="border border-gray-100 dark:border-zinc-850 rounded-xl bg-white dark:bg-[#141414] shadow-sm">
-                <CardHeader className="pb-2 border-b border-gray-50 dark:border-zinc-800">
+              <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-[#141414] shadow-none">
+                <CardHeader className="pb-2 border-b border-zinc-100 dark:border-zinc-800">
                   <CardTitle className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid]">Quick Analytics</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4 pt-3">
@@ -366,8 +366,8 @@ export function StationTable() {
 
           <TabsContent value="sessions" className="space-y-4 pr-2 mt-0">
             {sessionChartData.length > 0 && (
-              <Card className="border border-gray-100 dark:border-zinc-855 rounded-xl bg-white dark:bg-[#141414]">
-                <CardHeader className="pb-2 border-b border-gray-50 dark:border-zinc-800">
+              <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-[#141414] shadow-none">
+                <CardHeader className="pb-2 border-b border-zinc-100 dark:border-zinc-800">
                   <CardTitle className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid] flex items-center gap-2">
                     <TrendingUp className="h-4 w-4 text-[--roam-orange]" /> Daily Sessions
                   </CardTitle>
@@ -394,8 +394,8 @@ export function StationTable() {
             )}
 
             {vehicleTypeData.length > 0 && (
-              <Card className="border border-gray-100 dark:border-zinc-855 rounded-xl bg-white dark:bg-[#141414]">
-                <CardHeader className="pb-2 border-b border-gray-50 dark:border-zinc-800">
+              <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-[#141414] shadow-none">
+                <CardHeader className="pb-2 border-b border-zinc-100 dark:border-zinc-800">
                   <CardTitle className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid]">Sessions by Vehicle Type</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-3">
@@ -420,8 +420,8 @@ export function StationTable() {
             )}
 
             {/* Recent Sessions */}
-            <Card className="border border-gray-100 dark:border-zinc-855 rounded-xl bg-white dark:bg-[#141414]">
-              <CardHeader className="pb-2 border-b border-gray-50 dark:border-zinc-800">
+            <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-[#141414] shadow-none">
+              <CardHeader className="pb-2 border-b border-zinc-100 dark:border-zinc-800">
                 <CardTitle className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid]">Recent Sessions</CardTitle>
               </CardHeader>
               <CardContent className="p-0">
@@ -501,10 +501,10 @@ export function StationTable() {
 
   return (
     <>
-      <Card className="border border-gray-100 dark:border-zinc-850 rounded-2xl overflow-hidden bg-white dark:bg-[#141414] shadow-sm">
-        <CardHeader className="pb-3 border-b border-gray-50 dark:border-zinc-800">
+      <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden bg-white dark:bg-[#141414] shadow-none">
+        <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <CardTitle className="text-sm font-semibold uppercase tracking-widest text-[--roam-gray-dark] dark:text-zinc-200">Charging Stations</CardTitle>
+            <CardTitle className="text-sm font-bold uppercase tracking-widest text-[--roam-gray-dark] dark:text-zinc-200 font-display">Charging Stations</CardTitle>
             <Select value={filter} onValueChange={setFilter}>
               <SelectTrigger className="w-[160px] h-8 text-xs rounded-full cursor-pointer">
                 <SelectValue placeholder="Filter" />
