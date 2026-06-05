@@ -16,14 +16,6 @@ import { Button } from '@/components/ui/button';
 import { SyncDialog } from '@/components/dashboard/sync-dialog';
 import { useTheme } from 'next-themes';
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-  SheetClose,
-} from '@/components/ui/sheet';
-import {
   BatteryCharging,
   Zap,
   LayoutDashboard,
@@ -36,7 +28,6 @@ import {
   Mail,
   Sun,
   Moon,
-  Menu,
 } from 'lucide-react';
 
 const queryClient = new QueryClient({
@@ -112,55 +103,17 @@ export default function Dashboard() {
         <header className="bg-[#0D0D0D]/80 backdrop-blur-md text-white border-b border-white/10 sticky top-0 z-50 shadow-none h-14 md:h-16 flex items-center">
           <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
-                  <a href="https://www.roam-electric.com" target="_blank" rel="noopener noreferrer" className="flex items-center mr-1">
-                    <img 
-                      src="https://cdn.prod.website-files.com/68491dec0c89cd3226833f4f/68491dec0c89cd3226833f72_Logo%20Light.svg" 
-                      alt="Roam Electric Logo" 
-                      className="h-5 md:h-6 w-auto brightness-0 invert" 
-                    />
+                  <a href="https://www.roam-electric.com" target="_blank" rel="noopener noreferrer" className="flex items-baseline mr-1 text-white hover:text-[--roam-orange] transition-colors">
+                    <span className="font-black text-2xl tracking-tighter">ROAM</span>
+                    <span className="font-black text-2xl tracking-tighter hidden sm:inline ml-1">ELECTRIC</span>
                   </a>
                   <Badge className="bg-[--roam-orange] text-white text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full border-none hover:bg-[--roam-orange] hidden md:flex">
                     Charging Infrastructure Tracker
                   </Badge>
                 </div>
-                <Badge variant="secondary" className="text-[10px] hidden lg:flex bg-white/10 text-white/90 border-none">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[--roam-orange] mr-1.5 animate-pulse" />
-                  Live Tracking
-                </Badge>
               </div>
-
-              {/* Center navigation links for desktop */}
-              <nav className="hidden md:flex items-center gap-6">
-                {[
-                  { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-                  { id: 'stations', label: 'Stations', icon: Map },
-                  { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-                  { id: 'milestones', label: 'Milestones', icon: MilestoneIcon },
-                  { id: 'activity', label: 'Activity', icon: Rss },
-                ].map((item) => {
-                  const Icon = item.icon;
-                  const isActive = activeTab === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => setActiveTab(item.id)}
-                      className={`flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer py-1 relative hover:text-white ${
-                        isActive 
-                          ? 'text-[--roam-orange]' 
-                          : 'text-white/60'
-                      }`}
-                    >
-                      <Icon className="h-3.5 w-3.5" />
-                      {item.label}
-                      {isActive && (
-                        <span className="absolute bottom-[-16px] left-0 right-0 h-0.5 bg-[--roam-orange] rounded-full" />
-                      )}
-                    </button>
-                  );
-                })}
-              </nav>
 
               <div className="flex items-center gap-1.5">
                 <SyncDialog />
@@ -184,109 +137,6 @@ export default function Dashboard() {
                 </div>
                 
                 <ThemeToggle />
- 
-                {/* Mobile hamburger navigation drawer */}
-                <Sheet>
-                  <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon" className="sm:hidden h-9 w-9 rounded-full hover:bg-white/10 text-white cursor-pointer">
-                      <Menu className="h-5 w-5 text-white" />
-                    </Button>
-                  </SheetTrigger>
-                  <SheetContent side="right" className="bg-[#0D0D0D]/95 backdrop-blur-md border-l border-white/10 text-white w-[260px] p-6 flex flex-col justify-between">
-                    <div className="space-y-6">
-                      <SheetHeader className="text-left">
-                        <SheetTitle className="text-white font-bold flex items-center gap-2">
-                          <img 
-                            src="https://cdn.prod.website-files.com/68491dec0c89cd3226833f4f/68491dec0c89cd3226833f72_Logo%20Light.svg" 
-                            alt="Roam Electric Logo" 
-                            className="h-5 w-auto brightness-0 invert" 
-                          />
-                        </SheetTitle>
-                      </SheetHeader>
-                      <div className="flex flex-col gap-2 mt-4">
-                        <SheetClose asChild>
-                          <Button
-                            variant="ghost"
-                            className={`w-full justify-start text-xs font-bold uppercase tracking-wider h-10 rounded-full ${
-                              activeTab === 'overview' ? 'text-[--roam-orange] bg-white/5' : 'text-white/70 hover:text-white hover:bg-white/5'
-                            }`}
-                            onClick={() => setActiveTab('overview')}
-                          >
-                            <LayoutDashboard className="h-4 w-4 mr-2.5" />
-                            Overview
-                          </Button>
-                        </SheetClose>
-                        <SheetClose asChild>
-                          <Button
-                            variant="ghost"
-                            className={`w-full justify-start text-xs font-bold uppercase tracking-wider h-10 rounded-full ${
-                              activeTab === 'stations' ? 'text-[--roam-orange] bg-white/5' : 'text-white/70 hover:text-white hover:bg-white/5'
-                            }`}
-                            onClick={() => setActiveTab('stations')}
-                          >
-                            <Map className="h-4 w-4 mr-2.5" />
-                            Stations
-                          </Button>
-                        </SheetClose>
-                        <SheetClose asChild>
-                          <Button
-                            variant="ghost"
-                            className={`w-full justify-start text-xs font-bold uppercase tracking-wider h-10 rounded-full ${
-                              activeTab === 'analytics' ? 'text-[--roam-orange] bg-white/5' : 'text-white/70 hover:text-white hover:bg-white/5'
-                            }`}
-                            onClick={() => setActiveTab('analytics')}
-                          >
-                            <BarChart3 className="h-4 w-4 mr-2.5" />
-                            Analytics
-                          </Button>
-                        </SheetClose>
-                        <SheetClose asChild>
-                          <Button
-                            variant="ghost"
-                            className={`w-full justify-start text-xs font-bold uppercase tracking-wider h-10 rounded-full ${
-                              activeTab === 'milestones' ? 'text-[--roam-orange] bg-white/5' : 'text-white/70 hover:text-white hover:bg-white/5'
-                            }`}
-                            onClick={() => setActiveTab('milestones')}
-                          >
-                            <MilestoneIcon className="h-4 w-4 mr-2.5" />
-                            Milestones
-                          </Button>
-                        </SheetClose>
-                        <SheetClose asChild>
-                          <Button
-                            variant="ghost"
-                            className={`w-full justify-start text-xs font-bold uppercase tracking-wider h-10 rounded-full ${
-                              activeTab === 'activity' ? 'text-[--roam-orange] bg-white/5' : 'text-white/70 hover:text-white hover:bg-white/5'
-                            }`}
-                            onClick={() => setActiveTab('activity')}
-                          >
-                            <Rss className="h-4 w-4 mr-2.5" />
-                            Activity
-                          </Button>
-                        </SheetClose>
-                      </div>
-                    </div>
-                    <div className="space-y-3 pt-6 border-t border-white/10">
-                      <a
-                        href="https://www.roam-electric.com"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full block"
-                      >
-                        <Button variant="ghost" className="w-full border border-white/20 text-white hover:bg-white hover:text-black rounded-full text-xs font-semibold">
-                          <ExternalLink className="h-3.5 w-3.5 mr-2" />
-                          Website
-                        </Button>
-                      </a>
-                      <a href="tel:+254740666555" className="w-full block">
-                        <Button variant="ghost" className="w-full border border-white/20 text-white hover:bg-white hover:text-black rounded-full text-xs font-semibold">
-                          <Phone className="h-3.5 w-3.5 mr-2" />
-                          Contact
-                        </Button>
-                      </a>
-                    </div>
-                  </SheetContent>
-                </Sheet>
               </div>
             </div>
           </div>
@@ -311,13 +161,49 @@ export default function Dashboard() {
 
           {/* Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            {/* Operational Network Status sub-header */}
-            <div className="flex items-center justify-between border-b border-gray-200/60 dark:border-zinc-800 pb-3 mb-6">
-              <span className="text-xs font-bold uppercase tracking-wider text-[--roam-gray-dark] dark:text-zinc-300 flex items-center gap-2 font-display">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                Operational Network Status
-              </span>
-              <InfoBadges />
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 border-b border-gray-200/60 dark:border-zinc-800 pb-2">
+              <TabsList className="w-full sm:w-auto bg-transparent rounded-none h-auto p-0 flex gap-4 md:gap-6 justify-start overflow-x-auto border-none">
+                <TabsTrigger
+                  value="overview"
+                  className="text-xs gap-1.5 px-0 py-2.5 rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] dark:data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] hover:text-[--roam-black] dark:hover:text-white font-bold uppercase tracking-wider transition-all cursor-pointer font-display"
+                >
+                  <LayoutDashboard className={`h-3.5 w-3.5 ${activeTab === 'overview' ? 'text-[--roam-orange]' : 'text-[--roam-gray-mid]'}`} />
+                  <span>Overview</span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="stations"
+                  className="text-xs gap-1.5 px-0 py-2.5 rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] dark:data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] hover:text-[--roam-black] dark:hover:text-white font-bold uppercase tracking-wider transition-all cursor-pointer font-display"
+                >
+                  <Map className={`h-3.5 w-3.5 ${activeTab === 'stations' ? 'text-[--roam-orange]' : 'text-[--roam-gray-mid]'}`} />
+                  <span>Stations</span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="analytics"
+                  className="text-xs gap-1.5 px-0 py-2.5 rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] dark:data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] hover:text-[--roam-black] dark:hover:text-white font-bold uppercase tracking-wider transition-all cursor-pointer font-display"
+                >
+                  <BarChart3 className={`h-3.5 w-3.5 ${activeTab === 'analytics' ? 'text-[--roam-orange]' : 'text-[--roam-gray-mid]'}`} />
+                  <span>Analytics</span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="milestones"
+                  className="text-xs gap-1.5 px-0 py-2.5 rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] dark:data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] hover:text-[--roam-black] dark:hover:text-white font-bold uppercase tracking-wider transition-all cursor-pointer font-display"
+                >
+                  <MilestoneIcon className={`h-3.5 w-3.5 ${activeTab === 'milestones' ? 'text-[--roam-orange]' : 'text-[--roam-gray-mid]'}`} />
+                  <span>Milestones</span>
+                </TabsTrigger>
+                <TabsTrigger
+                  value="activity"
+                  className="text-xs gap-1.5 px-0 py-2.5 rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] dark:data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] hover:text-[--roam-black] dark:hover:text-white font-bold uppercase tracking-wider transition-all cursor-pointer font-display"
+                >
+                  <Rss className={`h-3.5 w-3.5 ${activeTab === 'activity' ? 'text-[--roam-orange]' : 'text-[--roam-gray-mid]'}`} />
+                  <span>Activity</span>
+                </TabsTrigger>
+              </TabsList>
+
+              {/* Info Badges - Dynamic */}
+              <div className="pb-2 sm:pb-0">
+                <InfoBadges />
+              </div>
             </div>
 
             {/* Overview Tab */}
