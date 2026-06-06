@@ -120,15 +120,15 @@ function parseStatus(raw: string | null, defaultStatus = 'planned'): string {
 }
 
 function normalizeStationStatus(chargerId: string, type: string, status: string): string {
-  if (type === 'hub' && status === 'operational') {
+  if (type === 'hub') {
     const activeHubIds = new Set([
       '#RH-KE-A-01', '#RH-KE-A-02', '#RH-KE-A-03', '#RH-KE-A-04', '#RH-KE-A-05',
       '#RH-KE-A-06', '#RH-KE-A-07', '#RH-KE-A-08', '#RH-KE-A-10', '#RH-KE-A-11',
       '#RH-KE-A-16', '#RH-KE-A-17', '#RH-KE-A-24' // Langata - opposite Galleria Mall
     ]);
-    if (!activeHubIds.has(chargerId)) {
-      return 'planned';
-    }
+    // Whitelist is the source of truth: always operational if listed, always non-operational if not
+    if (activeHubIds.has(chargerId)) return 'operational';
+    if (status === 'operational') return 'planned'; // downgrade unlisted hubs
   }
   return status;
 }
