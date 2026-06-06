@@ -329,16 +329,15 @@ export default function AdminPage() {
       <header className="relative border-b border-white/5 px-6 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src="/logo.svg" alt="Roam Logo" className="h-9 w-9 bg-transparent" />
-            <div>
-              <div className="flex items-center gap-2">
-                <p className="text-white font-black text-sm tracking-tight uppercase">Roam Electric</p>
-                <div className="flex items-center gap-1 px-2 py-0.5 bg-[#E8621A]/10 border border-[#E8621A]/20 rounded-full">
-                  <Shield className="w-2.5 h-2.5 text-[#E8621A]" />
-                  <span className="text-[#E8621A] text-[10px] font-bold uppercase tracking-wider">Admin</span>
-                </div>
+            <a href="/">
+              <img src="/roam-logo-horizontal-orange.png" alt="Roam Logo" className="h-7 w-auto object-contain" />
+            </a>
+            <div className="flex items-center gap-2 border-l border-white/10 pl-3">
+              <div className="flex items-center gap-1 px-2 py-0.5 bg-[#E8621A]/10 border border-[#E8621A]/20 rounded-full">
+                <Shield className="w-2.5 h-2.5 text-[#E8621A]" />
+                <span className="text-[#E8621A] text-[10px] font-bold uppercase tracking-wider">Admin</span>
               </div>
-              <p className="text-white/40 text-xs">Infrastructure Status Control Panel</p>
+              <p className="text-white/40 text-xs hidden sm:block">Infrastructure Status Control Panel</p>
             </div>
           </div>
 

@@ -110,10 +110,8 @@ export default function Dashboard() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
-                  <a href="https://www.roam-electric.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 mr-1 text-white hover:text-[--roam-orange] transition-colors">
-                    <img src="/logo.svg" alt="Roam Logo" className="h-6 w-6" />
-                    <span className="font-black text-2xl tracking-tighter">ROAM</span>
-                    <span className="font-black text-2xl tracking-tighter hidden sm:inline ml-1">ELECTRIC</span>
+                  <a href="https://www.roam-electric.com" target="_blank" rel="noopener noreferrer" className="flex items-center mr-1 transition-opacity hover:opacity-85">
+                    <img src="/roam-logo-horizontal-orange.png" alt="Roam Logo" className="h-6 md:h-7 w-auto object-contain" />
                   </a>
                   <Badge className="bg-[--roam-orange] text-white text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full border-none hover:bg-[--roam-orange] hidden md:flex">
                     Charging Infrastructure Tracker

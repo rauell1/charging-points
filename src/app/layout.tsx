@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   keywords: ["Roam Electric", "EV Charging", "Kenya", "Roam Hub", "Roam Point", "Electric Mobility", "Africa"],
   authors: [{ name: "Roam Electric Infrastructure Tracker" }],
   icons: {
-    icon: "https://roam-electric.com/favicon.ico",
+    icon: "/roam-logo-mark.png",
   },
   openGraph: {
     title: "Roam Electric — Charging Infrastructure Tracker",
