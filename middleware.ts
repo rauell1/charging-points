@@ -1,38 +1,34 @@
-import { withAuth } from 'next-auth/middleware';
 import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-export default withAuth(
-  function middleware(req) {
-    const token = req.nextauth.token;
-    const email = token?.email as string | undefined;
+export function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
 
-    // Double-check domain even if token exists (defence in depth)
-    if (token && email && !email.endsWith('@roam-electric.com')) {
-      return NextResponse.redirect(new URL('/login?error=AccessDenied', req.url));
-    }
-
+  // Allow public paths through without any check
+  if (
+    pathname.startsWith('/login') ||
+    pathname.startsWith('/api/') ||
+    pathname.startsWith('/_next/') ||
+    pathname.startsWith('/favicon') ||
+    pathname.startsWith('/robots')
+  ) {
     return NextResponse.next();
-  },
-  {
-    callbacks: {
-      authorized: ({ token }) => !!token,
-    },
-    pages: {
-      signIn: '/login',
-    },
   }
-);
+
+  // Check for session cookie — NextAuth v4 uses __Secure- prefix on HTTPS
+  const sessionToken =
+    req.cookies.get('__Secure-next-auth.session-token') ??
+    req.cookies.get('next-auth.session-token');
+
+  if (!sessionToken) {
+    const loginUrl = new URL('/login', req.url);
+    loginUrl.searchParams.set('callbackUrl', pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  return NextResponse.next();
+}
 
 export const config = {
-  matcher: [
-    /*
-     * Protect ONLY page routes.
-     * Exclude:
-     *   /login               — sign-in page
-     *   /api/*               — all API routes have their own auth (NextAuth, API keys)
-     *   /_next/*             — Next.js internals
-     *   /favicon*, /robots*  — static files
-     */
-    '/((?!login|api|_next/static|_next/image|favicon|robots).*)',
-  ],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 };
