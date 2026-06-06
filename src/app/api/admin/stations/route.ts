@@ -14,7 +14,7 @@ async function requireAdmin() {
 export async function GET() {
   const session = await requireAdmin();
   if (!session) {
-    return NextResponse.json({ error: 'Unauthorized — admin only' }, { status: 403 });
+    return NextResponse.json({ error: 'Unauthorized - admin only' }, { status: 403 });
   }
 
   const stations = await db.chargingStation.findMany({
@@ -46,7 +46,7 @@ export async function GET() {
     // The smart rule: operational if sheet=operational AND launchDate <= today
     let smartRuleResult: string;
     if (s.statusOverride) {
-      // We don't know the raw sheet status easily — show override info
+      // We don't know the raw sheet status easily - show override info
       smartRuleResult = s.statusOverride;
     } else {
       smartRuleResult = s.status;
@@ -57,7 +57,7 @@ export async function GET() {
       smartRuleResult,
       hasOverride: !!s.statusOverride,
       overrideInfo: s.statusOverride
-        ? `Set by ${s.statusOverrideBy ?? 'admin'} on ${s.statusOverrideAt?.toLocaleDateString() ?? 'unknown date'}${s.statusOverrideNote ? ` — "${s.statusOverrideNote}"` : ''}`
+        ? `Set by ${s.statusOverrideBy ?? 'admin'} on ${s.statusOverrideAt?.toLocaleDateString() ?? 'unknown date'}${s.statusOverrideNote ? ` - "${s.statusOverrideNote}"` : ''}`
         : null,
     };
   });

@@ -16,7 +16,7 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Check for session cookie — NextAuth v4 uses __Secure- prefix on HTTPS
+  // Check for session cookie - NextAuth v4 uses __Secure- prefix on HTTPS
   const sessionToken =
     req.cookies.get('__Secure-next-auth.session-token') ??
     req.cookies.get('next-auth.session-token');

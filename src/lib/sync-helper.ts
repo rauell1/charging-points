@@ -120,10 +120,10 @@ function parseStatus(raw: string | null, defaultStatus = 'planned'): string {
 }
 
 /**
- * Option D — Smart status rule (no hardcoded whitelist).
+ * Option D - Smart status rule (no hardcoded whitelist).
  * A hub is operational if the sheet says Operational AND the launch date is today or past.
  * If no launch date, trust the sheet directly (covers pre-existing hubs without dates).
- * Admin statusOverride always takes full precedence — checked at write time.
+ * Admin statusOverride always takes full precedence - checked at write time.
  */
 function computeSmartStatus(
   type: string,
@@ -867,7 +867,7 @@ function extractString(row: Record<string, unknown>, possibleKeys: string[]): st
   for (const key of possibleKeys) {
     const val = row[key];
     if (val !== undefined && val !== null && String(val).trim() !== '') {
-      return String(val).trim();
+      return String(val).trim().replace(/\u2013/g, '-').replace(/\u2014/g, '-');
     }
   }
   return null;

@@ -21,7 +21,7 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user }) {
       const email = user.email ?? '';
       if (!email.endsWith(`@${ALLOWED_DOMAIN}`)) {
-        return false; // Block sign-in — redirects to /login?error=AccessDenied
+        return false; // Block sign-in - redirects to /login?error=AccessDenied
       }
       return true;
     },
@@ -49,7 +49,7 @@ export const authOptions: NextAuthOptions = {
   },
   session: {
     strategy: 'jwt',
-    maxAge: 8 * 60 * 60, // 8 hours — work day session
+    maxAge: 8 * 60 * 60, // 8 hours - work day session
   },
   secret: process.env.NEXTAUTH_SECRET,
 };

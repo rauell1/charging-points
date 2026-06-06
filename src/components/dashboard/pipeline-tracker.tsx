@@ -324,7 +324,7 @@ export function PipelineTracker() {
                             site.priorityBucket
                           )}`}
                         >
-                          {site.priorityBucket.replace(' – ', ' ').replace(' - ', ' ')}
+                          {site.priorityBucket.replace(' - ', ' ')}
                         </Badge>
                         <span className="block text-[10px] text-zinc-400 font-bold ml-1">
                           Score: {site.priorityScore}

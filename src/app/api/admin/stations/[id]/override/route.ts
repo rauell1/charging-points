@@ -11,7 +11,7 @@ export async function POST(
 ) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.email || session.user.email !== ADMIN_EMAIL) {
-    return NextResponse.json({ error: 'Unauthorized — admin only' }, { status: 403 });
+    return NextResponse.json({ error: 'Unauthorized - admin only' }, { status: 403 });
   }
 
   const { id } = await params;
@@ -35,7 +35,7 @@ export async function POST(
     where: { id },
     data: {
       // If clearing override, reset status to what smart rule computed last sync
-      // Just clear the override fields — next sync will recompute
+      // Just clear the override fields - next sync will recompute
       statusOverride: status,
       statusOverrideBy: status ? session.user.email : null,
       statusOverrideAt: status ? new Date() : null,

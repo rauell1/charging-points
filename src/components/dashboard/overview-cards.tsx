@@ -119,7 +119,7 @@ export function OverviewCards() {
 
   return (
     <div className="space-y-4 md:space-y-6">
-      {/* TIER 1 — Hero Split Stat Bar (full width, dark background #0D0D0D) */}
+      {/* TIER 1 - Hero Split Stat Bar (full width, dark background #0D0D0D) */}
       <div className="bg-[#0D0D0D] border border-zinc-900 rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xl relative overflow-hidden">
         {/* Subtle orange ambient glow on the right */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-[#E8621A] opacity-[0.03] rounded-full blur-3xl pointer-events-none" />
@@ -177,7 +177,7 @@ export function OverviewCards() {
         </div>
       </div>
 
-      {/* TIER 2 — Three infrastructure status cards (strictly Deployed vs Deploying) */}
+      {/* TIER 2 - Three infrastructure status cards (strictly Deployed vs Deploying) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
         {/* Card 1: ROAM HUBS */}
         <div className="bg-white dark:bg-[#141414] border border-zinc-150 dark:border-zinc-850 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex items-start justify-between gap-4">
@@ -246,7 +246,7 @@ export function OverviewCards() {
         </div>
       </div>
 
-      {/* TIER 3 — Projections & Full Pipeline (full width progress bar) */}
+      {/* TIER 3 - Projections & Full Pipeline (full width progress bar) */}
       <div className="bg-[#F5F5F5] dark:bg-[#121212]/40 border border-zinc-150 dark:border-zinc-900 rounded-2xl p-5 flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <span className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A9A]">

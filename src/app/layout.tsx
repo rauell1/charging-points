@@ -22,7 +22,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Roam Electric — Charging Infrastructure Tracker",
+  title: "Roam Electric - Charging Infrastructure Tracker",
   description: "Track the progress of Roam Electric charging infrastructure across Kenya. Monitor Roam Hubs, Roam Points, milestones, and real-time analytics.",
   keywords: ["Roam Electric", "EV Charging", "Kenya", "Roam Hub", "Roam Point", "Electric Mobility", "Africa"],
   authors: [{ name: "Roam Electric Infrastructure Tracker" }],
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     icon: "/roam-logo-mark-transparent.png",
   },
   openGraph: {
-    title: "Roam Electric — Charging Infrastructure Tracker",
+    title: "Roam Electric - Charging Infrastructure Tracker",
     description: "Monitor Roam Hubs, Roam Points, and EV charging progress across Kenya.",
     type: "website",
   },

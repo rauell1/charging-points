@@ -33,7 +33,7 @@ model ChargingStation {
   launchDate      DateTime?
   dynamicsCode   String?
   notes           String?
-  // Admin override — takes full precedence over sheet + smart rule
+  // Admin override - takes full precedence over sheet + smart rule
   statusOverride     String?   // "operational", "planned", "construction", etc. Null = use smart rule
   statusOverrideBy   String?   // Email of admin who set it
   statusOverrideAt   DateTime? // When it was set

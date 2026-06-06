@@ -1,7 +1,7 @@
 import { db } from '@/lib/db';
 import { NextResponse } from 'next/server';
 
-// ONE-TIME migration endpoint — delete after use
+// ONE-TIME migration endpoint - delete after use
 // Adds statusOverride fields to ChargingStation table
 export async function POST(request: Request) {
   const authHeader = request.headers.get('x-migrate-key');

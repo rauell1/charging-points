@@ -120,7 +120,7 @@ function OverrideDropdown({ station, onUpdate }: {
       )}
 
       {station.hasOverride && (
-        <button onClick={handleClear} disabled={loading} title="Clear override — revert to smart sync"
+        <button onClick={handleClear} disabled={loading} title="Clear override - revert to smart sync"
           className="p-1.5 rounded-lg border border-white/10 text-white/30 hover:text-[#E8621A] hover:border-[#E8621A]/30 transition-all">
           <RotateCcw className="w-3 h-3" />
         </button>
@@ -210,11 +210,11 @@ function StationTable({ stations, onUpdate }: {
               <span className="text-white/40 text-xs">
                 {station.launchDate
                   ? new Date(station.launchDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' })
-                  : <span className="text-white/15">—</span>}
+                  : <span className="text-white/15">-</span>}
               </span>
             </td>
             <td className="px-4 py-3 hidden sm:table-cell">
-              <span className="text-white/40 text-xs">{station.chargerCount > 0 ? `${station.chargerCount} · ${station.totalKw.toFixed(1)}kW` : '—'}</span>
+              <span className="text-white/40 text-xs">{station.chargerCount > 0 ? `${station.chargerCount} · ${station.totalKw.toFixed(1)}kW` : '-'}</span>
             </td>
             <td className="px-4 py-3">
               <StatusBadge status={station.status} hasOverride={station.hasOverride} />
@@ -374,7 +374,7 @@ export default function AdminPage() {
                 <span className={`w-2 h-2 rounded-full ${s.dot}`} />
                 <span className="text-white/40 text-xs">{s.label}</span>
               </div>
-              <p className={`text-2xl font-black ${s.color}`}>{loading ? '—' : s.value}</p>
+              <p className={`text-2xl font-black ${s.color}`}>{loading ? '-' : s.value}</p>
             </div>
           ))}
         </div>
@@ -410,7 +410,7 @@ export default function AdminPage() {
         <div className="flex items-center justify-between mb-3">
           <div>
             <h1 className="text-base font-bold text-white">
-              {TYPE_CONFIG[activeTab].label} — {tabStations.filter(s => s.status === 'operational').length} operational
+              {TYPE_CONFIG[activeTab].label} - {tabStations.filter(s => s.status === 'operational').length} operational
               {tabStations.filter(s => s.status === 'construction').length > 0 && `, ${tabStations.filter(s => s.status === 'construction').length} in construction`}
             </h1>
             <p className="text-white/35 text-xs mt-0.5">
