@@ -18,8 +18,7 @@ export async function GET() {
   }
 
   const stations = await db.chargingStation.findMany({
-    where: { type: 'hub' },
-    orderBy: [{ status: 'asc' }, { name: 'asc' }],
+    orderBy: [{ type: 'asc' }, { status: 'asc' }, { name: 'asc' }],
     select: {
       id: true,
       chargerId: true,
@@ -30,6 +29,7 @@ export async function GET() {
       launchDate: true,
       partner: true,
       chargerCount: true,
+      totalKw: true,
       statusOverride: true,
       statusOverrideBy: true,
       statusOverrideAt: true,
