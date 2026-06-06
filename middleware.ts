@@ -26,12 +26,13 @@ export default withAuth(
 export const config = {
   matcher: [
     /*
-     * Match all paths EXCEPT:
-     * - /login (sign-in page)
-     * - /api/auth/** (NextAuth endpoints)
-     * - /_next/** (Next.js internals)
-     * - /favicon.ico, images, etc.
+     * Protect ONLY page routes.
+     * Exclude:
+     *   /login               — sign-in page
+     *   /api/*               — all API routes have their own auth (NextAuth, API keys)
+     *   /_next/*             — Next.js internals
+     *   /favicon*, /robots*  — static files
      */
-    '/((?!login|api/auth|_next/static|_next/image|favicon\\.ico).*)',
+    '/((?!login|api|_next/static|_next/image|favicon|robots).*)',
   ],
 };
