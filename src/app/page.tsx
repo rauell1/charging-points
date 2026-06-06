@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description:
     'Track the progress of Roam Electric charging infrastructure across Kenya. Monitor Roam Hubs, Roam Points, milestones, and real-time analytics.',
   icons: {
-    icon: '/roam-logo-mark.png',
+    icon: '/roam-logo-mark.svg',
   },
 };
 
