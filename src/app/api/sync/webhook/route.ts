@@ -72,8 +72,8 @@ export async function POST(request: Request) {
           ? String(chargerIdRaw)
           : `#${chargerIdRaw}`;
 
-        const name = station.name || station.siteName || station.site_name || `Station - ${chargerId}`;
-        const statusRaw = station.status || 'planned';
+        const name = String(station.name || station.siteName || station.site_name || `Station - ${chargerId}`);
+        const statusRaw = station.status ? String(station.status) : 'planned';
         let status = 'planned';
         const s = statusRaw.toLowerCase();
         if (s.includes('operational') || s.includes('active') || s.includes('live')) status = 'operational';
@@ -82,23 +82,37 @@ export async function POST(request: Request) {
         else if (s.includes('archived') || s.includes('closed') || s.includes('cancelled')) status = 'archived';
         else if (s.includes('planned') || s.includes('coming') || s.includes('upcoming')) status = 'planned';
 
-        const updateData: Record<string, unknown> = {
+        const type = String(station.type || station.stationType || station.station_type || 'point');
+        const address = station.address ? String(station.address) : (station.location ? String(station.location) : name);
+        const neighborhood = station.neighborhood ? String(station.neighborhood) : (station.area ? String(station.area) : (station.landmark ? String(station.landmark) : 'Nairobi'));
+        const lat = station.latitude != null ? Number(station.latitude) : (station.lat != null ? Number(station.lat) : null);
+        const lng = station.longitude != null ? Number(station.longitude) : (station.lng != null ? Number(station.lng) : (station.lon != null ? Number(station.lon) : null));
+        const chargerCount = station.chargerCount != null ? Number(station.chargerCount) : (station.charger_count != null ? Number(station.charger_count) : 1);
+        const totalKw = station.totalKw != null ? Number(station.totalKw) : (station.total_kw != null ? Number(station.total_kw) : 6);
+        const connectorType = station.connectorType ? String(station.connectorType) : (station.connector_type ? String(station.connector_type) : null);
+        const powerOutputKw = station.powerOutputKw != null ? Number(station.powerOutputKw) : (station.power_output != null ? Number(station.power_output) : null);
+        const partner = station.partner ? String(station.partner) : (station.host ? String(station.host) : null);
+        const siteManager = station.siteManager ? String(station.siteManager) : (station.site_manager ? String(station.site_manager) : (station.contactPerson ? String(station.contactPerson) : null));
+        const managerPhone = station.managerPhone ? String(station.managerPhone) : (station.phone ? String(station.phone) : (station.contact ? String(station.contact) : null));
+        const notes = station.notes ? String(station.notes) : (station.remarks ? String(station.remarks) : null);
+
+        const updateData = {
           name,
-          type: station.type || station.stationType || station.station_type || 'point',
+          type,
           status,
-          address: station.address || station.location || undefined,
-          neighborhood: station.neighborhood || station.area || station.landmark || undefined,
-          latitude: station.latitude ?? station.lat ?? undefined,
-          longitude: station.longitude ?? station.lng ?? station.lon ?? undefined,
-          chargerCount: station.chargerCount ?? station.charger_count ?? 1,
-          totalKw: station.totalKw ?? station.total_kw ?? 6,
-          connectorType: station.connectorType ?? station.connector_type ?? undefined,
-          powerOutputKw: station.powerOutputKw ?? station.power_output ?? undefined,
-          partner: station.partner ?? station.host ?? undefined,
-          siteManager: station.siteManager ?? station.site_manager ?? station.contactPerson ?? undefined,
-          managerPhone: station.managerPhone ?? station.phone ?? station.contact ?? undefined,
+          address,
+          neighborhood,
+          latitude: lat,
+          longitude: lng,
+          chargerCount,
+          totalKw,
+          connectorType,
+          powerOutputKw,
+          partner,
+          siteManager,
+          managerPhone,
           services: JSON.stringify(['charging']),
-          notes: station.notes ?? station.remarks ?? undefined,
+          notes,
         };
 
         const existing = await db.chargingStation.findUnique({

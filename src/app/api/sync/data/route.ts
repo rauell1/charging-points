@@ -41,10 +41,11 @@ export async function POST(request: Request) {
 
     for (const station of stations) {
       try {
-        const chargerId = station.chargerId
-          ? station.chargerId.startsWith('#')
-            ? station.chargerId
-            : `#${station.chargerId}`
+        const stationId = station.chargerId || station.id;
+        const chargerId = stationId
+          ? String(stationId).startsWith('#')
+            ? String(stationId)
+            : `#${stationId}`
           : null;
 
         if (!chargerId) {
@@ -52,8 +53,8 @@ export async function POST(request: Request) {
           continue;
         }
 
-        const name = station.name || `Station - ${chargerId}`;
-        const statusRaw = station.status || 'planned';
+        const name = String(station.name || `Station - ${chargerId}`);
+        const statusRaw = station.status ? String(station.status) : 'planned';
         let status = 'planned';
         const s = statusRaw.toLowerCase();
         if (s.includes('operational') || s.includes('active') || s.includes('live')) status = 'operational';
@@ -62,23 +63,37 @@ export async function POST(request: Request) {
         else if (s.includes('archived') || s.includes('closed') || s.includes('cancelled')) status = 'archived';
         else if (s.includes('planned') || s.includes('coming') || s.includes('upcoming')) status = 'planned';
 
-        const updateData: Record<string, unknown> = {
+        const type = String(station.type || 'point');
+        const address = station.address ? String(station.address) : name;
+        const neighborhood = station.neighborhood ? String(station.neighborhood) : 'Nairobi';
+        const lat = station.latitude != null ? Number(station.latitude) : null;
+        const lng = station.longitude != null ? Number(station.longitude) : null;
+        const chargerCount = station.chargerCount != null ? Number(station.chargerCount) : 1;
+        const totalKw = station.totalKw != null ? Number(station.totalKw) : 6;
+        const connectorType = station.connectorType ? String(station.connectorType) : null;
+        const powerOutputKw = station.powerOutputKw != null ? Number(station.powerOutputKw) : null;
+        const partner = station.partner ? String(station.partner) : null;
+        const siteManager = station.siteManager ? String(station.siteManager) : null;
+        const managerPhone = station.managerPhone ? String(station.managerPhone) : null;
+        const notes = station.notes ? String(station.notes) : null;
+
+        const updateData = {
           name,
-          type: station.type || 'point',
+          type,
           status,
-          address: station.address || undefined,
-          neighborhood: station.neighborhood || undefined,
-          latitude: station.latitude ?? undefined,
-          longitude: station.longitude ?? undefined,
-          chargerCount: station.chargerCount || 1,
-          totalKw: station.totalKw || 6,
-          connectorType: station.connectorType || undefined,
-          powerOutputKw: station.powerOutputKw ? station.powerOutputKw : undefined,
-          partner: station.partner || undefined,
-          siteManager: station.siteManager || undefined,
-          managerPhone: station.managerPhone || undefined,
+          address,
+          neighborhood,
+          latitude: lat,
+          longitude: lng,
+          chargerCount,
+          totalKw,
+          connectorType,
+          powerOutputKw,
+          partner,
+          siteManager,
+          managerPhone,
           services: JSON.stringify(['charging']),
-          notes: station.notes || undefined,
+          notes,
         };
 
         const existing = await db.chargingStation.findUnique({

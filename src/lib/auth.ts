@@ -36,9 +36,9 @@ export const authOptions: NextAuthOptions = {
     },
     async jwt({ token, user }) {
       if (user) {
-        token.email = user.email;
-        token.name = user.name;
-        token.picture = user.image;
+        token.email = user.email ?? undefined;
+        token.name = user.name ?? undefined;
+        token.picture = user.image ?? undefined;
       }
       return token;
     },

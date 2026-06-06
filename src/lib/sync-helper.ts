@@ -324,6 +324,7 @@ async function processMultiRowSheet(
         totalKw,
         latitude: lat, longitude: lng,
         services: JSON.stringify(servicesArr),
+        launchDate,
       };
 
       if (existing) {
@@ -469,7 +470,10 @@ async function processRoamHubs(rows: Record<string, unknown>[], result: SyncResu
       const name = rawName || `Roam Hub - ${chargerId}`;
       const address = extractString(row, ['Address', 'Location', 'address']);
       const neighborhood = extractString(row, ['Neighborhood', 'Area', 'Landmark']);
-      const status = normalizeStationStatus(normalizedId, 'hub', parseStatus(statusRaw, 'planned'));
+
+      const existing = await db.chargingStation.findUnique({ where: { chargerId: normalizedId } });
+      const smartStatus = computeSmartStatus('hub', parseStatus(statusRaw, 'planned'), null);
+      const status = applyOverride(existing?.statusOverride, smartStatus);
 
       const chargerCount = extractNumber(row, ['Chargers', 'charger_count', 'No. Chargers'], 0);
       const totalKw = extractNumber(row, ['Total kW', 'total_kw', 'Total Power'], 0);
@@ -479,8 +483,6 @@ async function processRoamHubs(rows: Record<string, unknown>[], result: SyncResu
       const solarPowered = extractString(row, ['Solar', 'solar'])?.toLowerCase() === 'yes';
       const dynamicsCode = extractString(row, ['Dynamics Code', 'dynamics_code', 'FO Code']);
       const city = extractString(row, ['City', 'city']) || 'Nairobi';
-
-      const existing = await db.chargingStation.findUnique({ where: { chargerId: normalizedId } });
 
       const data = {
         name,
@@ -875,7 +877,7 @@ function detectChanges(existing: Record<string, unknown>, newData: Record<string
   const fieldsToCompare = [
     'name', 'type', 'status', 'address', 'neighborhood', 'latitude', 'longitude',
     'chargerCount', 'totalKw', 'connectorType', 'powerOutputKw', 'partner',
-    'siteManager', 'managerPhone', 'notes', 'operatingHours',
+    'siteManager', 'managerPhone', 'notes', 'operatingHours', 'launchDate',
   ];
 
   for (const field of fieldsToCompare) {

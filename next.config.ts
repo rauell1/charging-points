@@ -14,7 +14,7 @@ const nextConfig: NextConfig = {
     outputFileTracingIncludes: {
       '/api/sync/rescan': ['./upload/**/*'],
     },
-  },
+  } as any,
 };
 
 export default nextConfig;
