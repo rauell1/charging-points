@@ -34,12 +34,8 @@ function LoginContent() {
       <div className="relative z-10 w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-3 mb-6">
-            <img src="/logo.svg" alt="Roam Logo" className="h-10 w-10 bg-transparent" />
-            <div className="text-left">
-              <p className="text-white font-black text-xl tracking-tighter leading-none uppercase">ROAM</p>
-              <p className="text-white/60 font-black text-xl tracking-tighter leading-none uppercase">ELECTRIC</p>
-            </div>
+          <div className="flex flex-col items-center mb-6">
+            <img src="/roam-logo-vertical-orange.png" alt="Roam Logo" className="h-20 w-auto object-contain" />
           </div>
           <h1 className="text-white font-bold text-2xl tracking-tight">
             Charging Infrastructure
