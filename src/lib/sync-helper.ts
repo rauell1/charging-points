@@ -34,6 +34,18 @@ export async function syncWorkbook(workbook: XLSX.WorkBook, source: string, file
     timestamp: new Date().toISOString(),
   };
 
+  // Reset construction statuses only if we are syncing the main Locations Database
+  const isMainDatabase = sheetNames.includes('Live data') || sheetNames.some(n => /^RH\s*-/i.test(n)) || sheetNames.some(n => /^RP\s*-/i.test(n));
+  if (isMainDatabase) {
+    try {
+      await db.chargingStation.updateMany({
+        where: { type: { in: ['hub', 'point'] }, status: 'construction' },
+        data: { status: 'planned' }
+      });
+    } catch (err) {
+      console.error('Failed to reset construction statuses:', err);
+    }
+  }
   // 1. Live data sheet (Locations Database workbook)
   if (sheetNames.includes('Live data')) {
     const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(workbook.Sheets['Live data']);
@@ -107,6 +119,20 @@ function parseStatus(raw: string | null, defaultStatus = 'planned'): string {
   return defaultStatus;
 }
 
+function normalizeStationStatus(chargerId: string, type: string, status: string): string {
+  if (type === 'hub' && status === 'operational') {
+    const activeHubIds = new Set([
+      '#RH-KE-A-01', '#RH-KE-A-02', '#RH-KE-A-03', '#RH-KE-A-04', '#RH-KE-A-05',
+      '#RH-KE-A-06', '#RH-KE-A-07', '#RH-KE-A-08', '#RH-KE-A-10', '#RH-KE-A-11',
+      '#RH-KE-A-16', '#RH-KE-A-17'
+    ]);
+    if (!activeHubIds.has(chargerId)) {
+      return 'planned';
+    }
+  }
+  return status;
+}
+
 // ─── Live Data Sheet Parser ──────────────────────────────────────────────────
 async function processLiveData(rows: Record<string, unknown>[], result: SyncResult) {
   for (const row of rows) {
@@ -126,7 +152,7 @@ async function processLiveData(rows: Record<string, unknown>[], result: SyncResu
       const closeTime = extractString(row, ['closeTime']);
 
       const existing = await db.chargingStation.findUnique({ where: { chargerId } });
-      const status = type === 'hub' ? 'planned' : 'operational';
+      const status = normalizeStationStatus(chargerId, type, type === 'hub' ? 'planned' : 'operational');
       const data = {
         name, type, status,
         address: name,
@@ -223,7 +249,7 @@ async function processMultiRowSheet(
         }
       }
 
-      const status = parseStatus(statusRaw, 'planned');
+      const status = normalizeStationStatus(normalizedId, type, parseStatus(statusRaw, 'planned'));
 
       const existing = await db.chargingStation.findUnique({ where: { chargerId: normalizedId } });
       const stationName = get(row, 'Station Name', 'Site Name') ?? name;
@@ -317,7 +343,7 @@ async function processRoamPoints(rows: Record<string, unknown>[], result: SyncRe
       const name = rawName || `Roam Point - ${chargerId}`;
       const address = extractString(row, ['Address', 'Location', 'address', 'location']);
       const neighborhood = extractString(row, ['Neighborhood', 'Area', 'Landmark', 'neighborhood']);
-      const status = parseStatus(statusRaw, 'planned');
+      const status = normalizeStationStatus(normalizedId, 'point', parseStatus(statusRaw, 'planned'));
 
       const partner = extractString(row, ['Partner', 'Host', 'Partner Name', 'partner', 'host_name']);
       const connectorType = extractString(row, ['Connector', 'connector_type', 'Type']);
@@ -403,7 +429,7 @@ async function processRoamHubs(rows: Record<string, unknown>[], result: SyncResu
       const name = rawName || `Roam Hub - ${chargerId}`;
       const address = extractString(row, ['Address', 'Location', 'address']);
       const neighborhood = extractString(row, ['Neighborhood', 'Area', 'Landmark']);
-      const status = parseStatus(statusRaw, 'operational');
+      const status = normalizeStationStatus(normalizedId, 'hub', parseStatus(statusRaw, 'planned'));
 
       const chargerCount = extractNumber(row, ['Chargers', 'charger_count', 'No. Chargers'], 0);
       const totalKw = extractNumber(row, ['Total kW', 'total_kw', 'Total Power'], 0);
