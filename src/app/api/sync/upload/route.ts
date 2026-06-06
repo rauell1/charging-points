@@ -168,7 +168,6 @@ async function processWorkbook(workbook: XLSX.WorkBook, source: string): Promise
           }
         }
       } catch (e) { console.error(`Generic sheet ${name} error:`, e); }
-      }
     }
   }
 
