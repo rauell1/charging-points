@@ -2,6 +2,7 @@ import { NextAuthOptions } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 
 const ALLOWED_DOMAIN = 'roam-electric.com';
+export const ADMIN_EMAIL = 'roy.otieno@roam-electric.com';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -29,6 +30,7 @@ export const authOptions: NextAuthOptions = {
         session.user.email = token.email as string;
         session.user.name = token.name as string;
         session.user.image = token.picture as string;
+        session.user.isAdmin = token.email === ADMIN_EMAIL;
       }
       return session;
     },
@@ -51,3 +53,4 @@ export const authOptions: NextAuthOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET,
 };
+

@@ -119,18 +119,29 @@ function parseStatus(raw: string | null, defaultStatus = 'planned'): string {
   return defaultStatus;
 }
 
-function normalizeStationStatus(chargerId: string, type: string, status: string): string {
-  if (type === 'hub') {
-    const activeHubIds = new Set([
-      '#RH-KE-A-01', '#RH-KE-A-02', '#RH-KE-A-03', '#RH-KE-A-04', '#RH-KE-A-05',
-      '#RH-KE-A-06', '#RH-KE-A-07', '#RH-KE-A-08', '#RH-KE-A-10', '#RH-KE-A-11',
-      '#RH-KE-A-16', '#RH-KE-A-17', '#RH-KE-A-24' // Langata - opposite Galleria Mall
-    ]);
-    // Whitelist is the source of truth: always operational if listed, always non-operational if not
-    if (activeHubIds.has(chargerId)) return 'operational';
-    if (status === 'operational') return 'planned'; // downgrade unlisted hubs
-  }
-  return status;
+/**
+ * Option D — Smart status rule (no hardcoded whitelist).
+ * A hub is operational if the sheet says Operational AND the launch date is today or past.
+ * If no launch date, trust the sheet directly (covers pre-existing hubs without dates).
+ * Admin statusOverride always takes full precedence — checked at write time.
+ */
+function computeSmartStatus(
+  type: string,
+  rawStatus: string,
+  launchDate: Date | null
+): string {
+  if (type !== 'hub') return rawStatus; // only smart-rule for hubs
+  if (rawStatus !== 'operational') return rawStatus; // non-operational → pass through
+  // Hub says Operational in sheet
+  if (!launchDate) return 'operational'; // no date → trust the sheet
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return launchDate <= today ? 'operational' : 'construction'; // future date → not yet open
+}
+
+/** Apply admin override if one is set, else return the computed status */
+function applyOverride(statusOverride: string | null | undefined, computedStatus: string): string {
+  return statusOverride ?? computedStatus;
 }
 
 // ─── Live Data Sheet Parser ──────────────────────────────────────────────────
@@ -152,7 +163,8 @@ async function processLiveData(rows: Record<string, unknown>[], result: SyncResu
       const closeTime = extractString(row, ['closeTime']);
 
       const existing = await db.chargingStation.findUnique({ where: { chargerId } });
-      const status = normalizeStationStatus(chargerId, type, type === 'hub' ? 'planned' : 'operational');
+      const smartStatus = computeSmartStatus(type, type === 'hub' ? 'planned' : 'operational', null);
+      const status = applyOverride(existing?.statusOverride, smartStatus);
       const data = {
         name, type, status,
         address: name,
@@ -249,9 +261,21 @@ async function processMultiRowSheet(
         }
       }
 
-      const status = normalizeStationStatus(normalizedId, type, parseStatus(statusRaw, 'planned'));
+      // Parse the launch date from the sheet
+      const launchDateRaw = get(row, 'Launch Date');
+      let launchDate: Date | null = null;
+      if (launchDateRaw) {
+        // Handle Excel serial numbers and date strings
+        const parsed = typeof launchDateRaw === 'number'
+          ? new Date((launchDateRaw - 25569) * 86400 * 1000) // Excel serial to JS date
+          : new Date(launchDateRaw);
+        if (!isNaN(parsed.getTime())) launchDate = parsed;
+      }
 
       const existing = await db.chargingStation.findUnique({ where: { chargerId: normalizedId } });
+      const rawParsedStatus = parseStatus(statusRaw, 'planned');
+      const smartStatus = computeSmartStatus(type, rawParsedStatus, launchDate);
+      const status = applyOverride(existing?.statusOverride, smartStatus);
       const stationName = get(row, 'Station Name', 'Site Name') ?? name;
       const area = get(row, 'Area', 'Site Name') ?? 'Nairobi';
       let chargerCount = 0;
@@ -343,7 +367,9 @@ async function processRoamPoints(rows: Record<string, unknown>[], result: SyncRe
       const name = rawName || `Roam Point - ${chargerId}`;
       const address = extractString(row, ['Address', 'Location', 'address', 'location']);
       const neighborhood = extractString(row, ['Neighborhood', 'Area', 'Landmark', 'neighborhood']);
-      const status = normalizeStationStatus(normalizedId, 'point', parseStatus(statusRaw, 'planned'));
+      const smartStatus = computeSmartStatus('point', parseStatus(statusRaw, 'planned'), null);
+      const existing2 = await db.chargingStation.findUnique({ where: { chargerId: normalizedId } });
+      const status = applyOverride(existing2?.statusOverride, smartStatus);
 
       const partner = extractString(row, ['Partner', 'Host', 'Partner Name', 'partner', 'host_name']);
       const connectorType = extractString(row, ['Connector', 'connector_type', 'Type']);
@@ -353,7 +379,8 @@ async function processRoamPoints(rows: Record<string, unknown>[], result: SyncRe
       const notes = extractString(row, ['Notes', 'Comment', 'Remarks', 'notes', 'comments']);
       const operatingHours = extractString(row, ['Hours', 'operating_hours', 'Operating Hours']);
 
-      const existing = await db.chargingStation.findUnique({ where: { chargerId: normalizedId } });
+      // existing already fetched above for override check
+      const existing = existing2;
 
       const data = {
         name,
