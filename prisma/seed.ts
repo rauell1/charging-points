@@ -190,7 +190,7 @@ async function seed() {
       notes: 'NEW largest hub at 79 chargers, 77.7kW! Partnership with Adams Minimall.',
     },
     {
-      chargerId: '#RH-KE-A-24', name: 'Roam Hub - Langata', type: 'hub', status: 'planned',
+      chargerId: '#RH-KE-A-24', name: 'Roam Hub - Langata', type: 'hub', status: 'operational',
       address: 'Langata, Nairobi', neighborhood: 'Langata',
       latitude: -1.34207, longitude: 36.7639,
       chargerCount: 30, totalKw: 25.2,

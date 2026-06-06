@@ -124,7 +124,7 @@ function normalizeStationStatus(chargerId: string, type: string, status: string)
     const activeHubIds = new Set([
       '#RH-KE-A-01', '#RH-KE-A-02', '#RH-KE-A-03', '#RH-KE-A-04', '#RH-KE-A-05',
       '#RH-KE-A-06', '#RH-KE-A-07', '#RH-KE-A-08', '#RH-KE-A-10', '#RH-KE-A-11',
-      '#RH-KE-A-16', '#RH-KE-A-17'
+      '#RH-KE-A-16', '#RH-KE-A-17', '#RH-KE-A-24' // Langata - opposite Galleria Mall
     ]);
     if (!activeHubIds.has(chargerId)) {
       return 'planned';
