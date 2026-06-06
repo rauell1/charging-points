@@ -90,6 +90,11 @@ interface SyncResult {
   timestamp: string;
 }
 
+// ─── Sheet name matchers — fuzzy, resilient to minor renames ─────────────────
+function findSheet(sheetNames: string[], pattern: RegExp): string | undefined {
+  return sheetNames.find(n => pattern.test(n.trim()));
+}
+
 async function processWorkbook(workbook: XLSX.WorkBook, source: string): Promise<SyncResult> {
   const sheetNames = workbook.SheetNames;
   const result: SyncResult = {
@@ -101,50 +106,68 @@ async function processWorkbook(workbook: XLSX.WorkBook, source: string): Promise
     timestamp: new Date().toISOString(),
   };
 
-  // Live data sheet — clean headers (Locations Database workbook)
-  if (sheetNames.includes('Live data')) {
-    const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(workbook.Sheets['Live data']);
-    await processLiveData(rows, result);
+  // Live data — fuzzy match: "Live data", "Live Data", "live_data", etc.
+  const liveSheet = findSheet(sheetNames, /^live[\s_-]?data$/i);
+  if (liveSheet) {
+    try {
+      const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(workbook.Sheets[liveSheet]);
+      await processLiveData(rows, result);
+    } catch (e) { console.error('Live data sheet error:', e); }
   }
 
-  // RH - KE / RP - KE sheets — 2-row headers, actual column names in row index 1
-  const rhSheet = sheetNames.find(n => /^RH\s*-/.test(n));
-  const rpSheet = sheetNames.find(n => /^RP\s*-/.test(n));
-  if (rhSheet) await processMultiRowSheet(workbook.Sheets[rhSheet], 'hub', 'Roam Charger ID', result);
-  if (rpSheet) await processMultiRowSheet(workbook.Sheets[rpSheet], 'point', 'Roam Charge Station ID', result);
-
-  // SITES sheet — uses Site_ID (underscore), pipeline/prospective data
-  if (sheetNames.includes('SITES')) {
-    const sitesRows = XLSX.utils.sheet_to_json<Record<string, unknown>>(workbook.Sheets['SITES']);
-    await processSitesSheet(sitesRows, result);
+  // RH / RP sheets — fuzzy: "RH - KE", "RH-KE", "RH KE", "Roam Hubs", etc.
+  const rhSheet = findSheet(sheetNames, /^RH[\s_-]+KE|^roam\s*hub/i);
+  const rpSheet = findSheet(sheetNames, /^RP[\s_-]+KE|^roam\s*(point|charge)/i);
+  if (rhSheet) {
+    try { await processMultiRowSheet(workbook.Sheets[rhSheet], 'hub', 'Roam Charger ID', result); }
+    catch (e) { console.error(`${rhSheet} sheet error:`, e); }
+  }
+  if (rpSheet) {
+    try { await processMultiRowSheet(workbook.Sheets[rpSheet], 'point', 'Roam Charge Station ID', result); }
+    catch (e) { console.error(`${rpSheet} sheet error:`, e); }
   }
 
-  // Legacy RP/RH detection (simple single-row headers)
-  const hasLegacyRP = !rpSheet && sheetNames.some(n => n.includes('RP'));
-  const hasLegacyRH = !rhSheet && sheetNames.some(n => n.includes('RH'));
+  // SITES sheet — fuzzy: "SITES", "Sites", "SITE", etc.
+  const sitesSheet = findSheet(sheetNames, /^sites?$/i);
+  if (sitesSheet) {
+    try {
+      const sitesRows = XLSX.utils.sheet_to_json<Record<string, unknown>>(workbook.Sheets[sitesSheet]);
+      await processSitesSheet(sitesRows, result);
+    } catch (e) { console.error('SITES sheet error:', e); }
+  }
+
+  // Legacy RP/RH detection (simple single-row headers) — fallback only if fuzzy match failed
+  const hasLegacyRP = !rpSheet && sheetNames.some(n => /RP/i.test(n));
+  const hasLegacyRH = !rhSheet && sheetNames.some(n => /RH/i.test(n) && !/FORM|LOOK|AGENT|MULTI|LABEL|LIST|SHEET/i.test(n));
   if (hasLegacyRP) {
-    const name = sheetNames.find(n => n.includes('RP'))!;
-    await processRoamPoints(XLSX.utils.sheet_to_json<Record<string, unknown>>(workbook.Sheets[name]), result);
+    const name = sheetNames.find(n => /RP/i.test(n))!;
+    try { await processRoamPoints(XLSX.utils.sheet_to_json<Record<string, unknown>>(workbook.Sheets[name]), result); }
+    catch (e) { console.error(`Legacy RP sheet error:`, e); }
   }
   if (hasLegacyRH) {
-    const name = sheetNames.find(n => n.includes('RH'))!;
-    await processRoamHubs(XLSX.utils.sheet_to_json<Record<string, unknown>>(workbook.Sheets[name]), result);
+    const name = sheetNames.find(n => /RH/i.test(n) && !/FORM|LOOK|AGENT|MULTI|LABEL|LIST|SHEET/i.test(n))!;
+    try { await processRoamHubs(XLSX.utils.sheet_to_json<Record<string, unknown>>(workbook.Sheets[name]), result); }
+    catch (e) { console.error(`Legacy RH sheet error:`, e); }
   }
 
   // Auto-detect generic sheets with charging data
-  const handled = new Set(['Live data', rhSheet, rpSheet, 'SITES'].filter(Boolean));
-  if (!handled.size || (!sheetNames.includes('Live data') && !rhSheet && !rpSheet && !sheetNames.includes('SITES'))) {
+  const SKIP_SHEETS = /^(CONFIG|LOOKUPS?|AGENTS?|MULTI\s*SITES|TBD|FORM|KE\s*COUNTY|FO\s*PROJECT|EVSEID|LABELS?|EME[IM]S?|LIST\s*OF|SHEET\d+)$/i;
+  const handled = new Set([liveSheet, rhSheet, rpSheet, sitesSheet].filter(Boolean) as string[]);
+  if (!liveSheet && !rhSheet && !rpSheet && !sitesSheet) {
     for (const name of sheetNames) {
-      if (['CONFIG', 'LOOKUPS', 'AGENTS', 'MULTI SITES PARTNERS', 'TBD'].includes(name)) continue;
+      if (SKIP_SHEETS.test(name.trim())) continue;
       if (handled.has(name)) continue;
       const sheet = workbook.Sheets[name];
       if (!sheet) continue;
-      const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet);
-      if (rows.length > 0) {
-        const keys = Object.keys(rows[0]);
-        if (keys.some(k => /charger|station|site|point|hub/i.test(k))) {
-          await processGenericSheet(rows, result, name);
+      try {
+        const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet);
+        if (rows.length > 0) {
+          const keys = Object.keys(rows[0]);
+          if (keys.some(k => /charger|station|site|point|hub/i.test(k))) {
+            await processGenericSheet(rows, result, name);
+          }
         }
+      } catch (e) { console.error(`Generic sheet ${name} error:`, e); }
       }
     }
   }

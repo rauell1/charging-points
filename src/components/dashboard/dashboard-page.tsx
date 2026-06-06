@@ -3,6 +3,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { signOut, useSession } from 'next-auth/react';
+import { LogOut } from 'lucide-react';
 import { OverviewCards } from '@/components/dashboard/overview-cards';
 import { StationTable } from '@/components/dashboard/station-table';
 import { StationMap } from '@/components/dashboard/station-map';
@@ -95,6 +97,7 @@ function InfoBadges() {
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
+  const { data: session } = useSession();
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -135,8 +138,25 @@ export default function Dashboard() {
                     </Button>
                   </a>
                 </div>
-                
+
                 <ThemeToggle />
+
+                {session?.user && (
+                  <div className="flex items-center gap-2 pl-2 border-l border-white/20">
+                    <span className="text-[10px] text-white/60 hidden md:block truncate max-w-[120px]">
+                      {session.user.email}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-xs gap-1.5 text-white/70 hover:text-white hover:bg-white/10 rounded-full"
+                      onClick={() => signOut({ callbackUrl: '/login' })}
+                    >
+                      <LogOut className="h-3 w-3" />
+                      <span className="hidden sm:inline">Sign out</span>
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
