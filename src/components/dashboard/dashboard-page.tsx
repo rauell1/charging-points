@@ -110,7 +110,8 @@ export default function Dashboard() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
-                  <a href="https://www.roam-electric.com" target="_blank" rel="noopener noreferrer" className="flex items-baseline mr-1 text-white hover:text-[--roam-orange] transition-colors">
+                  <a href="https://www.roam-electric.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 mr-1 text-white hover:text-[--roam-orange] transition-colors">
+                    <img src="/logo.svg" alt="Roam Logo" className="h-6 w-6" />
                     <span className="font-black text-2xl tracking-tighter">ROAM</span>
                     <span className="font-black text-2xl tracking-tighter hidden sm:inline ml-1">ELECTRIC</span>
                   </a>
@@ -147,8 +148,7 @@ export default function Dashboard() {
                   <a href="/admin">
                     <Button
                       variant="ghost"
-                      size="sm"
-                      className="text-xs gap-1.5 text-white/70 hover:text-white hover:bg-white/10 rounded-full border border-white/20 cursor-pointer"
+                      className="border border-white/20 text-white hover:bg-white hover:text-black rounded-full px-4 py-1.5 h-8 text-xs font-semibold transition-all cursor-pointer"
                     >
                       Admin Login
                     </Button>
@@ -158,9 +158,8 @@ export default function Dashboard() {
                     {session.user.isAdmin && (
                       <a href="/admin">
                         <Button
-                          variant="outline"
-                          size="sm"
-                          className="text-xs gap-1.5 text-[--roam-orange] border-[--roam-orange]/30 hover:border-[--roam-orange] hover:bg-[--roam-orange]/10 rounded-full font-semibold cursor-pointer"
+                          variant="ghost"
+                          className="border border-white/20 text-white hover:bg-white hover:text-black rounded-full px-4 py-1.5 h-8 text-xs font-semibold transition-all cursor-pointer"
                         >
                           Admin Panel
                         </Button>

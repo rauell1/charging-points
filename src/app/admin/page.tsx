@@ -329,9 +329,7 @@ export default function AdminPage() {
       <header className="relative border-b border-white/5 px-6 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-9 w-9 bg-[#E8621A] rounded-xl flex items-center justify-center shadow-lg shadow-[#E8621A]/20">
-              <Zap className="h-4 w-4 text-white" />
-            </div>
+            <img src="/logo.svg" alt="Roam Logo" className="h-9 w-9 bg-transparent" />
             <div>
               <div className="flex items-center gap-2">
                 <p className="text-white font-black text-sm tracking-tight uppercase">Roam Electric</p>
