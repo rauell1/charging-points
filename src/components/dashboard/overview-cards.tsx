@@ -90,6 +90,10 @@ export function OverviewCards() {
   const constructionPoints = overview.constructionPoints || 0;
   const constructionKiosks = overview.constructionKiosks || 0;
 
+  const constructionPointsChargers = stationsList
+    .filter((s) => s.type === 'point' && s.status === 'construction')
+    .reduce((sum, s) => sum + (s.chargerCount || 0), 0);
+
   // Planned counts derived from stats
   const plannedHubs = stationStats.filter((s) => s.type === 'hub' && s.status === 'planned').length;
   const plannedPoints = stationStats.filter((s) => s.type === 'point' && s.status === 'planned').length;
@@ -156,7 +160,7 @@ export function OverviewCards() {
                 </span>
               </div>
               <span className="block text-xs md:text-sm text-white/60 font-semibold mt-1">
-                {constructionHubs} Hubs + {constructionPoints} Points + {constructionKiosks} Kiosk
+                {constructionHubs} Hubs + {constructionPointsChargers} Point Chargers ({constructionPoints} sites) + {constructionKiosks} Kiosk
               </span>
             </div>
           </div>
@@ -211,7 +215,7 @@ export function OverviewCards() {
             </p>
             <p className="text-xs text-[#9A9A9A] font-semibold flex items-center gap-1.5">
               <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
-              <span>{constructionPoints} deploying (in progress)</span>
+              <span>{constructionPointsChargers} chargers deploying ({constructionPoints} sites)</span>
             </p>
           </div>
           <div className="rounded-xl p-3 bg-[#0D0D0D]/10 dark:bg-white/10 flex-shrink-0">
