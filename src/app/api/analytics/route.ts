@@ -6,8 +6,18 @@ export async function GET() {
     // Total stats
     const totalStations = await db.chargingStation.count();
     const activeStations = await db.chargingStation.count({ where: { status: 'operational' } });
-    const hubCount = await db.chargingStation.count({ where: { type: 'hub' } });
-    const pointCount = await db.chargingStation.count({ where: { type: 'point' } });
+    const constructionStations = await db.chargingStation.count({ where: { status: 'construction' } });
+
+    // Deployed (Operational) counts
+    const hubCount = await db.chargingStation.count({ where: { type: 'hub', status: 'operational' } });
+    const pointCount = await db.chargingStation.count({ where: { type: 'point', status: 'operational' } });
+    const operationalKiosks = await db.chargingStation.count({ where: { type: 'kiosk', status: 'operational' } });
+
+    // Deploying (Construction) counts
+    const constructionHubs = await db.chargingStation.count({ where: { type: 'hub', status: 'construction' } });
+    const constructionPoints = await db.chargingStation.count({ where: { type: 'point', status: 'construction' } });
+    const constructionKiosks = await db.chargingStation.count({ where: { type: 'kiosk', status: 'construction' } });
+
     const totalSessions = await db.chargingSession.count();
     const totalChargers = await db.chargingStation.aggregate({ _sum: { chargerCount: true } });
 
@@ -62,8 +72,13 @@ export async function GET() {
       overview: {
         totalStations,
         activeStations,
+        constructionStations,
         hubCount,
         pointCount,
+        operationalKiosks,
+        constructionHubs,
+        constructionPoints,
+        constructionKiosks,
         totalSessions,
         totalChargers: totalChargers._sum.chargerCount || 0,
       },

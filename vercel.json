@@ -1,4 +1,9 @@
 {
   "framework": "nextjs",
-  "buildCommand": "prisma generate && prisma db push && next build"
+  "buildCommand": "prisma generate && prisma db push && next build",
+  "functions": {
+    "src/app/api/sync/rescan/route.ts": {
+      "includeFiles": "upload/**"
+    }
+  }
 }

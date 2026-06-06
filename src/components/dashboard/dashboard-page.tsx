@@ -30,7 +30,9 @@ import {
   Mail,
   Sun,
   Moon,
+  ClipboardCheck,
 } from 'lucide-react';
+import { PipelineTracker } from '@/components/dashboard/pipeline-tracker';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -198,6 +200,13 @@ export default function Dashboard() {
                   <span>Stations</span>
                 </TabsTrigger>
                 <TabsTrigger
+                  value="pipeline"
+                  className="text-xs gap-1.5 px-0 py-2.5 rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] dark:data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] hover:text-[--roam-black] dark:hover:text-white font-bold uppercase tracking-wider transition-all cursor-pointer font-display"
+                >
+                  <ClipboardCheck className={`h-3.5 w-3.5 ${activeTab === 'pipeline' ? 'text-[--roam-orange]' : 'text-[--roam-gray-mid]'}`} />
+                  <span>Site Acquisition</span>
+                </TabsTrigger>
+                <TabsTrigger
                   value="analytics"
                   className="text-xs gap-1.5 px-0 py-2.5 rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] dark:data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] hover:text-[--roam-black] dark:hover:text-white font-bold uppercase tracking-wider transition-all cursor-pointer font-display"
                 >
@@ -266,6 +275,11 @@ export default function Dashboard() {
             {/* Milestones Tab */}
             <TabsContent value="milestones" className="mt-0">
               <MilestonesTimeline />
+            </TabsContent>
+
+            {/* Site Acquisition Tab */}
+            <TabsContent value="pipeline" className="mt-0">
+              <PipelineTracker />
             </TabsContent>
 
             {/* Activity Tab */}
