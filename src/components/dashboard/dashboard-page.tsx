@@ -143,21 +143,44 @@ export default function Dashboard() {
 
                 <ThemeToggle />
 
-                {session?.user && (
-                  <div className="flex items-center gap-2 pl-2 border-l border-white/20">
-                    <span className="text-[10px] text-white/60 hidden md:block truncate max-w-[120px]">
-                      {session.user.email}
-                    </span>
+                {!session?.user ? (
+                  <a href="/admin">
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-xs gap-1.5 text-white/70 hover:text-white hover:bg-white/10 rounded-full"
-                      onClick={() => signOut({ callbackUrl: '/login' })}
+                      className="text-xs gap-1.5 text-white/70 hover:text-white hover:bg-white/10 rounded-full border border-white/20 cursor-pointer"
                     >
-                      <LogOut className="h-3 w-3" />
-                      <span className="hidden sm:inline">Sign out</span>
+                      Admin Login
                     </Button>
-                  </div>
+                  </a>
+                ) : (
+                  <>
+                    {session.user.isAdmin && (
+                      <a href="/admin">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-xs gap-1.5 text-[--roam-orange] border-[--roam-orange]/30 hover:border-[--roam-orange] hover:bg-[--roam-orange]/10 rounded-full font-semibold cursor-pointer"
+                        >
+                          Admin Panel
+                        </Button>
+                      </a>
+                    )}
+                    <div className="flex items-center gap-2 pl-2 border-l border-white/20">
+                      <span className="text-[10px] text-white/60 hidden md:block truncate max-w-[120px]">
+                        {session.user.email}
+                      </span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-xs gap-1.5 text-white/70 hover:text-white hover:bg-white/10 rounded-full cursor-pointer"
+                        onClick={() => signOut({ callbackUrl: '/login' })}
+                      >
+                        <LogOut className="h-3 w-3" />
+                        <span className="hidden sm:inline">Sign out</span>
+                      </Button>
+                    </div>
+                  </>
                 )}
               </div>
             </div>

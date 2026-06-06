@@ -261,6 +261,24 @@ async function processMultiRowSheet(
         }
       }
 
+      // Fallback coordinates for kiosks since their sheet has empty coordinate columns
+      if (type === 'kiosk' && (!lat || !lng)) {
+        const lowerName = name.toLowerCase();
+        if (lowerName.includes('jogoo road')) {
+          lat = -1.292109;
+          lng = 36.843321;
+        } else if (lowerName.includes('lavington')) {
+          lat = -1.279364;
+          lng = 36.770414;
+        } else if (lowerName.includes('kawangware')) {
+          lat = -1.287923;
+          lng = 36.741585;
+        } else if (lowerName.includes('ruaraka')) {
+          lat = -1.227694;
+          lng = 36.883355;
+        }
+      }
+
       // Parse the launch date from the sheet
       // Excel stores dates as serial numbers (e.g. 44931 = Jan 5 2023).
       // get() always returns a string, so we must detect and convert serials manually.
