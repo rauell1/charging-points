@@ -262,14 +262,27 @@ async function processMultiRowSheet(
       }
 
       // Parse the launch date from the sheet
+      // Excel stores dates as serial numbers (e.g. 44931 = Jan 5 2023).
+      // get() always returns a string, so we must detect and convert serials manually.
       const launchDateRaw = get(row, 'Launch Date');
       let launchDate: Date | null = null;
       if (launchDateRaw) {
-        // Handle Excel serial numbers and date strings
-        const parsed = typeof launchDateRaw === 'number'
-          ? new Date((launchDateRaw - 25569) * 86400 * 1000) // Excel serial to JS date
-          : new Date(launchDateRaw);
-        if (!isNaN(parsed.getTime())) launchDate = parsed;
+        const numVal = parseFloat(launchDateRaw);
+        if (!isNaN(numVal) && numVal > 25569 && numVal < 60000) {
+          // Looks like an Excel serial (25569 = Jan 1 1970, 60000 = ~2064)
+          const parsed = new Date((numVal - 25569) * 86400 * 1000);
+          if (!isNaN(parsed.getTime())) launchDate = parsed;
+        } else {
+          // Try as a regular date string (e.g. "16/01/2025", "2025-01-16")
+          // Normalise DD/MM/YYYY → YYYY-MM-DD for reliable parsing
+          const normalised = launchDateRaw.replace(
+            /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/, '$3-$2-$1'
+          );
+          const parsed = new Date(normalised);
+          if (!isNaN(parsed.getTime()) && parsed.getFullYear() >= 2020 && parsed.getFullYear() <= 2035) {
+            launchDate = parsed;
+          }
+        }
       }
 
       const existing = await db.chargingStation.findUnique({ where: { chargerId: normalizedId } });
