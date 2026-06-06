@@ -146,7 +146,7 @@ async function seed() {
       notes: 'Largest Roam Hub with 60 chargers! Shop-based, no container.',
     },
     {
-      chargerId: '#RH-KE-A-19', name: 'Roam Hub - Thika Centre', type: 'hub', status: 'operational',
+      chargerId: '#RH-KE-A-19', name: 'Roam Hub - Thika Centre', type: 'hub', status: 'planned',
       address: 'Thika Centre, Thika', neighborhood: 'Thika',
       latitude: -1.03381, longitude: 37.07543,
       chargerCount: 15, totalKw: 12.6,
@@ -157,7 +157,7 @@ async function seed() {
       notes: 'First hub outside Nairobi. Thika Centre location with after-sales.',
     },
     {
-      chargerId: '#RH-KE-A-20', name: 'Roam Hub - Machakos Centre', type: 'hub', status: 'operational',
+      chargerId: '#RH-KE-A-20', name: 'Roam Hub - Machakos Centre', type: 'hub', status: 'planned',
       address: 'Machakos Centre, Machakos', neighborhood: 'Machakos',
       latitude: -1.52782, longitude: 37.20929,
       chargerCount: 10, totalKw: 8.4,
@@ -168,7 +168,7 @@ async function seed() {
       notes: 'TotalEnergies Machakos. First Machakos hub.',
     },
     {
-      chargerId: '#RH-KE-A-21', name: 'Roam Hub - Nairobi Regional Office', type: 'hub', status: 'operational',
+      chargerId: '#RH-KE-A-21', name: 'Roam Hub - Nairobi Regional Office', type: 'hub', status: 'planned',
       address: 'Nairobi Regional Office, Industrial Area', neighborhood: 'Industrial Area',
       latitude: -1.30187, longitude: 36.8332,
       chargerCount: 61, totalKw: 51.24,
@@ -179,7 +179,7 @@ async function seed() {
       notes: 'Largest hub at 61 chargers, 51kW. Regional HQ with all services.',
     },
     {
-      chargerId: '#RH-KE-A-23', name: "Roam Hub - Adam's Minimall", type: 'hub', status: 'operational',
+      chargerId: '#RH-KE-A-23', name: "Roam Hub - Adam's Minimall", type: 'hub', status: 'planned',
       address: "Adam's Minimall, Nairobi", neighborhood: 'Industrial Area',
       latitude: -1.30085, longitude: 36.77946,
       chargerCount: 79, totalKw: 77.7,
@@ -190,7 +190,7 @@ async function seed() {
       notes: 'NEW largest hub at 79 chargers, 77.7kW! Partnership with Adams Minimall.',
     },
     {
-      chargerId: '#RH-KE-A-24', name: 'Roam Hub - Langata', type: 'hub', status: 'operational',
+      chargerId: '#RH-KE-A-24', name: 'Roam Hub - Langata', type: 'hub', status: 'planned',
       address: 'Langata, Nairobi', neighborhood: 'Langata',
       latitude: -1.34207, longitude: 36.7639,
       chargerCount: 30, totalKw: 25.2,

@@ -126,8 +126,9 @@ async function processLiveData(rows: Record<string, unknown>[], result: SyncResu
       const closeTime = extractString(row, ['closeTime']);
 
       const existing = await db.chargingStation.findUnique({ where: { chargerId } });
+      const status = type === 'hub' ? 'planned' : 'operational';
       const data = {
-        name, type, status: 'operational',
+        name, type, status,
         address: name,
         neighborhood: 'Nairobi',
         latitude: lat, longitude: lng,
@@ -198,8 +199,11 @@ async function processMultiRowSheet(
       const phone = get(row, 'Phone Number');
       const siteManager = get(row, 'Full Name');
 
+      const isTemplateName = !rawName || /^Roam\s+(Hub|Point|Kiosk)\s*-\s*$/i.test(rawName.trim());
+      const isEmptyTemplate = isTemplateName && !coordRaw && !statusRaw && !phone && !siteManager;
+
       // Purge/Self-healing: Delete empty template rows if they exist in the database
-      if (!rawName && !coordRaw && !statusRaw && !phone && !siteManager) {
+      if (isEmptyTemplate) {
         await db.chargingStation.deleteMany({ where: { chargerId: normalizedId } });
         continue;
       }
@@ -219,13 +223,25 @@ async function processMultiRowSheet(
         }
       }
 
-      const status = parseStatus(statusRaw, type === 'hub' ? 'operational' : 'planned');
+      const status = parseStatus(statusRaw, 'planned');
 
       const existing = await db.chargingStation.findUnique({ where: { chargerId: normalizedId } });
       const stationName = get(row, 'Station Name', 'Site Name') ?? name;
       const area = get(row, 'Area', 'Site Name') ?? 'Nairobi';
-      const chargerCount = parseInt(get(row, 'Total') ?? '0') || (type === 'point' ? 1 : type === 'kiosk' ? 4 : 0);
-      const totalKw = parseFloat(get(row, 'Total kW') ?? '0') || (type === 'point' ? 6 : 0);
+      let chargerCount = 0;
+      if (type === 'point') {
+        const socket = parseInt(get(row, 'Socket v1.2') ?? '0') || 0;
+        const type6_3p = parseInt(get(row, '6kW DC 1xType 6 3P') ?? '0') || 0;
+        const type6_1p = parseInt(get(row, '6kW DC 2xType 6 1P') ?? '0') || 0;
+        chargerCount = socket + type6_3p + type6_1p;
+        if (chargerCount === 0) {
+          chargerCount = 1; // Fallback
+        }
+      } else {
+        chargerCount = parseInt(get(row, 'Total') ?? '0') || (type === 'kiosk' ? 4 : 0);
+      }
+
+      const totalKw = parseFloat(get(row, 'Total kW') ?? '0') || (type === 'point' ? chargerCount * 6 : 0);
 
       const servicesArr = type === 'hub' 
         ? ['charging', 'rental'] 
@@ -292,8 +308,9 @@ async function processRoamPoints(rows: Record<string, unknown>[], result: SyncRe
       const phone = extractString(row, ['Phone', 'Contact', 'phone', 'contact_number']);
       const siteManager = extractString(row, ['Site Manager', 'Contact Person', 'Manager', 'site_manager']);
 
+      const isTemplateName = !rawName || /^Roam\s+(Hub|Point|Kiosk)\s*-\s*$/i.test(rawName.trim());
       // Skip empty template rows
-      if (!rawName && lat === null && lng === null && !statusRaw && !phone && !siteManager) {
+      if (isTemplateName && lat === null && lng === null && !statusRaw && !phone && !siteManager) {
         continue;
       }
 
@@ -377,8 +394,9 @@ async function processRoamHubs(rows: Record<string, unknown>[], result: SyncResu
       const phone = extractString(row, ['Phone', 'Contact', 'phone']);
       const siteManager = extractString(row, ['Site Manager', 'Manager', 'site_manager']);
 
+      const isTemplateName = !rawName || /^Roam\s+(Hub|Point|Kiosk)\s*-\s*$/i.test(rawName.trim());
       // Skip empty template rows
-      if (!rawName && lat === null && lng === null && !statusRaw && !phone && !siteManager) {
+      if (isTemplateName && lat === null && lng === null && !statusRaw && !phone && !siteManager) {
         continue;
       }
 
@@ -716,8 +734,9 @@ async function processGenericSheet(rows: Record<string, unknown>[], result: Sync
       const lat = extractNumber(row, ['Latitude', 'lat', 'Lat']);
       const lng = extractNumber(row, ['Longitude', 'lng', 'Lng']);
 
+      const isTemplateName = !rawName || /^Roam\s+(Hub|Point|Kiosk)\s*-\s*$/i.test(rawName.trim());
       // Skip empty template rows
-      if (!rawName && lat === null && lng === null) {
+      if (isTemplateName && lat === null && lng === null) {
         continue;
       }
 
@@ -806,31 +825,7 @@ function detectChanges(existing: Record<string, unknown>, newData: Record<string
 
 // ─── Post-Sync Cleanup & Status Adjustments ──────────────────────────────────
 async function postSyncCleanup() {
-  try {
-    const approvedSites = await db.pipelineSite.findMany({
-      where: {
-        status: { in: ['approved', 'Approved'] }
-      }
-    });
-
-    const stations = await db.chargingStation.findMany({
-      where: {
-        type: 'point'
-      }
-    });
-
-    for (const site of approvedSites) {
-      const match = findActiveStationMatch(site, stations);
-      if (match && match.status !== 'operational') {
-        await db.chargingStation.update({
-          where: { id: match.id },
-          data: { status: 'construction' }
-        });
-      }
-    }
-  } catch (error) {
-    console.error('Error during postSyncCleanup:', error);
-  }
+  // Disabled status override to ensure point station statuses align strictly with the Locations Database Excel source of truth.
 }
 
 function findActiveStationMatch(site: any, stations: any[]) {
