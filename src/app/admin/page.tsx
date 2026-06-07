@@ -182,18 +182,18 @@ function StationTable({ stations, onUpdate }: {
     <table className="w-full">
       <thead>
         <tr className="border-b border-white/5">
-          <th className="text-left px-4 py-3 text-white/35 text-[11px] font-medium uppercase tracking-wider">Station</th>
-          <th className="text-left px-4 py-3 text-white/35 text-[11px] font-medium uppercase tracking-wider hidden lg:table-cell">ID</th>
-          <th className="text-left px-4 py-3 text-white/35 text-[11px] font-medium uppercase tracking-wider hidden md:table-cell">Launch</th>
-          <th className="text-left px-4 py-3 text-white/35 text-[11px] font-medium uppercase tracking-wider hidden sm:table-cell">Chargers</th>
-          <th className="text-left px-4 py-3 text-white/35 text-[11px] font-medium uppercase tracking-wider">Status</th>
-          <th className="text-right px-4 py-3 text-white/35 text-[11px] font-medium uppercase tracking-wider">Override</th>
+          <th className="text-left px-3 sm:px-4 py-3 text-white/35 text-[11px] font-medium uppercase tracking-wider">Station</th>
+          <th className="text-left px-3 sm:px-4 py-3 text-white/35 text-[11px] font-medium uppercase tracking-wider hidden lg:table-cell">ID</th>
+          <th className="text-left px-3 sm:px-4 py-3 text-white/35 text-[11px] font-medium uppercase tracking-wider hidden md:table-cell">Launch</th>
+          <th className="text-left px-3 sm:px-4 py-3 text-white/35 text-[11px] font-medium uppercase tracking-wider hidden sm:table-cell">Chargers</th>
+          <th className="text-left px-3 sm:px-4 py-3 text-white/35 text-[11px] font-medium uppercase tracking-wider">Status</th>
+          <th className="text-right px-3 sm:px-4 py-3 text-white/35 text-[11px] font-medium uppercase tracking-wider">Override</th>
         </tr>
       </thead>
       <tbody>
         {stations.map((station) => (
           <tr key={station.id} className={`border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors group ${station.hasOverride ? 'bg-[#E8621A]/[0.015]' : ''}`}>
-            <td className="px-4 py-3">
+            <td className="px-3 sm:px-4 py-3">
               <p className="text-white text-sm font-medium leading-tight">{station.name}</p>
               <p className="text-white/35 text-xs mt-0.5">{station.neighborhood}</p>
               {station.hasOverride && station.overrideInfo && (
@@ -203,23 +203,23 @@ function StationTable({ stations, onUpdate }: {
                 </p>
               )}
             </td>
-            <td className="px-4 py-3 hidden lg:table-cell">
+            <td className="px-3 sm:px-4 py-3 hidden lg:table-cell">
               <code className="text-white/25 text-[11px]">{station.chargerId}</code>
             </td>
-            <td className="px-4 py-3 hidden md:table-cell">
+            <td className="px-3 sm:px-4 py-3 hidden md:table-cell">
               <span className="text-white/40 text-xs">
                 {station.launchDate
                   ? new Date(station.launchDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' })
                   : <span className="text-white/15">-</span>}
               </span>
             </td>
-            <td className="px-4 py-3 hidden sm:table-cell">
+            <td className="px-3 sm:px-4 py-3 hidden sm:table-cell">
               <span className="text-white/40 text-xs">{station.chargerCount > 0 ? `${station.chargerCount} · ${station.totalKw.toFixed(1)}kW` : '-'}</span>
             </td>
-            <td className="px-4 py-3">
+            <td className="px-3 sm:px-4 py-3">
               <StatusBadge status={station.status} hasOverride={station.hasOverride} />
             </td>
-            <td className="px-4 py-3">
+            <td className="px-3 sm:px-4 py-3">
               <OverrideDropdown station={station} onUpdate={onUpdate} />
             </td>
           </tr>
@@ -326,7 +326,7 @@ export default function AdminPage() {
       )}
 
       {/* Header */}
-      <header className="relative border-b border-white/5 px-6 py-4">
+      <header className="relative border-b border-white/5 px-4 sm:px-6 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <a href="/">
@@ -360,7 +360,7 @@ export default function AdminPage() {
         </div>
       </header>
 
-      <main className="relative max-w-6xl mx-auto px-6 py-6">
+      <main className="relative max-w-6xl mx-auto px-4 sm:px-6 py-6">
         {/* Summary strip */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
           {[
@@ -380,7 +380,7 @@ export default function AdminPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex items-center gap-1 mb-4 bg-white/[0.03] border border-white/5 rounded-2xl p-1.5 w-fit">
+        <div className="flex items-center gap-1 mb-4 bg-white/[0.03] border border-white/5 rounded-2xl p-1.5 overflow-x-auto max-w-full [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {tabs.map((tab) => {
             const TypeIcon = TYPE_CONFIG[tab.key].icon;
             const isActive = activeTab === tab.key;
@@ -388,7 +388,7 @@ export default function AdminPage() {
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 flex-shrink-0 ${
                   isActive
                     ? `bg-white/10 ${TYPE_CONFIG[tab.key].color} border ${TYPE_CONFIG[tab.key].accent}`
                     : 'text-white/40 hover:text-white/70 hover:bg-white/5'
@@ -407,7 +407,7 @@ export default function AdminPage() {
         </div>
 
         {/* Active tab context bar */}
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
           <div>
             <h1 className="text-base font-bold text-white">
               {TYPE_CONFIG[activeTab].label} - {tabStations.filter(s => s.status === 'operational').length} operational
@@ -427,7 +427,7 @@ export default function AdminPage() {
         </div>
 
         {/* Table */}
-        <div className="bg-white/[0.02] border border-white/5 rounded-2xl overflow-hidden">
+        <div className="bg-white/[0.02] border border-white/5 rounded-2xl overflow-x-auto max-w-full">
           {loading ? (
             <div className="flex items-center justify-center py-16 gap-2">
               <RefreshCw className="w-4 h-4 text-[#E8621A] animate-spin" />
