@@ -142,7 +142,7 @@ export default function Dashboard() {
 
                 <ThemeToggle />
 
-                {session?.user ? (
+                {session?.user && (
                   <>
                     {session.user.isAdmin && (
                       <a href="/admin">
