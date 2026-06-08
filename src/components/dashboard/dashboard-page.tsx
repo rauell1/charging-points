@@ -142,16 +142,7 @@ export default function Dashboard() {
 
                 <ThemeToggle />
 
-                {!session?.user ? (
-                  <a href="/admin">
-                    <Button
-                      variant="ghost"
-                      className="border border-white/20 text-white hover:bg-white hover:text-black rounded-full px-4 py-1.5 h-8 text-xs font-semibold transition-all cursor-pointer"
-                    >
-                      Admin Login
-                    </Button>
-                  </a>
-                ) : (
+                {session?.user ? (
                   <>
                     {session.user.isAdmin && (
                       <a href="/admin">
