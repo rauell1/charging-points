@@ -88,7 +88,7 @@ export async function syncWorkbook(workbook: XLSX.WorkBook, source: string, file
   const handled = new Set(['Live data', rhSheet, rpSheet, rkSheet, 'SITES'].filter(Boolean));
   if (!handled.size || (!sheetNames.includes('Live data') && !rhSheet && !rpSheet && !rkSheet && !sheetNames.includes('SITES'))) {
     for (const name of sheetNames) {
-      if (['CONFIG', 'LOOKUPS', 'AGENTS', 'MULTI SITES PARTNERS', 'TBD', 'Leads', 'Scheduled Site Visit'].includes(name)) continue;
+      if (['CONFIG', 'LOOKUPS', 'AGENTS', 'MULTI SITES PARTNERS', 'TBD', 'Leads', 'Scheduled Site Visit', 'FORM_RESPONSES', 'Form Responses 1'].includes(name)) continue;
       if (handled.has(name)) continue;
       const sheet = workbook.Sheets[name];
       if (!sheet) continue;
@@ -559,6 +559,10 @@ async function processSitesSheet(rows: Record<string, unknown>[], result: SyncRe
     try {
       const siteId = extractString(row, ['Site_ID', 'Site ID', 'site_id']);
       if (!siteId) continue;
+
+      // Skip rows flagged as duplicates
+      const dupFlag = extractString(row, ['Duplicate_Flag', 'Duplicate Flag', 'duplicate_flag']);
+      if (dupFlag && dupFlag.trim().toLowerCase() === 'yes') continue;
 
       const landmark = extractString(row, ['Landmark', 'Site Name']) ?? 'Unknown Landmark';
       const neighborhood = extractString(row, ['County', 'Neighborhood', 'Area']) ?? 'Nairobi';

@@ -1,46 +1,53 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { Zap, BatteryCharging, HardHat, Radio } from 'lucide-react';
+import { BatteryCharging, Zap, HardHat } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
-interface Station {
-  id: string;
-  chargerId: string;
-  name: string;
-  type: string;
-  status: string;
-  chargerCount: number;
-  totalKw: number;
+interface BreakdownCell {
+  count: number;
+  chargers: number;
+  kw: number;
 }
 
-interface AnalyticsData {
+interface StatusBreakdown {
+  operationalHubs:    BreakdownCell;
+  operationalPoints:  BreakdownCell;
+  constructionHubs:   BreakdownCell;
+  constructionPoints: BreakdownCell;
+  plannedHubs:        BreakdownCell;
+  plannedPoints:      BreakdownCell;
+  blockedHubs:        BreakdownCell;
+  blockedPoints:      BreakdownCell;
+  archivedHubs:       BreakdownCell;
+  archivedPoints:     BreakdownCell;
+}
+
+interface AnalyticsResponse {
   overview: {
     totalStations: number;
     activeStations: number;
-    constructionStations: number;
     hubCount: number;
     pointCount: number;
-    operationalKiosks: number;
-    constructionHubs: number;
-    constructionPoints: number;
-    constructionKiosks: number;
     totalSessions: number;
     totalChargers: number;
   };
-  stationStats: Array<{
-    id: string;
-    name: string;
-    type: string;
-    status: string;
-    sessionCount: number;
-    totalEnergy: number;
-    totalRevenue: number;
-  }>;
+  statusBreakdown: StatusBreakdown;
+}
+
+const EMPTY_CELL: BreakdownCell = { count: 0, chargers: 0, kw: 0 };
+
+function PulsingDot() {
+  return (
+    <span className="relative flex h-2 w-2">
+      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#E8621A] opacity-75" />
+      <span className="relative inline-flex rounded-full h-2 w-2 bg-[#E8621A]" />
+    </span>
+  );
 }
 
 export function OverviewCards() {
-  const { data: analyticsData, isLoading: isAnalyticsLoading } = useQuery<AnalyticsData>({
+  const { data, isLoading } = useQuery<AnalyticsResponse>({
     queryKey: ['analytics'],
     queryFn: () =>
       fetch('/api/analytics').then((r) => {
@@ -49,257 +56,219 @@ export function OverviewCards() {
       }),
   });
 
-  const { data: stations, isLoading: isStationsLoading } = useQuery<Station[]>({
-    queryKey: ['stations'],
-    queryFn: () =>
-      fetch('/api/stations').then((r) => {
-        if (!r.ok) throw new Error(`API error ${r.status}`);
-        return r.json();
-      }),
-  });
-
-  const isLoading = isAnalyticsLoading || isStationsLoading || !analyticsData || !stations;
-
   if (isLoading) {
     return (
-      <div className="space-y-4 md:space-y-6">
-        <Skeleton className="h-28 w-full rounded-2xl animate-pulse bg-zinc-200 dark:bg-zinc-800" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Skeleton className="h-32 rounded-2xl animate-pulse bg-zinc-200 dark:bg-zinc-800" />
-          <Skeleton className="h-32 rounded-2xl animate-pulse bg-zinc-200 dark:bg-zinc-800" />
-          <Skeleton className="h-32 rounded-2xl animate-pulse bg-zinc-200 dark:bg-zinc-800" />
+      <div className="space-y-3">
+        <Skeleton className="h-20 w-full rounded-2xl" />
+        <div className="grid grid-cols-1 min-[480px]:grid-cols-3 gap-3">
+          <Skeleton className="h-32 rounded-2xl" />
+          <Skeleton className="h-32 rounded-2xl" />
+          <Skeleton className="h-32 rounded-2xl" />
         </div>
-        <Skeleton className="h-20 w-full rounded-2xl animate-pulse bg-zinc-200 dark:bg-zinc-800" />
+        <Skeleton className="h-20 w-full rounded-2xl" />
       </div>
     );
   }
 
-  const overview = analyticsData.overview;
-  const stationStats = Array.isArray(analyticsData?.stationStats) ? analyticsData.stationStats : [];
-  const stationsList = Array.isArray(stations) ? stations : [];
+  const sb = data?.statusBreakdown;
+  const overview = data?.overview;
 
-  // Active counts from API
-  const activeStations = overview.activeStations || 0;
-  const constructionStations = overview.constructionStations || 0;
-  
-  const operationalHubs = overview.hubCount || 0;
-  const operationalPoints = overview.pointCount || 0;
-  const operationalKiosks = overview.operationalKiosks || 0;
+  // ── Derived numbers ────────────────────────────────────────────────────────
+  const opHubs    = sb?.operationalHubs    ?? EMPTY_CELL;
+  const opPoints  = sb?.operationalPoints  ?? EMPTY_CELL;
+  const conHubs   = sb?.constructionHubs   ?? EMPTY_CELL;
+  const conPoints = sb?.constructionPoints ?? EMPTY_CELL;
+  const plHubs    = sb?.plannedHubs        ?? EMPTY_CELL;
+  const plPoints  = sb?.plannedPoints      ?? EMPTY_CELL;
 
-  const constructionHubs = overview.constructionHubs || 0;
-  const constructionPoints = overview.constructionPoints || 0;
-  const constructionKiosks = overview.constructionKiosks || 0;
-
-  const constructionPointsChargers = stationsList
-    .filter((s) => s.type === 'point' && s.status === 'construction')
-    .reduce((sum, s) => sum + (s.chargerCount || 0), 0);
-
-  // Planned counts derived from stats
-  const plannedHubs = stationStats.filter((s) => s.type === 'hub' && s.status === 'planned').length;
-  const plannedPoints = stationStats.filter((s) => s.type === 'point' && s.status === 'planned').length;
-  const plannedKiosks = stationStats.filter((s) => s.type === 'kiosk' && s.status === 'planned').length;
-  const totalPlanned = plannedHubs + plannedPoints + plannedKiosks;
-
-  // Total tracked active + planned
-  const totalTracked = activeStations + constructionStations + totalPlanned;
-
-  // Live capacity calculations from operational stations
-  const operationalStations = stationsList.filter((s) => s.status === 'operational');
-  const liveChargers = operationalStations.reduce((sum, s) => sum + (s.chargerCount || 0), 0);
-  const liveKw = operationalStations.reduce((sum, s) => sum + (s.totalKw || 0), 0);
-  const formattedKw = liveKw.toLocaleString(undefined, {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 1,
-  });
-
-  // Percentages for progress bar
-  const opPct = totalTracked > 0 ? (activeStations / totalTracked) * 100 : 0;
-  const constPct = totalTracked > 0 ? (constructionStations / totalTracked) * 100 : 0;
-  const planPct = totalTracked > 0 ? (totalPlanned / totalTracked) * 100 : 0;
+  const totalOperational  = opHubs.count + opPoints.count;
+  const totalConstruction = conHubs.count + conPoints.count;
+  const totalPlanned      = plHubs.count + plPoints.count;
+  const totalAll          = overview?.totalStations ?? 0;
+  const operationalChargers = opHubs.chargers + opPoints.chargers;
+  const operationalKw       = Math.round((opHubs.kw + opPoints.kw) * 10) / 10;
+  const deployedPct         = totalAll > 0 ? Math.round((totalOperational / totalAll) * 1000) / 10 : 0;
 
   return (
-    <div className="space-y-4 md:space-y-6">
-      {/* TIER 1 - Hero Split Stat Bar (full width, dark background #0D0D0D) */}
-      <div className="bg-[#0D0D0D] border border-zinc-900 rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xl relative overflow-hidden">
-        {/* Subtle orange ambient glow on the right */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-[#E8621A] opacity-[0.03] rounded-full blur-3xl pointer-events-none" />
+    <div className="space-y-3">
 
-        <div className="flex flex-col md:flex-row md:items-center divide-y md:divide-y-0 md:divide-x divide-zinc-800 gap-6 w-full z-10">
-          {/* Left section: Deployed operational stations */}
-          <div className="flex items-center gap-4 flex-1 min-w-0 pb-4 md:pb-0">
-            <div className="bg-[#E8621A]/10 rounded-2xl p-3 flex items-center justify-center border border-[#E8621A]/20">
-              <Zap className="h-7 w-7 text-[#E8621A] animate-pulse" />
-            </div>
-            <div className="space-y-0.5">
-              <div className="flex items-baseline gap-2">
-                <span className="font-black text-4xl md:text-5xl text-[#E8621A] tracking-tighter leading-none font-display">
-                  {activeStations}
-                </span>
-                <span className="block font-bold text-xs tracking-widest text-white uppercase">
-                  OPERATIONAL SITES (DEPLOYED)
-                </span>
-              </div>
-              <span className="block text-xs md:text-sm text-white/60 font-semibold mt-1">
-                {liveChargers} Chargers <span className="text-white/30 mx-1.5">•</span> {formattedKw} kW Capacity
-              </span>
-            </div>
-          </div>
-
-          {/* Right section: Deploying under construction */}
-          <div className="flex items-center gap-4 flex-1 min-w-0 pt-4 md:pt-0 md:pl-6">
-            <div className="bg-amber-500/10 rounded-2xl p-3 flex items-center justify-center border border-amber-500/20">
-              <HardHat className="h-7 w-7 text-amber-500" />
-            </div>
-            <div className="space-y-0.5">
-              <div className="flex items-baseline gap-2">
-                <span className="font-black text-4xl md:text-5xl text-amber-500 tracking-tighter leading-none font-display">
-                  {constructionStations}
-                </span>
-                <span className="block font-bold text-xs tracking-widest text-white/95 uppercase">
-                  IN PROGRESS (DEPLOYING)
-                </span>
-              </div>
-              <span className="block text-xs md:text-sm text-white/60 font-semibold mt-1">
-                {constructionHubs} Hubs + {constructionPointsChargers} Point Chargers ({constructionPoints} sites) + {constructionKiosks} Kiosk
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 bg-zinc-900/60 border border-zinc-800/85 rounded-full px-3 py-1.5 self-start md:self-center z-10 shadow-sm flex-shrink-0">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#E8621A] opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#E8621A]"></span>
-          </span>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-white/90">
-            Live Now
-          </span>
-        </div>
-      </div>
-
-      {/* TIER 2 - Three infrastructure status cards (strictly Deployed vs Deploying) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-        {/* Card 1: ROAM HUBS */}
-        <div className="bg-white dark:bg-[#141414] border border-zinc-150 dark:border-zinc-850 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex items-start justify-between gap-4">
-          <div className="space-y-1 min-w-0">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A9A]">
-              ROAM HUBS
-            </span>
-            <p className="text-4xl font-black text-[#0D0D0D] dark:text-white leading-tight font-display">
-              {operationalHubs}{' '}
-              <span className="text-sm font-bold text-[#9A9A9A] normal-case tracking-normal">
-                deployed
-              </span>
-            </p>
-            <p className="text-xs text-[#9A9A9A] font-semibold flex items-center gap-1.5">
-              <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
-              <span>{constructionHubs} deploying (in progress)</span>
-            </p>
-          </div>
-          <div className="rounded-xl p-3 bg-[#E8621A]/10 border border-[#E8621A]/10 flex-shrink-0">
-            <BatteryCharging className="h-6 w-6 text-[#E8621A]" />
-          </div>
-        </div>
-
-        {/* Card 2: ROAM POINTS */}
-        <div className="bg-white dark:bg-[#141414] border border-zinc-150 dark:border-zinc-850 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex items-start justify-between gap-4">
-          <div className="space-y-1 min-w-0">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A9A]">
-              ROAM POINTS
-            </span>
-            <p className="text-4xl font-black text-[#0D0D0D] dark:text-white leading-tight font-display">
-              {operationalPoints}{' '}
-              <span className="text-sm font-bold text-[#9A9A9A] normal-case tracking-normal">
-                deployed
-              </span>
-            </p>
-            <p className="text-xs text-[#9A9A9A] font-semibold flex items-center gap-1.5">
-              <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
-              <span>{constructionPointsChargers} chargers deploying ({constructionPoints} sites)</span>
-            </p>
-          </div>
-          <div className="rounded-xl p-3 bg-[#0D0D0D]/10 dark:bg-white/10 flex-shrink-0">
-            <Zap className="h-6 w-6 text-[#0D0D0D] dark:text-white" />
-          </div>
-        </div>
-
-        {/* Card 3: ROAM KIOSKS */}
-        <div className="bg-white dark:bg-[#141414] border border-zinc-150 dark:border-zinc-850 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all flex items-start justify-between gap-4">
-          <div className="space-y-1 min-w-0">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A9A]">
-              ROAM KIOSKS
-            </span>
-            <p className="text-4xl font-black text-[#0D0D0D] dark:text-white leading-tight font-display">
-              {operationalKiosks}{' '}
-              <span className="text-sm font-bold text-[#9A9A9A] normal-case tracking-normal">
-                deployed
-              </span>
-            </p>
-            <p className="text-xs text-[#9A9A9A] font-semibold flex items-center gap-1.5">
-              <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
-              <span>{constructionKiosks} deploying (in progress)</span>
-            </p>
-          </div>
-          <div className="rounded-xl p-3 bg-zinc-100 dark:bg-zinc-800 flex-shrink-0">
-            <Radio className="h-6 w-6 text-zinc-650 dark:text-zinc-300" />
-          </div>
-        </div>
-      </div>
-
-      {/* TIER 3 - Projections & Full Pipeline (full width progress bar) */}
-      <div className="bg-[#F5F5F5] dark:bg-[#121212]/40 border border-zinc-150 dark:border-zinc-900 rounded-2xl p-5 flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A9A]">
-            DEPLOYMENT PIPELINE
-          </span>
-          <span className="text-xs font-bold text-[#0D0D0D] dark:text-white/80">
-            {totalTracked} total tracked sites
-          </span>
-        </div>
-
+      {/* ── TIER 1: Hero operational banner ─────────────────────────────── */}
+      <div className="bg-[#0D0D0D] rounded-2xl px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-4">
-          {/* Segmented Progress Bar */}
-          <div className="flex h-3 w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
-            <div
-              style={{ width: `${opPct}%` }}
-              className="bg-[#E8621A] h-full transition-all duration-500"
-              title={`Deployed (Operational): ${opPct.toFixed(1)}%`}
-            />
-            <div
-              style={{ width: `${constPct}%` }}
-              className="bg-amber-500 h-full transition-all duration-500"
-              title={`Deploying (Construction): ${constPct.toFixed(1)}%`}
-            />
-            <div
-              style={{ width: `${planPct}%` }}
-              className="bg-zinc-300 dark:bg-zinc-700 h-full transition-all duration-500"
-              title={`Planned Projections: ${planPct.toFixed(1)}%`}
-            />
+          <div className="flex items-baseline gap-1.5">
+            <span className="font-black text-5xl md:text-6xl text-[#E8621A] font-display leading-none">
+              {totalOperational}
+            </span>
+            <div className="flex flex-col">
+              <span className="text-white font-bold text-xs uppercase tracking-widest leading-tight">
+                Operational
+              </span>
+              <span className="text-white font-bold text-xs uppercase tracking-widest leading-tight">
+                Charging Sites
+              </span>
+            </div>
           </div>
-          <span className="text-sm font-black text-[#E8621A] whitespace-nowrap font-display">
-            {opPct.toFixed(1)}% deployed
+          <div className="hidden sm:block w-px h-10 bg-white/10" />
+          <div className="hidden sm:flex flex-col gap-0.5">
+            <span className="text-white/80 text-sm font-semibold">
+              {operationalChargers} Chargers
+            </span>
+            <span className="text-white/50 text-xs">
+              {operationalKw} kW capacity
+            </span>
+          </div>
+        </div>
+        <div className="flex items-center gap-4 sm:flex-col sm:items-end">
+          <div className="flex items-center gap-1.5">
+            <PulsingDot />
+            <span className="text-[#E8621A] text-xs font-semibold uppercase tracking-wider">
+              Live Now
+            </span>
+          </div>
+          <span className="text-white/40 text-xs sm:text-right">
+            Across Nairobi, Kenya
           </span>
         </div>
+      </div>
 
-        <div className="flex flex-wrap items-center gap-3 text-[11px] font-semibold text-zinc-700 dark:text-zinc-300">
-          <div className="inline-flex items-center gap-1.5 bg-white dark:bg-[#181818] border border-zinc-200/50 dark:border-zinc-800/80 px-3 py-1 rounded-full shadow-sm">
-            <span className="h-2 w-2 rounded-full bg-[#E8621A]" />
-            <span>Deployed {activeStations}</span>
+      {/* ── TIER 2: Three status cards ──────────────────────────────────── */}
+      <div className="grid grid-cols-1 min-[480px]:grid-cols-3 gap-3">
+
+        {/* Roam Hubs */}
+        <div className="bg-white dark:bg-[#141414] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 hover:border-[#E8621A]/30 transition-colors">
+          <div className="flex items-start justify-between mb-3">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-400">
+              Roam Hubs
+            </p>
+            <div className="rounded-xl p-2 bg-[#E8621A]/10">
+              <BatteryCharging className="h-4 w-4 text-[#E8621A]" />
+            </div>
           </div>
-          <div className="inline-flex items-center gap-1.5 bg-white dark:bg-[#181818] border border-zinc-200/50 dark:border-zinc-800/80 px-3 py-1 rounded-full shadow-sm">
-            <span className="h-2 w-2 rounded-full bg-amber-500" />
-            <span>Deploying {constructionStations}</span>
+          <p className="font-black text-4xl text-[#0D0D0D] dark:text-white font-display leading-none mb-1">
+            {opHubs.count}
+          </p>
+          <p className="text-xs text-zinc-400 mb-2">operational</p>
+          <div className="flex items-center gap-1 text-[11px] text-zinc-400">
+            <span className="text-[#E8621A] font-semibold">{opHubs.chargers}</span>
+            <span>chargers &middot;</span>
+            <span className="text-[#E8621A] font-semibold">{opHubs.kw}</span>
+            <span>kW</span>
           </div>
-          <div className="inline-flex items-center gap-1.5 bg-white dark:bg-[#181818] border border-zinc-200/50 dark:border-zinc-800/80 px-3 py-1 rounded-full shadow-sm">
-            <span className="h-2 w-2 rounded-full bg-zinc-350 dark:bg-zinc-600" />
-            <span>Planned Milestones {totalPlanned}</span>
+          {plHubs.count > 0 && (
+            <p className="text-[10px] text-zinc-400 mt-2 flex items-center gap-1">
+              <span className="text-[#E8621A]">&#8599;</span>
+              {plHubs.count} planned
+            </p>
+          )}
+        </div>
+
+        {/* Roam Points */}
+        <div className="bg-white dark:bg-[#141414] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 hover:border-[#E8621A]/30 transition-colors">
+          <div className="flex items-start justify-between mb-3">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-400">
+              Roam Points
+            </p>
+            <div className="rounded-xl p-2 bg-[#0D0D0D]/5 dark:bg-white/5">
+              <Zap className="h-4 w-4 text-[#0D0D0D] dark:text-white" />
+            </div>
+          </div>
+          <p className="font-black text-4xl text-[#0D0D0D] dark:text-white font-display leading-none mb-1">
+            {opPoints.count}
+          </p>
+          <p className="text-xs text-zinc-400 mb-2">operational</p>
+          <div className="flex items-center gap-1 text-[11px] text-zinc-400">
+            <span className="font-semibold text-[#0D0D0D] dark:text-white">{opPoints.chargers}</span>
+            <span>chargers &middot;</span>
+            <span className="font-semibold text-[#0D0D0D] dark:text-white">{opPoints.kw}</span>
+            <span>kW</span>
+          </div>
+          {plPoints.count > 0 && (
+            <p className="text-[10px] text-zinc-400 mt-2 flex items-center gap-1">
+              <span className="text-[#E8621A]">&#8599;</span>
+              {plPoints.count} planned
+            </p>
+          )}
+        </div>
+
+        {/* In Construction */}
+        <div className="bg-white dark:bg-[#141414] border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 hover:border-amber-400/30 transition-colors">
+          <div className="flex items-start justify-between mb-3">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-400">
+              In Progress
+            </p>
+            <div className="rounded-xl p-2 bg-amber-50 dark:bg-amber-400/10">
+              <HardHat className="h-4 w-4 text-amber-500" />
+            </div>
+          </div>
+          <p className="font-black text-4xl text-[#0D0D0D] dark:text-white font-display leading-none mb-1">
+            {totalConstruction}
+          </p>
+          <p className="text-xs text-zinc-400 mb-2">under construction</p>
+          <div className="text-[11px] text-zinc-400 space-y-0.5">
+            {conHubs.count > 0 && (
+              <p><span className="font-semibold text-amber-500">{conHubs.count}</span> hub{conHubs.count !== 1 ? 's' : ''}</p>
+            )}
+            {conPoints.count > 0 && (
+              <p><span className="font-semibold text-amber-500">{conPoints.count}</span> point{conPoints.count !== 1 ? 's' : ''}</p>
+            )}
+            {totalConstruction === 0 && <p className="text-zinc-300">None active</p>}
+          </div>
+        </div>
+      </div>
+
+      {/* ── TIER 3: Deployment pipeline ─────────────────────────────────── */}
+      <div className="bg-zinc-50 dark:bg-[#141414] border border-zinc-200 dark:border-zinc-800 rounded-2xl px-5 py-4">
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-400">
+            Deployment Pipeline
+          </p>
+          <p className="text-[10px] font-semibold text-zinc-400">
+            {totalAll.toLocaleString()} total sites
+          </p>
+        </div>
+
+        {/* Segmented progress bar */}
+        <div className="w-full h-2.5 rounded-full bg-zinc-200 dark:bg-zinc-700 overflow-hidden flex mb-3">
+          {totalAll > 0 && totalOperational > 0 && (
+            <div
+              className="h-full bg-[#E8621A] transition-all"
+              style={{ width: `${(totalOperational / totalAll) * 100}%` }}
+            />
+          )}
+          {totalAll > 0 && totalConstruction > 0 && (
+            <div
+              className="h-full bg-amber-400 transition-all"
+              style={{ width: `${(totalConstruction / totalAll) * 100}%` }}
+            />
+          )}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
+          <div className="flex items-center gap-1.5 text-[11px]">
+            <span className="inline-block w-2.5 h-2.5 rounded-full bg-[#E8621A]" />
+            <span className="text-zinc-600 dark:text-zinc-300 font-semibold">Operational</span>
+            <span className="text-zinc-400">{totalOperational}</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-[11px]">
+            <span className="inline-block w-2.5 h-2.5 rounded-full bg-amber-400" />
+            <span className="text-zinc-600 dark:text-zinc-300 font-semibold">Construction</span>
+            <span className="text-zinc-400">{totalConstruction}</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-[11px]">
+            <span className="inline-block w-2.5 h-2.5 rounded-full bg-zinc-300 dark:bg-zinc-600" />
+            <span className="text-zinc-600 dark:text-zinc-300 font-semibold">Planned</span>
+            <span className="text-zinc-400">{totalPlanned.toLocaleString()}</span>
+          </div>
+          <div className="ml-auto text-[11px] text-zinc-400 font-semibold">
+            {deployedPct}% deployed
           </div>
         </div>
 
-        <p className="text-[11px] text-[#9A9A9A] font-semibold border-t border-zinc-250/20 dark:border-zinc-800/40 pt-3">
-          Full Pipeline: {plannedHubs} Roam Hubs + {plannedPoints} Roam Points + {plannedKiosks} Roam Kiosks pending deployment across Kenya
+        <p className="text-[10px] text-zinc-400 mt-2 border-t border-zinc-200 dark:border-zinc-700 pt-2">
+          Future pipeline: {plHubs.count.toLocaleString()} Roam Hubs + {plPoints.count.toLocaleString()} Roam Points pending deployment across Kenya
         </p>
       </div>
+
     </div>
   );
 }

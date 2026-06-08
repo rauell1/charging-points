@@ -68,6 +68,40 @@ export async function GET() {
       };
     });
 
+    // Status × type breakdown for the tiered dashboard overview
+    const rawBreakdown = await db.chargingStation.groupBy({
+      by: ['status', 'type'],
+      _count: { id: true },
+      _sum: { chargerCount: true, totalKw: true },
+    });
+
+    type BreakdownCell = { count: number; chargers: number; kw: number };
+    const breakdown: Record<string, Record<string, BreakdownCell>> = {};
+    for (const row of rawBreakdown) {
+      if (!breakdown[row.status]) breakdown[row.status] = {};
+      breakdown[row.status][row.type] = {
+        count: row._count.id,
+        chargers: row._sum.chargerCount ?? 0,
+        kw: Math.round((row._sum.totalKw ?? 0) * 10) / 10,
+      };
+    }
+
+    const get = (status: string, type: string): BreakdownCell =>
+      breakdown[status]?.[type] ?? { count: 0, chargers: 0, kw: 0 };
+
+    const statusBreakdown = {
+      operationalHubs:     get('operational', 'hub'),
+      operationalPoints:   get('operational', 'point'),
+      constructionHubs:    get('construction', 'hub'),
+      constructionPoints:  get('construction', 'point'),
+      plannedHubs:         get('planned', 'hub'),
+      plannedPoints:       get('planned', 'point'),
+      blockedHubs:         get('blocked', 'hub'),
+      blockedPoints:       get('blocked', 'point'),
+      archivedHubs:        get('archived', 'hub'),
+      archivedPoints:      get('archived', 'point'),
+    };
+
     return NextResponse.json({
       overview: {
         totalStations,
@@ -82,6 +116,7 @@ export async function GET() {
         totalSessions,
         totalChargers: totalChargers._sum.chargerCount || 0,
       },
+      statusBreakdown,
       sessionsByVehicle,
       dailySessions: dailySessions.map((d) => ({
         date: d.date.toISOString().split('T')[0],

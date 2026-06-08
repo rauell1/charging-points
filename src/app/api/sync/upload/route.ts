@@ -20,8 +20,8 @@ export async function POST(request: Request) {
     const result = await syncWorkbook(workbook, source, file.name);
 
     const durationMs = Date.now() - startTime;
-    const status = result.summary.errors > 0 
-      ? (result.summary.created + result.summary.updated > 0 ? 'partial' : 'error') 
+    const status = result.summary.errors > 0
+      ? (result.summary.created + result.summary.updated > 0 ? 'partial' : 'error')
       : 'success';
 
     try {
@@ -47,7 +47,6 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Sync upload error:', error);
 
-    // Log error to SyncLog
     try {
       const durationMs = Date.now() - startTime;
       await db.syncLog.create({
@@ -71,4 +70,3 @@ export async function POST(request: Request) {
     );
   }
 }
-
