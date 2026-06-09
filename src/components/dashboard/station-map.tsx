@@ -152,10 +152,10 @@ function StationMapInner() {
       let anchor: [number, number] = [10, 20];
       
       if (type === 'hub') {
-        let pinColor = '#E8621A'; // Default operational orange
-        if (status === 'construction') pinColor = '#D97706'; // Amber
+        let pinColor = '#22C55E'; // Default operational green
+        if (status === 'construction') pinColor = '#F59E0B'; // Amber
         else if (status === 'blocked') pinColor = '#EF4444'; // Red
-        else if (status === 'planned') pinColor = '#F97316'; // Lighter orange
+        else if (status === 'planned') pinColor = '#3B82F6'; // Blue
         else if (status === 'closed' || status === 'archived') pinColor = '#71717A'; // Muted gray
 
         size = [32, 32];
@@ -167,8 +167,8 @@ function StationMapInner() {
           </svg>
         `;
       } else if (type === 'point') {
-        let pinColor = '#0D0D0D'; // Default operational black
-        if (status === 'construction') pinColor = '#D97706'; // Amber
+        let pinColor = '#15803D'; // Default operational dark green
+        if (status === 'construction') pinColor = '#F59E0B'; // Amber
         else if (status === 'blocked') pinColor = '#EF4444'; // Red
         else if (status === 'planned') pinColor = '#3B82F6'; // Blue
         else if (status === 'closed' || status === 'archived') pinColor = '#71717A'; // Muted gray
@@ -184,7 +184,7 @@ function StationMapInner() {
       } else {
         let pinColor = '#9A9A9A'; // Default Kiosk gray
         if (status === 'operational') pinColor = '#8B5CF6'; // Purple for active kiosk
-        else if (status === 'construction') pinColor = '#D97706'; // Amber
+        else if (status === 'construction') pinColor = '#F59E0B'; // Amber
 
         size = [20, 20];
         anchor = [10, 20];
@@ -206,14 +206,14 @@ function StationMapInner() {
     };
 
     const createPopupHtml = (station: Station) => {
-      const statusColorClass = 
+      const statusColorClass =
         station.status === 'operational'
-          ? 'bg-[#FFF0E8] text-[#E8621A]'
+          ? 'bg-green-50 text-green-700'
           : station.status === 'construction'
             ? 'bg-amber-50 text-amber-700'
             : station.status === 'blocked'
-              ? 'bg-red-50 text-red-650'
-              : 'bg-zinc-100 text-zinc-650';
+              ? 'bg-red-50 text-red-600'
+              : 'bg-zinc-100 text-zinc-600';
 
       return `
         <div class="p-1 min-w-[160px] font-sans">
@@ -312,30 +312,64 @@ function StationMapInner() {
           </div>
         )}
 
-        {/* Map Legend Overlay for Point status */}
+        {/* Map Legend Overlay */}
         {!isLoading && (
-          <div className="absolute bottom-3 left-3 z-10 bg-white/95 border border-zinc-200 rounded-xl p-2.5 shadow-md text-[10px] space-y-1.5 pointer-events-auto backdrop-blur-xs max-w-[180px]">
-            <p className="font-bold text-zinc-500 uppercase tracking-wider mb-0.5">Roam Point Status</p>
-            <div className="grid grid-cols-2 gap-x-2 gap-y-1 font-semibold text-zinc-700">
-              <div className="flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-full bg-[#0D0D0D]" />
-                <span>Active</span>
+          <div className="absolute bottom-3 left-3 z-10 bg-white/95 border border-zinc-200 rounded-xl p-2.5 shadow-md text-[10px] pointer-events-auto backdrop-blur-xs max-w-[220px] space-y-2.5">
+            {/* Status colours (shared across all types) */}
+            <div>
+              <p className="font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Status</p>
+              <div className="grid grid-cols-2 gap-x-3 gap-y-1.5 font-semibold text-zinc-700">
+                <div className="flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-[#22C55E] flex-shrink-0" />
+                  <span>Operational</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-amber-400 flex-shrink-0" />
+                  <span>Construction</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-blue-500 flex-shrink-0" />
+                  <span>Planned</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-red-500 flex-shrink-0" />
+                  <span>Blocked</span>
+                </div>
+                <div className="flex items-center gap-1.5 col-span-2">
+                  <span className="h-2 w-2 rounded-full bg-zinc-400 flex-shrink-0" />
+                  <span>Archived / Closed</span>
+                </div>
               </div>
-              <div className="flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-full bg-amber-500" />
-                <span>In Progress</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-full bg-blue-500" />
-                <span>Planned</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-full bg-red-500" />
-                <span>Blocked</span>
-              </div>
-              <div className="flex items-center gap-1.5 col-span-2">
-                <span className="h-2 w-2 rounded-full bg-zinc-400" />
-                <span>Archived / Closed</span>
+            </div>
+
+            {/* Divider */}
+            <div className="border-t border-zinc-100" />
+
+            {/* Station type markers */}
+            <div>
+              <p className="font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Type</p>
+              <div className="space-y-1.5 font-semibold text-zinc-700">
+                <div className="flex items-center gap-2">
+                  <svg width="14" height="14" viewBox="0 0 32 32">
+                    <path fill="#22C55E" stroke="#fff" strokeWidth="2" d="M16 2C9.4 2 4 7.4 4 14c0 7.2 11.2 16 12 16s12-8.8 12-16c0-6.6-5.4-12-12-12z"/>
+                    <circle cx="16" cy="14" r="5" fill="#fff"/>
+                  </svg>
+                  <span>Roam Hub (large pin)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <svg width="11" height="11" viewBox="0 0 24 24">
+                    <path fill="#15803D" stroke="#fff" strokeWidth="2" d="M12 2C7.6 2 4 5.6 4 10c0 5.2 8 12 8 12s8-6.8 8-12c0-4.4-3.6-8-8-8z"/>
+                    <circle cx="12" cy="10" r="3.5" fill="#fff"/>
+                  </svg>
+                  <span>Roam Point (medium)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <svg width="9" height="9" viewBox="0 0 20 20">
+                    <path fill="#8B5CF6" stroke="#fff" strokeWidth="1.5" d="M10 2C6.7 2 4 4.7 4 8c0 4.2 6 10 6 10s6-5.8 6-10c0-3.3-2.7-6-6-6z"/>
+                    <circle cx="10" cy="8" r="2.5" fill="#fff"/>
+                  </svg>
+                  <span>Roam Kiosk (small, purple)</span>
+                </div>
               </div>
             </div>
           </div>

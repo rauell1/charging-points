@@ -95,9 +95,9 @@ interface StationDetail extends Station {
 }
 
 const statusConfig: Record<string, { label: string; className: string }> = {
-  operational: { label: 'Operational', className: 'bg-[--roam-orange]/10 text-[--roam-orange] border-none hover:bg-[--roam-orange]/15' },
+  operational: { label: 'Operational', className: 'bg-green-50 text-green-700 border-none hover:bg-green-100/40' },
   construction: { label: 'Under Construction', className: 'bg-amber-50 text-amber-700 border-none hover:bg-amber-100/30' },
-  planned: { label: 'Planned', className: 'bg-gray-100 text-gray-600 border-none hover:bg-gray-200/50' },
+  planned: { label: 'Planned', className: 'bg-blue-50 text-blue-600 border-none hover:bg-blue-100/30' },
   blocked: { label: 'Blocked', className: 'bg-red-50 text-red-600 border-none hover:bg-red-100/30' },
   archived: { label: 'Archived', className: 'bg-gray-50 text-gray-400 border-none hover:bg-gray-100/20' },
   closed: { label: 'Closed', className: 'bg-gray-50 text-gray-400 border-none hover:bg-gray-100/20' },
