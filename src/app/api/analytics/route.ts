@@ -92,14 +92,19 @@ export async function GET() {
     const statusBreakdown = {
       operationalHubs:     get('operational', 'hub'),
       operationalPoints:   get('operational', 'point'),
+      operationalKiosks:   get('operational', 'kiosk'),
       constructionHubs:    get('construction', 'hub'),
       constructionPoints:  get('construction', 'point'),
+      constructionKiosks:  get('construction', 'kiosk'),
       plannedHubs:         get('planned', 'hub'),
       plannedPoints:       get('planned', 'point'),
+      plannedKiosks:       get('planned', 'kiosk'),
       blockedHubs:         get('blocked', 'hub'),
       blockedPoints:       get('blocked', 'point'),
+      blockedKiosks:       get('blocked', 'kiosk'),
       archivedHubs:        get('archived', 'hub'),
       archivedPoints:      get('archived', 'point'),
+      archivedKiosks:      get('archived', 'kiosk'),
     };
 
     return NextResponse.json({
