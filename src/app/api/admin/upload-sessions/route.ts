@@ -118,13 +118,25 @@ export async function POST(req: NextRequest) {
   }
 
   // Load station map: chargerId → station DB id
+  // Indexed by BOTH the full canonical ID (FO-NBI-01#RH-KE-A-07) AND the bare
+  // suffix (#RH-KE-A-07) so CSVs using either format resolve to the same hub.
   const stations = await db.chargingStation.findMany({
     where: { type: 'hub' },
     select: { id: true, chargerId: true, name: true },
   });
-  const stationMap = new Map<string, { id: string; name: string }>(
-    stations.map(s => [s.chargerId, { id: s.id, name: s.name }])
-  );
+  const stationMap = new Map<string, { id: string; name: string }>();
+  for (const s of stations) {
+    stationMap.set(s.chargerId, { id: s.id, name: s.name });
+    // Also index by bare suffix for old-format code compatibility
+    // e.g. "FO-NBI-01#RH-KE-A-07"  →  also register "#RH-KE-A-07"
+    const hashIdx = s.chargerId.indexOf('#');
+    if (hashIdx > 0) {
+      const suffix = s.chargerId.slice(hashIdx);
+      if (!stationMap.has(suffix)) {
+        stationMap.set(suffix, { id: s.id, name: s.name });
+      }
+    }
+  }
 
   // Process rows
   const seenIds = new Set<string>();
