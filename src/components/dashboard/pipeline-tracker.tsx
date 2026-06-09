@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
@@ -79,11 +79,11 @@ export function PipelineTracker() {
       <div className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-24 rounded-2xl bg-zinc-200 dark:bg-zinc-800" />
+            <Skeleton key={i} className="h-24 rounded-2xl bg-zinc-200" />
           ))}
         </div>
-        <Skeleton className="h-10 w-full rounded-lg bg-zinc-200 dark:bg-zinc-800" />
-        <Skeleton className="h-[400px] w-full rounded-2xl bg-zinc-200 dark:bg-zinc-800" />
+        <Skeleton className="h-10 w-full rounded-lg bg-zinc-200" />
+        <Skeleton className="h-[400px] w-full rounded-2xl bg-zinc-200" />
       </div>
     );
   }
@@ -124,22 +124,22 @@ export function PipelineTracker() {
 
   const getPriorityBadgeColor = (bucket: string) => {
     const b = bucket.toLowerCase();
-    if (b.includes('strategic') || b.includes('p0')) return 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20';
-    if (b.includes('high') || b.includes('p1')) return 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20';
-    return 'bg-zinc-500/10 text-zinc-650 dark:text-zinc-400 border-zinc-500/20';
+    if (b.includes('strategic') || b.includes('p0')) return 'bg-rose-500/10 text-rose-600 border-rose-500/20';
+    if (b.includes('high') || b.includes('p1')) return 'bg-orange-500/10 text-orange-600 border-orange-500/20';
+    return 'bg-zinc-500/10 text-zinc-650 border-zinc-500/20';
   };
 
   const renderChecklistCell = (status: string) => {
     if (status === 'Signed' || status === 'Yes') {
       return (
-        <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+        <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600">
           <Check className="h-4.5 w-4.5 stroke-[3]" />
           <span>Signed</span>
         </span>
       );
     }
     return (
-      <span className="inline-flex items-center gap-1 text-xs font-semibold text-zinc-450 dark:text-zinc-500">
+      <span className="inline-flex items-center gap-1 text-xs font-semibold text-zinc-450">
         <Clock className="h-4 w-4" />
         <span>Pending</span>
       </span>
@@ -151,12 +151,12 @@ export function PipelineTracker() {
       {/* KPI Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* KPI 1 */}
-        <div className="bg-white dark:bg-[#141414] border border-zinc-150 dark:border-zinc-850 rounded-2xl p-5 flex items-center gap-4">
-          <div className="p-3.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-500">
+        <div className="bg-white border border-zinc-150 rounded-2xl p-5 flex items-center gap-4">
+          <div className="p-3.5 rounded-xl bg-zinc-100 text-zinc-500">
             <ClipboardCheck className="h-6 w-6" />
           </div>
           <div>
-            <p className="text-3xl font-black font-display text-zinc-900 dark:text-white leading-tight">
+            <p className="text-3xl font-black font-display text-zinc-900 leading-tight">
               {totalLeads}
             </p>
             <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 mt-0.5">
@@ -166,12 +166,12 @@ export function PipelineTracker() {
         </div>
 
         {/* KPI 2 */}
-        <div className="bg-white dark:bg-[#141414] border border-zinc-150 dark:border-zinc-850 rounded-2xl p-5 flex items-center gap-4">
+        <div className="bg-white border border-zinc-150 rounded-2xl p-5 flex items-center gap-4">
           <div className="p-3.5 rounded-xl bg-[--roam-orange]/10 text-[--roam-orange] border border-[--roam-orange]/10">
             <FileCheck className="h-6 w-6" />
           </div>
           <div>
-            <p className="text-3xl font-black font-display text-zinc-900 dark:text-white leading-tight">
+            <p className="text-3xl font-black font-display text-zinc-900 leading-tight">
               {approvedLeads}
             </p>
             <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 mt-0.5">
@@ -181,12 +181,12 @@ export function PipelineTracker() {
         </div>
 
         {/* KPI 3 */}
-        <div className="bg-white dark:bg-[#141414] border border-zinc-150 dark:border-zinc-850 rounded-2xl p-5 flex items-center gap-4">
+        <div className="bg-white border border-zinc-150 rounded-2xl p-5 flex items-center gap-4">
           <div className="p-3.5 rounded-xl bg-emerald-500/10 text-emerald-600 border border-emerald-500/10">
             <ShieldCheck className="h-6 w-6" />
           </div>
           <div>
-            <p className="text-3xl font-black font-display text-zinc-900 dark:text-white leading-tight">
+            <p className="text-3xl font-black font-display text-zinc-900 leading-tight">
               {agreementsSigned}
             </p>
             <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 mt-0.5">
@@ -196,12 +196,12 @@ export function PipelineTracker() {
         </div>
 
         {/* KPI 4 */}
-        <div className="bg-white dark:bg-[#141414] border border-zinc-150 dark:border-zinc-850 rounded-2xl p-5 flex items-center gap-4">
+        <div className="bg-white border border-zinc-150 rounded-2xl p-5 flex items-center gap-4">
           <div className="p-3.5 rounded-xl bg-blue-500/10 text-blue-600 border border-blue-500/10">
             <Building className="h-6 w-6" />
           </div>
           <div>
-            <p className="text-3xl font-black font-display text-zinc-900 dark:text-white leading-tight">
+            <p className="text-3xl font-black font-display text-zinc-900 leading-tight">
               {deployedInField}
             </p>
             <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 mt-0.5">
@@ -212,7 +212,7 @@ export function PipelineTracker() {
       </div>
 
       {/* Filters & Search Bar */}
-      <div className="bg-white dark:bg-[#141414] border border-zinc-150 dark:border-zinc-850 rounded-2xl p-4 flex flex-col md:flex-row items-center gap-4">
+      <div className="bg-white border border-zinc-150 rounded-2xl p-4 flex flex-col md:flex-row items-center gap-4">
         {/* Search */}
         <div className="relative flex-1 w-full">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
@@ -220,7 +220,7 @@ export function PipelineTracker() {
             placeholder="Search landmark, neighborhood, site ID..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-9 h-10 border-zinc-200 dark:border-zinc-800 rounded-xl"
+            className="pl-9 h-10 border-zinc-200 rounded-xl"
           />
         </div>
 
@@ -230,7 +230,7 @@ export function PipelineTracker() {
           <select
             value={priorityFilter}
             onChange={(e) => setPriorityFilter(e.target.value)}
-            className="h-10 text-xs px-3 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-[#141414] text-zinc-800 dark:text-zinc-255 font-bold uppercase tracking-wider w-full md:w-auto cursor-pointer"
+            className="h-10 text-xs px-3 border border-zinc-200 rounded-xl bg-white text-zinc-800 font-bold uppercase tracking-wider w-full md:w-auto cursor-pointer"
           >
             <option value="all">All Priorities</option>
             <option value="strategic">Strategic (P0)</option>
@@ -244,7 +244,7 @@ export function PipelineTracker() {
           <select
             value={checklistFilter}
             onChange={(e) => setChecklistFilter(e.target.value)}
-            className="h-10 text-xs px-3 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-[#141414] text-zinc-800 dark:text-zinc-255 font-bold uppercase tracking-wider w-full md:w-auto cursor-pointer"
+            className="h-10 text-xs px-3 border border-zinc-200 rounded-xl bg-white text-zinc-800 font-bold uppercase tracking-wider w-full md:w-auto cursor-pointer"
           >
             <option value="all">All Checklists</option>
             <option value="agreement">Agreement Signed</option>
@@ -256,11 +256,11 @@ export function PipelineTracker() {
       </div>
 
       {/* Main Table Grid */}
-      <div className="bg-white dark:bg-[#141414] border border-zinc-150 dark:border-zinc-850 rounded-2xl overflow-hidden shadow-none">
+      <div className="bg-white border border-zinc-150 rounded-2xl overflow-hidden shadow-none">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-zinc-150 dark:border-zinc-850 bg-zinc-50/50 dark:bg-zinc-900/30 text-[10px] font-black uppercase tracking-wider text-zinc-450 dark:text-zinc-400">
+              <tr className="border-b border-zinc-150 bg-zinc-50/50 text-[10px] font-black uppercase tracking-wider text-zinc-450">
                 <th className="py-4 px-5">Site Details</th>
                 <th className="py-4 px-5">Priority</th>
                 <th className="py-4 px-5 text-center">Agreement</th>
@@ -270,7 +270,7 @@ export function PipelineTracker() {
                 <th className="py-4 px-5 text-center">Live Deployment</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-150 dark:divide-zinc-850 text-sm">
+            <tbody className="divide-y divide-zinc-150 text-sm">
               {filteredList.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="py-12 text-center text-zinc-400 font-semibold">
@@ -281,13 +281,13 @@ export function PipelineTracker() {
                 filteredList.map((site) => (
                   <tr
                     key={site.id}
-                    className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/10 transition-colors"
+                    className="hover:bg-zinc-50/50 transition-colors"
                   >
                     {/* Site Details */}
                     <td className="py-4.5 px-5 max-w-[280px]">
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
-                          <span className="font-extrabold text-[--roam-black] dark:text-white leading-tight">
+                          <span className="font-extrabold text-[--roam-black] leading-tight">
                             {site.landmark}
                           </span>
                           {site.status.toLowerCase() === 'approved' && (
@@ -308,7 +308,7 @@ export function PipelineTracker() {
                           </div>
                         )}
                         {site.comment && site.comment !== site.landmark && (
-                          <p className="text-[11px] text-zinc-450 dark:text-zinc-500 italic mt-1.5 leading-relaxed truncate max-w-[260px]" title={site.comment}>
+                          <p className="text-[11px] text-zinc-450 italic mt-1.5 leading-relaxed truncate max-w-[260px]" title={site.comment}>
                             "{site.comment}"
                           </p>
                         )}
@@ -356,18 +356,18 @@ export function PipelineTracker() {
                     <td className="py-4.5 px-5 text-center">
                       {site.matchedStation ? (
                         <div className="inline-flex flex-col items-center gap-1.5">
-                          <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 rounded-lg px-2 py-0.5">
-                            <span className="text-[10px] font-extrabold text-zinc-700 dark:text-zinc-350">
+                          <div className="flex items-center gap-1 bg-zinc-100 border border-zinc-200 rounded-lg px-2 py-0.5">
+                            <span className="text-[10px] font-extrabold text-zinc-700">
                               {site.matchedStation.chargerId}
                             </span>
                           </div>
                           <Badge
                             className={`text-[9px] font-black uppercase rounded-full border px-1.5 py-0 border-none leading-none ${
                               site.matchedStation.status === 'operational'
-                                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                                ? 'bg-emerald-500/10 text-emerald-600'
                                 : site.matchedStation.status === 'construction'
-                                ? 'bg-amber-500/10 text-amber-600 dark:text-amber-500'
-                                : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
+                                ? 'bg-amber-500/10 text-amber-600'
+                                : 'bg-rose-500/10 text-rose-600'
                             }`}
                           >
                             {site.matchedStation.status}

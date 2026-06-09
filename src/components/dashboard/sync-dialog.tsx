@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import {
@@ -431,10 +431,10 @@ export function SyncDialog() {
 
   const getActionColor = (action: string) => {
     switch (action) {
-      case 'created': return 'border-[--roam-orange]/20 bg-[--roam-orange-light] dark:bg-[--roam-orange]/10';
-      case 'updated': return 'border-blue-200 bg-blue-50 dark:bg-blue-950/20 dark:border-blue-900';
+      case 'created': return 'border-[--roam-orange]/20 bg-[--roam-orange-light]';
+      case 'updated': return 'border-blue-200 bg-blue-50';
       case 'unchanged': return 'border-muted';
-      case 'error': return 'border-red-200 bg-red-50 dark:bg-red-950/20 dark:border-red-900';
+      case 'error': return 'border-red-200 bg-red-50';
       default: return '';
     }
   };
@@ -447,9 +447,9 @@ export function SyncDialog() {
           <span>Sync Data</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-[95vw] sm:max-w-3xl h-[100vh] md:h-auto max-h-[90vh] md:max-h-[85vh] overflow-y-auto flex flex-col border border-gray-100 dark:border-zinc-800 rounded-2xl bg-white dark:bg-[#0D0D0D] p-6 shadow-xl">
+      <DialogContent className="w-[95vw] sm:max-w-3xl h-[100vh] md:h-auto max-h-[90vh] md:max-h-[85vh] overflow-y-auto flex flex-col border border-gray-100 rounded-2xl bg-white p-6 shadow-xl">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-[--roam-black] dark:text-white font-black text-lg uppercase tracking-tight">
+          <DialogTitle className="flex items-center gap-2 text-[--roam-black] font-black text-lg uppercase tracking-tight">
             <RefreshCw className="h-5 w-5 text-[--roam-orange]" />
             Data Sync Center
           </DialogTitle>
@@ -462,25 +462,25 @@ export function SyncDialog() {
           <TabsList className="w-full bg-transparent border-b rounded-none h-auto p-0 flex gap-4">
             <TabsTrigger
               value="upload"
-              className="rounded-none px-0 py-2 bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] dark:data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] font-medium cursor-pointer"
+              className="rounded-none px-0 py-2 bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] font-medium cursor-pointer"
             >
               Upload
             </TabsTrigger>
             <TabsTrigger
               value="auto"
-              className="rounded-none px-0 py-2 bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] dark:data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] font-medium cursor-pointer"
+              className="rounded-none px-0 py-2 bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] font-medium cursor-pointer"
             >
               Auto Sync
             </TabsTrigger>
             <TabsTrigger
               value="history"
-              className="rounded-none px-0 py-2 bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] dark:data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] font-medium cursor-pointer"
+              className="rounded-none px-0 py-2 bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] font-medium cursor-pointer"
             >
               History
             </TabsTrigger>
             <TabsTrigger
               value="api"
-              className="rounded-none px-0 py-2 bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] dark:data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] font-medium cursor-pointer"
+              className="rounded-none px-0 py-2 bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] font-medium cursor-pointer"
             >
               API Reference
             </TabsTrigger>
@@ -494,9 +494,9 @@ export function SyncDialog() {
                 <div
                   className={`relative border-2 border-dashed rounded-2xl p-8 text-center transition-colors cursor-pointer ${
                     dragOver
-                      ? 'border-[--roam-orange] bg-[--roam-orange-light] dark:bg-[--roam-orange]/10'
+                      ? 'border-[--roam-orange] bg-[--roam-orange-light]'
                       : selectedFile
-                      ? 'border-[--roam-orange] bg-[--roam-orange-light]/50 dark:bg-[--roam-orange]/5'
+                      ? 'border-[--roam-orange] bg-[--roam-orange-light]/50'
                       : 'border-muted-foreground/25 hover:border-[--roam-orange]/50'
                   }`}
                   onDrop={handleDrop}
@@ -518,7 +518,7 @@ export function SyncDialog() {
                   {selectedFile ? (
                     <div className="flex flex-col items-center gap-2">
                       <FileSpreadsheet className="h-10 w-10 text-[--roam-orange]" />
-                      <p className="text-sm font-semibold text-[--roam-gray-dark] dark:text-zinc-200">{selectedFile.name}</p>
+                      <p className="text-sm font-semibold text-[--roam-gray-dark]">{selectedFile.name}</p>
                       <p className="text-xs text-[--roam-gray-mid]">
                         {(selectedFile.size / 1024).toFixed(1)} KB
                       </p>
@@ -536,7 +536,7 @@ export function SyncDialog() {
                   ) : (
                     <div className="flex flex-col items-center gap-2">
                       <Upload className="h-10 w-10 text-[--roam-gray-mid]" />
-                      <p className="text-sm font-semibold text-[--roam-gray-dark] dark:text-zinc-200">
+                      <p className="text-sm font-semibold text-[--roam-gray-dark]">
                         Drop Excel file here or click to browse
                       </p>
                       <p className="text-xs text-[--roam-gray-mid]">
@@ -549,11 +549,11 @@ export function SyncDialog() {
 
               {/* Error Display */}
               {error && (
-                <div className="rounded-xl border border-red-200 bg-red-50 dark:bg-red-950/20 dark:border-red-900/50 p-3 flex items-start gap-2">
+                <div className="rounded-xl border border-red-200 bg-red-50 p-3 flex items-start gap-2">
                   <AlertCircle className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />
                   <div>
-                    <p className="text-sm font-semibold text-red-800 dark:text-red-400">Sync Error</p>
-                    <p className="text-xs text-red-650 dark:text-red-300 mt-0.5">{error}</p>
+                    <p className="text-sm font-semibold text-red-800">Sync Error</p>
+                    <p className="text-xs text-red-650 mt-0.5">{error}</p>
                   </div>
                 </div>
               )}
@@ -562,19 +562,19 @@ export function SyncDialog() {
               {result && (
                 <div className="space-y-3">
                   <div className="grid grid-cols-4 gap-2">
-                    <Card className={`p-3 border-gray-100 dark:border-zinc-850 bg-white dark:bg-[#141414] ${result.summary.created > 0 ? 'border-[--roam-orange]/30 bg-[--roam-orange-light]' : ''}`}>
+                    <Card className={`p-3 border-gray-100 bg-white ${result.summary.created > 0 ? 'border-[--roam-orange]/30 bg-[--roam-orange-light]' : ''}`}>
                       <div className="text-2xl font-black text-[--roam-orange]">{result.summary.created}</div>
                       <div className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid]">Created</div>
                     </Card>
-                    <Card className={`p-3 border-gray-100 dark:border-zinc-850 bg-white dark:bg-[#141414] ${result.summary.updated > 0 ? 'border-blue-200 bg-blue-50 dark:bg-blue-950/20' : ''}`}>
+                    <Card className={`p-3 border-gray-100 bg-white ${result.summary.updated > 0 ? 'border-blue-200 bg-blue-50' : ''}`}>
                       <div className="text-2xl font-black text-blue-600">{result.summary.updated}</div>
                       <div className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid]">Updated</div>
                     </Card>
-                    <Card className="p-3 border-gray-100 dark:border-zinc-850 bg-white dark:bg-[#141414]">
+                    <Card className="p-3 border-gray-100 bg-white">
                       <div className="text-2xl font-black text-muted-foreground">{result.summary.unchanged}</div>
                       <div className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid]">Unchanged</div>
                     </Card>
-                    <Card className={`p-3 border-gray-100 dark:border-zinc-850 bg-white dark:bg-[#141414] ${result.summary.errors > 0 ? 'border-red-200 bg-red-50 dark:bg-red-950/20' : ''}`}>
+                    <Card className={`p-3 border-gray-100 bg-white ${result.summary.errors > 0 ? 'border-red-200 bg-red-50' : ''}`}>
                       <div className="text-2xl font-black text-red-600">{result.summary.errors}</div>
                       <div className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid]">Errors</div>
                     </Card>
@@ -583,7 +583,7 @@ export function SyncDialog() {
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-xs text-[--roam-gray-mid]">Sheets detected:</span>
                     {result.sheets.map(sheet => (
-                      <Badge key={sheet} className="text-[10px] bg-[--roam-gray-light] dark:bg-zinc-800 text-[--roam-gray-dark] dark:text-zinc-300 border-none px-2 py-0.5 rounded-full hover:bg-[--roam-gray-light]">
+                      <Badge key={sheet} className="text-[10px] bg-[--roam-gray-light] text-[--roam-gray-dark] border-none px-2 py-0.5 rounded-full hover:bg-[--roam-gray-light]">
                         {sheet}
                       </Badge>
                     ))}
@@ -593,7 +593,7 @@ export function SyncDialog() {
                     <>
                       <Separator />
                       <div>
-                        <p className="text-xs font-semibold text-[--roam-gray-dark] dark:text-zinc-200 mb-2 uppercase tracking-wider">
+                        <p className="text-xs font-semibold text-[--roam-gray-dark] mb-2 uppercase tracking-wider">
                           Changes ({result.summary.changes.length} total)
                         </p>
                         <ScrollArea className="h-48">
@@ -611,8 +611,8 @@ export function SyncDialog() {
                                   </div>
                                   <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-1.5">
-                                      <span className="font-semibold text-[--roam-gray-dark] dark:text-zinc-200 truncate">{change.name}</span>
-                                      <Badge variant="outline" className="text-[9px] font-mono shrink-0 px-1 py-0 border-stone-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+                                      <span className="font-semibold text-[--roam-gray-dark] truncate">{change.name}</span>
+                                      <Badge variant="outline" className="text-[9px] font-mono shrink-0 px-1 py-0 border-stone-200 bg-white">
                                         {change.chargerId}
                                       </Badge>
                                     </div>
@@ -639,7 +639,7 @@ export function SyncDialog() {
                   )}
 
                   {result.summary.errors === 0 && (
-                    <div className="flex items-center gap-2 p-2.5 rounded-xl bg-[--roam-orange-light] dark:bg-[--roam-orange]/10 border border-[--roam-orange]/20">
+                    <div className="flex items-center gap-2 p-2.5 rounded-xl bg-[--roam-orange-light] border border-[--roam-orange]/20">
                       <CheckCircle2 className="h-4 w-4 text-[--roam-orange]" />
                       <p className="text-xs text-[--roam-orange] font-semibold">
                         Dashboard data updated successfully. All tabs have been refreshed.
@@ -657,7 +657,7 @@ export function SyncDialog() {
                     <div className="flex items-center gap-2">
                       <FolderSync className="h-4 w-4 text-[--roam-orange]" />
                       <div>
-                        <p className="text-xs font-semibold text-[--roam-gray-dark] dark:text-zinc-200">Re-scan Upload Folder</p>
+                        <p className="text-xs font-semibold text-[--roam-gray-dark]">Re-scan Upload Folder</p>
                         <p className="text-[10px] text-[--roam-gray-mid]">
                           Re-read existing Excel files from the upload directory
                         </p>
@@ -668,7 +668,7 @@ export function SyncDialog() {
                       size="sm"
                       onClick={handleRescan}
                       disabled={rescanning}
-                      className="text-xs gap-1.5 rounded-full border border-zinc-200 dark:border-zinc-800 hover:bg-[--roam-gray-light]"
+                      className="text-xs gap-1.5 rounded-full border border-zinc-200 hover:bg-[--roam-gray-light]"
                     >
                       {rescanning ? (
                         <>
@@ -685,8 +685,8 @@ export function SyncDialog() {
                   </div>
 
                   {rescanResult && (
-                    <div className="rounded-2xl border border-gray-150 dark:border-zinc-850 p-3 space-y-2 bg-[--roam-gray-light] dark:bg-[#141414]">
-                      <p className="text-xs font-semibold text-[--roam-gray-dark] dark:text-zinc-200">Scan Results</p>
+                    <div className="rounded-2xl border border-gray-150 p-3 space-y-2 bg-[--roam-gray-light]">
+                      <p className="text-xs font-semibold text-[--roam-gray-dark]">Scan Results</p>
                       <div className="grid grid-cols-4 gap-2">
                         <div className="text-center">
                           <div className="text-lg font-black text-[--roam-orange]">{rescanResult.summary.totalCreated}</div>
@@ -757,9 +757,9 @@ export function SyncDialog() {
           <TabsContent value="auto" className="flex-1 min-h-0 overflow-y-auto mt-4">
             <div className="space-y-4">
               {/* Status Card */}
-              <Card className="border border-gray-150 dark:border-zinc-850 rounded-2xl bg-white dark:bg-[#141414] shadow-sm">
-                <CardHeader className="pb-3 border-b border-gray-50 dark:border-zinc-800">
-                  <CardTitle className="text-sm font-semibold uppercase tracking-widest text-[--roam-gray-dark] dark:text-zinc-200 flex items-center gap-2">
+              <Card className="border border-gray-150 rounded-2xl bg-white shadow-sm">
+                <CardHeader className="pb-3 border-b border-gray-50">
+                  <CardTitle className="text-sm font-semibold uppercase tracking-widest text-[--roam-gray-dark] flex items-center gap-2">
                     <Settings className="h-4 w-4 text-[--roam-orange]" />
                     Auto Sync Configuration
                   </CardTitle>
@@ -768,7 +768,7 @@ export function SyncDialog() {
                   {/* Enable/Disable */}
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs font-semibold text-[--roam-gray-dark] dark:text-zinc-200">Enable Auto Sync</p>
+                      <p className="text-xs font-semibold text-[--roam-gray-dark]">Enable Auto Sync</p>
                       <p className="text-[10px] text-[--roam-gray-mid] mt-0.5">
                         Allow automated data sync via API or webhook
                       </p>
@@ -796,7 +796,7 @@ export function SyncDialog() {
                   {/* Schedule */}
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs font-semibold text-[--roam-gray-dark] dark:text-zinc-200">Sync Schedule</p>
+                      <p className="text-xs font-semibold text-[--roam-gray-dark]">Sync Schedule</p>
                       <p className="text-[10px] text-[--roam-gray-mid] mt-0.5">
                         How often to automatically pull data
                       </p>
@@ -830,12 +830,12 @@ export function SyncDialog() {
                   {/* API Key */}
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs font-semibold text-[--roam-gray-dark] dark:text-zinc-200">API Key</p>
+                      <p className="text-xs font-semibold text-[--roam-gray-dark]">API Key</p>
                       <p className="text-[10px] text-[--roam-gray-mid] mt-0.5">
                         Used to authenticate API and webhook requests
                       </p>
                     </div>
-                    <Badge variant="outline" className="text-[10px] font-mono border-stone-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+                    <Badge variant="outline" className="text-[10px] font-mono border-stone-200 bg-white">
                       {resolvedConfig.apiKey}
                     </Badge>
                   </div>
@@ -845,7 +845,7 @@ export function SyncDialog() {
                   {/* Last Sync Info */}
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-xs font-semibold text-[--roam-gray-dark] dark:text-zinc-200">Last Sync</p>
+                      <p className="text-xs font-semibold text-[--roam-gray-dark]">Last Sync</p>
                       <p className="text-[10px] text-[--roam-gray-mid] mt-0.5">
                         {resolvedConfig.lastSync
                           ? formatTime(resolvedConfig.lastSync)
@@ -862,9 +862,9 @@ export function SyncDialog() {
               </Card>
 
               {/* Test Connection */}
-              <Card className="border border-gray-150 dark:border-zinc-850 rounded-2xl bg-white dark:bg-[#141414] shadow-sm">
-                <CardHeader className="pb-3 border-b border-gray-50 dark:border-zinc-800">
-                  <CardTitle className="text-sm font-semibold uppercase tracking-widest text-[--roam-gray-dark] dark:text-zinc-200 flex items-center gap-2">
+              <Card className="border border-gray-150 rounded-2xl bg-white shadow-sm">
+                <CardHeader className="pb-3 border-b border-gray-50">
+                  <CardTitle className="text-sm font-semibold uppercase tracking-widest text-[--roam-gray-dark] flex items-center gap-2">
                     <Plug className="h-4 w-4 text-[--roam-orange]" />
                     Test Connection
                   </CardTitle>
@@ -893,24 +893,24 @@ export function SyncDialog() {
                   </Button>
 
                   {testResult && (
-                    <div className="flex items-center gap-2 p-2.5 rounded-xl bg-[--roam-orange-light] dark:bg-[--roam-orange]/10 border border-[--roam-orange]/20">
+                    <div className="flex items-center gap-2 p-2.5 rounded-xl bg-[--roam-orange-light] border border-[--roam-orange]/20">
                       <CheckCircle2 className="h-4 w-4 text-[--roam-orange] shrink-0" />
                       <p className="text-xs text-[--roam-orange] font-semibold">{testResult}</p>
                     </div>
                   )}
                   {testError && (
-                    <div className="flex items-center gap-2 p-2.5 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50">
+                    <div className="flex items-center gap-2 p-2.5 rounded-xl bg-red-50 border border-red-200">
                       <AlertCircle className="h-4 w-4 text-red-500 shrink-0" />
-                      <p className="text-xs text-red-700 dark:text-red-400">{testError}</p>
+                      <p className="text-xs text-red-700">{testError}</p>
                     </div>
                   )}
                 </CardContent>
               </Card>
 
               {/* Sync Now (Re-scan) */}
-              <Card className="border border-gray-150 dark:border-zinc-850 rounded-2xl bg-white dark:bg-[#141414] shadow-sm">
-                <CardHeader className="pb-3 border-b border-gray-50 dark:border-zinc-800">
-                  <CardTitle className="text-sm font-semibold uppercase tracking-widest text-[--roam-gray-dark] dark:text-zinc-200 flex items-center gap-2">
+              <Card className="border border-gray-150 rounded-2xl bg-white shadow-sm">
+                <CardHeader className="pb-3 border-b border-gray-50">
+                  <CardTitle className="text-sm font-semibold uppercase tracking-widest text-[--roam-gray-dark] flex items-center gap-2">
                     <FolderSync className="h-4 w-4 text-[--roam-orange]" />
                     Manual Sync (Re-scan)
                   </CardTitle>
@@ -924,7 +924,7 @@ export function SyncDialog() {
                     size="sm"
                     onClick={handleRescan}
                     disabled={rescanning}
-                    className="text-xs gap-1.5 rounded-full border border-zinc-200 dark:border-zinc-800 hover:bg-[--roam-gray-light]"
+                    className="text-xs gap-1.5 rounded-full border border-zinc-200 hover:bg-[--roam-gray-light]"
                   >
                     {rescanning ? (
                       <>
@@ -949,19 +949,19 @@ export function SyncDialog() {
               {/* Summary stats */}
               {historyData?.summary && (
                 <div className="grid grid-cols-4 gap-2">
-                  <Card className="p-3 border-gray-150 dark:border-zinc-850 bg-white dark:bg-[#141414] shadow-sm">
-                    <div className="text-xl font-black text-[--roam-black] dark:text-white leading-tight">{historyData.summary.totalSyncs || 0}</div>
+                  <Card className="p-3 border-gray-150 bg-white shadow-sm">
+                    <div className="text-xl font-black text-[--roam-black] leading-tight">{historyData.summary.totalSyncs || 0}</div>
                     <div className="text-[10px] text-[--roam-gray-mid] mt-0.5">Total Syncs</div>
                   </Card>
-                  <Card className="p-3 border-gray-150 dark:border-zinc-850 bg-white dark:bg-[#141414] shadow-sm">
+                  <Card className="p-3 border-gray-150 bg-white shadow-sm">
                     <div className="text-xl font-black text-[--roam-orange]">{historyData.summary.totalSuccess || 0}</div>
                     <div className="text-[10px] text-[--roam-gray-mid] mt-0.5">Successful</div>
                   </Card>
-                  <Card className="p-3 border-gray-150 dark:border-zinc-850 bg-white dark:bg-[#141414] shadow-sm">
+                  <Card className="p-3 border-gray-150 bg-white shadow-sm">
                     <div className="text-xl font-black text-blue-600">{historyData.summary.totalCreated || 0}</div>
                     <div className="text-[10px] text-[--roam-gray-mid] mt-0.5">Created</div>
                   </Card>
-                  <Card className="p-3 border-gray-150 dark:border-zinc-850 bg-white dark:bg-[#141414] shadow-sm">
+                  <Card className="p-3 border-gray-150 bg-white shadow-sm">
                     <div className="text-xl font-black text-red-600">{historyData.summary.totalErrors || 0}</div>
                     <div className="text-[10px] text-[--roam-gray-mid] mt-0.5">Errors</div>
                   </Card>
@@ -975,13 +975,13 @@ export function SyncDialog() {
                 {historyData?.logs && historyData.logs.length > 0 ? (
                   <div className="space-y-2">
                     {historyData.logs.slice(0, 10).map((log) => (
-                      <div key={log.id} className="rounded-2xl border border-gray-150 dark:border-zinc-850 p-3 space-y-1.5 bg-white dark:bg-[#141414] shadow-sm">
+                      <div key={log.id} className="rounded-2xl border border-gray-150 p-3 space-y-1.5 bg-white shadow-sm">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Badge className={`text-[9px] border-none px-2 py-0.5 rounded-full ${log.status === 'success' ? 'bg-[--roam-orange-light] text-[--roam-orange]' : 'bg-red-50 text-red-650'}`}>
                               {log.status}
                             </Badge>
-                            <Badge className="text-[9px] bg-[--roam-gray-light] dark:bg-zinc-800 text-[--roam-gray-dark] dark:text-zinc-300 border-none px-2 py-0.5 rounded-full">
+                            <Badge className="text-[9px] bg-[--roam-gray-light] text-[--roam-gray-dark] border-none px-2 py-0.5 rounded-full">
                               {getSourceLabel(log.source)}
                             </Badge>
                           </div>
@@ -1023,9 +1023,9 @@ export function SyncDialog() {
           {/* ─── API Reference Tab ───────────────────────────────────── */}
           <TabsContent value="api" className="flex-1 min-h-0 overflow-y-auto mt-4">
             <div className="space-y-4">
-              <Card className="border border-gray-150 dark:border-zinc-850 rounded-2xl bg-white dark:bg-[#141414] shadow-sm">
-                <CardHeader className="pb-3 border-b border-gray-50 dark:border-zinc-800">
-                  <CardTitle className="text-sm font-semibold uppercase tracking-widest text-[--roam-gray-dark] dark:text-zinc-200 flex items-center gap-2">
+              <Card className="border border-gray-150 rounded-2xl bg-white shadow-sm">
+                <CardHeader className="pb-3 border-b border-gray-50">
+                  <CardTitle className="text-sm font-semibold uppercase tracking-widest text-[--roam-gray-dark] flex items-center gap-2">
                     <Code2 className="h-4 w-4 text-[--roam-orange]" />
                     API Endpoint: POST /api/sync/data
                   </CardTitle>
@@ -1078,9 +1078,9 @@ export function SyncDialog() {
                 </CardContent>
               </Card>
 
-              <Card className="border border-gray-150 dark:border-zinc-850 rounded-2xl bg-white dark:bg-[#141414] shadow-sm">
-                <CardHeader className="pb-3 border-b border-gray-50 dark:border-zinc-800">
-                  <CardTitle className="text-sm font-semibold uppercase tracking-widest text-[--roam-gray-dark] dark:text-zinc-200 flex items-center gap-2">
+              <Card className="border border-gray-150 rounded-2xl bg-white shadow-sm">
+                <CardHeader className="pb-3 border-b border-gray-50">
+                  <CardTitle className="text-sm font-semibold uppercase tracking-widest text-[--roam-gray-dark] flex items-center gap-2">
                     <Code2 className="h-4 w-4 text-[--roam-orange]" />
                     JavaScript / Fetch Example
                   </CardTitle>
@@ -1117,9 +1117,9 @@ const result = await response.json();
                 </CardContent>
               </Card>
 
-              <Card className="border border-gray-150 dark:border-zinc-855 rounded-2xl bg-white dark:bg-[#141414] shadow-sm">
-                <CardHeader className="pb-3 border-b border-gray-50 dark:border-zinc-800">
-                  <CardTitle className="text-sm font-semibold uppercase tracking-widest text-[--roam-gray-dark] dark:text-zinc-200 flex items-center gap-2">
+              <Card className="border border-gray-150 rounded-2xl bg-white shadow-sm">
+                <CardHeader className="pb-3 border-b border-gray-50">
+                  <CardTitle className="text-sm font-semibold uppercase tracking-widest text-[--roam-gray-dark] flex items-center gap-2">
                     <Code2 className="h-4 w-4 text-[--roam-orange]" />
                     Webhook Endpoint: POST /api/sync/webhook
                   </CardTitle>
@@ -1144,9 +1144,9 @@ curl -X POST /api/sync/webhook \\
                 </CardContent>
               </Card>
 
-              <Card className="border border-gray-150 dark:border-zinc-855 rounded-2xl bg-white dark:bg-[#141414] shadow-sm">
-                <CardHeader className="pb-3 border-b border-gray-50 dark:border-zinc-800">
-                  <CardTitle className="text-sm font-semibold uppercase tracking-widest text-[--roam-gray-dark] dark:text-zinc-200">Available Endpoints</CardTitle>
+              <Card className="border border-gray-150 rounded-2xl bg-white shadow-sm">
+                <CardHeader className="pb-3 border-b border-gray-50">
+                  <CardTitle className="text-sm font-semibold uppercase tracking-widest text-[--roam-gray-dark]">Available Endpoints</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-4">
                   <div className="space-y-2">
@@ -1159,11 +1159,11 @@ curl -X POST /api/sync/webhook \\
                       { method: 'GET', path: '/api/sync/config', desc: 'Get sync config' },
                       { method: 'PUT', path: '/api/sync/config', desc: 'Update sync config' },
                     ].map((ep) => (
-                      <div key={ep.path} className="flex items-center gap-2 text-xs text-[--roam-gray-dark] dark:text-zinc-350">
+                      <div key={ep.path} className="flex items-center gap-2 text-xs text-[--roam-gray-dark]">
                         <Badge className={`text-[9px] w-14 justify-center border-none rounded-full ${ep.method === 'GET' ? 'bg-[--roam-gray-light] text-[--roam-gray-dark]' : 'bg-[--roam-orange-light] text-[--roam-orange]'}`}>
                           {ep.method}
                         </Badge>
-                        <code className="text-[11px] font-mono bg-muted dark:bg-zinc-800 px-1.5 py-0.5 rounded">{ep.path}</code>
+                        <code className="text-[11px] font-mono bg-muted px-1.5 py-0.5 rounded">{ep.path}</code>
                         <span className="text-[10px] text-[--roam-gray-mid] ml-auto">{ep.desc}</span>
                       </div>
                     ))}

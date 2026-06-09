@@ -1,7 +1,7 @@
-'use client';
+﻿'use client';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { signOut, useSession } from 'next-auth/react';
 import { LogOut } from 'lucide-react';
@@ -16,7 +16,6 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { SyncDialog } from '@/components/dashboard/sync-dialog';
-import { useTheme } from 'next-themes';
 import {
   BatteryCharging,
   Zap,
@@ -28,8 +27,6 @@ import {
   ExternalLink,
   Phone,
   Mail,
-  Sun,
-  Moon,
   ClipboardCheck,
 } from 'lucide-react';
 import { PipelineTracker } from '@/components/dashboard/pipeline-tracker';
@@ -43,34 +40,6 @@ const queryClient = new QueryClient({
   },
 });
 
-function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return <div className="h-9 w-9" />;
-  }
-
-  return (
-    <Button
-      variant="ghost"
-      size="icon"
-      className="h-9 w-9 rounded-full hover:bg-white/10 text-white transition-colors cursor-pointer"
-      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-    >
-      {theme === 'dark' ? (
-        <Sun className="h-4 w-4 text-[--roam-orange]" />
-      ) : (
-        <Moon className="h-4 w-4 text-white" />
-      )}
-      <span className="sr-only">Toggle theme</span>
-    </Button>
-  );
-}
 
 function InfoBadges() {
   const { data } = useQuery<{ overview: { hubCount: number; pointCount: number } }>({
@@ -85,11 +54,11 @@ function InfoBadges() {
 
   return (
     <div className="flex items-center gap-2">
-      <Badge variant="outline" className="text-[10px] gap-1 border-[--roam-orange]/20 bg-[--roam-orange-light] text-[--roam-orange] dark:bg-[--roam-orange]/10 hover:bg-[--roam-orange-light]">
+      <Badge variant="outline" className="text-[10px] gap-1 border-[--roam-orange]/20 bg-[--roam-orange-light] text-[--roam-orange] hover:bg-[--roam-orange-light]">
         <BatteryCharging className="h-3 w-3 text-[--roam-orange]" />
         {hubCount} Roam Hubs
       </Badge>
-      <Badge variant="outline" className="text-[10px] gap-1 border-stone-200 dark:border-stone-800 text-[--roam-gray-dark] dark:text-zinc-300">
+      <Badge variant="outline" className="text-[10px] gap-1 border-stone-200 text-[--roam-gray-dark]">
         <Zap className="h-3 w-3 text-[--roam-gray-mid]" />
         {pointCount} Roam Points
       </Badge>
@@ -140,8 +109,6 @@ export default function Dashboard() {
                   </a>
                 </div>
 
-                <ThemeToggle />
-
                 {session?.user && (
                   <>
                     {session.user.isAdmin && (
@@ -179,10 +146,10 @@ export default function Dashboard() {
         <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
           {/* Brand Hero Title */}
           <div className="mb-8 border-l-4 border-[--roam-orange] pl-4 md:pl-6 py-2">
-            <h1 className="text-3xl md:text-5xl font-black tracking-tighter uppercase text-[--roam-black] dark:text-white leading-none mb-3 font-display">
+            <h1 className="text-3xl md:text-5xl font-black tracking-tighter uppercase text-[--roam-black] leading-none mb-3 font-display">
               CHARGING INFRASTRUCTURE
             </h1>
-            <p className="text-[--roam-gray-dark] dark:text-[--roam-gray-mid] max-w-3xl text-xs sm:text-sm md:text-base leading-relaxed">
+            <p className="text-[--roam-gray-dark] max-w-3xl text-xs sm:text-sm md:text-base leading-relaxed">
               Monitoring Roam Electric's charging network across East Africa. Real-time telemetry, mapping, and milestone tracking for the Roam Hub and Roam Point network, powering clean mobility.
             </p>
           </div>
@@ -194,46 +161,46 @@ export default function Dashboard() {
 
           {/* Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 border-b border-gray-200/60 dark:border-zinc-800 pb-2">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 border-b border-gray-200/60 pb-2">
               <TabsList className="w-full sm:w-auto bg-transparent rounded-none h-auto p-0 flex gap-4 md:gap-6 justify-start overflow-x-auto border-none">
                 <TabsTrigger
                   value="overview"
-                  className="text-xs gap-1.5 px-0 py-2.5 rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] dark:data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] hover:text-[--roam-black] dark:hover:text-white font-bold uppercase tracking-wider transition-all cursor-pointer font-display"
+                  className="text-xs gap-1.5 px-0 py-2.5 rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] hover:text-[--roam-black] font-bold uppercase tracking-wider transition-all cursor-pointer font-display"
                 >
                   <LayoutDashboard className={`h-3.5 w-3.5 ${activeTab === 'overview' ? 'text-[--roam-orange]' : 'text-[--roam-gray-mid]'}`} />
                   <span>Overview</span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="stations"
-                  className="text-xs gap-1.5 px-0 py-2.5 rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] dark:data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] hover:text-[--roam-black] dark:hover:text-white font-bold uppercase tracking-wider transition-all cursor-pointer font-display"
+                  className="text-xs gap-1.5 px-0 py-2.5 rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] hover:text-[--roam-black] font-bold uppercase tracking-wider transition-all cursor-pointer font-display"
                 >
                   <Map className={`h-3.5 w-3.5 ${activeTab === 'stations' ? 'text-[--roam-orange]' : 'text-[--roam-gray-mid]'}`} />
                   <span>Stations</span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="pipeline"
-                  className="text-xs gap-1.5 px-0 py-2.5 rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] dark:data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] hover:text-[--roam-black] dark:hover:text-white font-bold uppercase tracking-wider transition-all cursor-pointer font-display"
+                  className="text-xs gap-1.5 px-0 py-2.5 rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] hover:text-[--roam-black] font-bold uppercase tracking-wider transition-all cursor-pointer font-display"
                 >
                   <ClipboardCheck className={`h-3.5 w-3.5 ${activeTab === 'pipeline' ? 'text-[--roam-orange]' : 'text-[--roam-gray-mid]'}`} />
                   <span>Site Acquisition</span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="analytics"
-                  className="text-xs gap-1.5 px-0 py-2.5 rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] dark:data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] hover:text-[--roam-black] dark:hover:text-white font-bold uppercase tracking-wider transition-all cursor-pointer font-display"
+                  className="text-xs gap-1.5 px-0 py-2.5 rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] hover:text-[--roam-black] font-bold uppercase tracking-wider transition-all cursor-pointer font-display"
                 >
                   <BarChart3 className={`h-3.5 w-3.5 ${activeTab === 'analytics' ? 'text-[--roam-orange]' : 'text-[--roam-gray-mid]'}`} />
                   <span>Analytics</span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="milestones"
-                  className="text-xs gap-1.5 px-0 py-2.5 rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] dark:data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] hover:text-[--roam-black] dark:hover:text-white font-bold uppercase tracking-wider transition-all cursor-pointer font-display"
+                  className="text-xs gap-1.5 px-0 py-2.5 rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] hover:text-[--roam-black] font-bold uppercase tracking-wider transition-all cursor-pointer font-display"
                 >
                   <MilestoneIcon className={`h-3.5 w-3.5 ${activeTab === 'milestones' ? 'text-[--roam-orange]' : 'text-[--roam-gray-mid]'}`} />
                   <span>Milestones</span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="activity"
-                  className="text-xs gap-1.5 px-0 py-2.5 rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] dark:data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] hover:text-[--roam-black] dark:hover:text-white font-bold uppercase tracking-wider transition-all cursor-pointer font-display"
+                  className="text-xs gap-1.5 px-0 py-2.5 rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] hover:text-[--roam-black] font-bold uppercase tracking-wider transition-all cursor-pointer font-display"
                 >
                   <Rss className={`h-3.5 w-3.5 ${activeTab === 'activity' ? 'text-[--roam-orange]' : 'text-[--roam-gray-mid]'}`} />
                   <span>Activity</span>

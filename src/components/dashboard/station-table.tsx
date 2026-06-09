@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
@@ -96,17 +96,17 @@ interface StationDetail extends Station {
 
 const statusConfig: Record<string, { label: string; className: string }> = {
   operational: { label: 'Operational', className: 'bg-[--roam-orange]/10 text-[--roam-orange] border-none hover:bg-[--roam-orange]/15' },
-  construction: { label: 'Under Construction', className: 'bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400 border-none hover:bg-amber-100/30' },
-  planned: { label: 'Planned', className: 'bg-gray-100 text-gray-600 dark:bg-zinc-800 dark:text-zinc-400 border-none hover:bg-gray-200/50' },
-  blocked: { label: 'Blocked', className: 'bg-red-50 text-red-600 dark:bg-red-950/20 dark:text-red-400 border-none hover:bg-red-100/30' },
-  archived: { label: 'Archived', className: 'bg-gray-50 text-gray-400 dark:bg-zinc-900 dark:text-zinc-500 border-none hover:bg-gray-100/20' },
-  closed: { label: 'Closed', className: 'bg-gray-50 text-gray-400 dark:bg-zinc-900 dark:text-zinc-500 border-none hover:bg-gray-100/20' },
+  construction: { label: 'Under Construction', className: 'bg-amber-50 text-amber-700 border-none hover:bg-amber-100/30' },
+  planned: { label: 'Planned', className: 'bg-gray-100 text-gray-600 border-none hover:bg-gray-200/50' },
+  blocked: { label: 'Blocked', className: 'bg-red-50 text-red-600 border-none hover:bg-red-100/30' },
+  archived: { label: 'Archived', className: 'bg-gray-50 text-gray-400 border-none hover:bg-gray-100/20' },
+  closed: { label: 'Closed', className: 'bg-gray-50 text-gray-400 border-none hover:bg-gray-100/20' },
 };
 
 const typeConfig: Record<string, { label: string; className: string; icon: React.ElementType; color: string }> = {
   hub: { label: 'Roam Hub', className: 'bg-[--roam-orange]/10 text-[--roam-orange] border-none hover:bg-[--roam-orange]/15', icon: BatteryCharging, color: 'bg-[--roam-orange]/10' },
-  point: { label: 'Roam Point', className: 'bg-[--roam-black]/10 text-[--roam-black] dark:bg-white/10 dark:text-white border-none', icon: Zap, color: 'bg-[--roam-black]/10 dark:bg-white/10' },
-  kiosk: { label: 'Roam Kiosk', className: 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 border-none', icon: Radio, color: 'bg-zinc-100 dark:bg-zinc-850' },
+  point: { label: 'Roam Point', className: 'bg-[--roam-black]/10 text-[--roam-black] border-none', icon: Zap, color: 'bg-[--roam-black]/10' },
+  kiosk: { label: 'Roam Kiosk', className: 'bg-zinc-100 text-zinc-600 border-none', icon: Radio, color: 'bg-zinc-100' },
 };
 
 function TypeIcon({ type, className }: { type: string; className?: string }) {
@@ -203,13 +203,13 @@ export function StationTable() {
               currentDetail.type === 'hub'
                 ? 'text-[--roam-orange]'
                 : currentDetail.type === 'point'
-                  ? 'text-[--roam-black] dark:text-white'
+                  ? 'text-[--roam-black]'
                   : 'text-[--roam-gray-mid]'
             }`}
           />
         </div>
         <div>
-          <h3 className="text-lg font-bold text-[--roam-black] dark:text-white leading-tight">{currentDetail.name}</h3>
+          <h3 className="text-lg font-bold text-[--roam-black] leading-tight">{currentDetail.name}</h3>
           <p className="text-xs text-[--roam-gray-mid] flex items-center gap-1 mt-0.5">
             <MapPin className="h-3.5 w-3.5 text-[--roam-orange]" />
             {currentDetail.address}
@@ -221,19 +221,19 @@ export function StationTable() {
         <TabsList className="w-full bg-transparent border-b rounded-none h-auto p-0 flex gap-4">
           <TabsTrigger
             value="overview"
-            className="rounded-none px-0 py-2 bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] dark:data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] font-medium cursor-pointer"
+            className="rounded-none px-0 py-2 bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] font-medium cursor-pointer"
           >
             Overview
           </TabsTrigger>
           <TabsTrigger
             value="sessions"
-            className="rounded-none px-0 py-2 bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] dark:data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] font-medium cursor-pointer"
+            className="rounded-none px-0 py-2 bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] font-medium cursor-pointer"
           >
             Sessions
           </TabsTrigger>
           <TabsTrigger
             value="activity"
-            className="rounded-none px-0 py-2 bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] dark:data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] font-medium cursor-pointer"
+            className="rounded-none px-0 py-2 bg-transparent shadow-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] font-medium cursor-pointer"
           >
             Activity
           </TabsTrigger>
@@ -243,23 +243,23 @@ export function StationTable() {
           <TabsContent value="overview" className="space-y-4 pr-2 mt-0">
             {/* Status and Quick Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#141414] p-3 text-center">
+              <div className="rounded-lg border border-zinc-200 bg-white p-3 text-center">
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid]">Status</p>
                 <Badge className={`mt-1.5 ${(statusConfig[currentDetail.status] || statusConfig.planned).className}`}>
                   {(statusConfig[currentDetail.status] || statusConfig.planned).label}
                 </Badge>
               </div>
-              <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#141414] p-3 text-center">
+              <div className="rounded-lg border border-zinc-200 bg-white p-3 text-center">
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid]">Chargers</p>
-                <p className="text-lg font-black text-[--roam-black] dark:text-white mt-1">{currentDetail.chargerCount}</p>
+                <p className="text-lg font-black text-[--roam-black] mt-1">{currentDetail.chargerCount}</p>
               </div>
-              <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#141414] p-3 text-center">
+              <div className="rounded-lg border border-zinc-200 bg-white p-3 text-center">
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid]">Power Output</p>
-                <p className="text-lg font-black text-[--roam-black] dark:text-white mt-1">{currentDetail.powerOutputKw || currentDetail.totalKw || 0} kW</p>
+                <p className="text-lg font-black text-[--roam-black] mt-1">{currentDetail.powerOutputKw || currentDetail.totalKw || 0} kW</p>
               </div>
-              <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-[#141414] p-3 text-center">
+              <div className="rounded-lg border border-zinc-200 bg-white p-3 text-center">
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid]">Sessions</p>
-                <p className="text-lg font-black text-[--roam-black] dark:text-white mt-1">
+                <p className="text-lg font-black text-[--roam-black] mt-1">
                   {currentDetail._count?.sessions ?? sessions.length ?? 0}
                 </p>
               </div>
@@ -267,8 +267,8 @@ export function StationTable() {
 
             {/* Details Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-[#141414] shadow-none">
-                <CardHeader className="pb-2 border-b border-zinc-100 dark:border-zinc-800">
+              <Card className="border border-zinc-200 rounded-lg bg-white shadow-none">
+                <CardHeader className="pb-2 border-b border-zinc-100">
                   <CardTitle className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid]">Station Details</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2.5 text-xs pt-3">
@@ -276,7 +276,7 @@ export function StationTable() {
                     <>
                       <div className="flex justify-between">
                         <span className="text-[--roam-gray-mid]">Connector Type</span>
-                        <span className="font-semibold text-[--roam-gray-dark] dark:text-zinc-200">{currentDetail.connectorType}</span>
+                        <span className="font-semibold text-[--roam-gray-dark]">{currentDetail.connectorType}</span>
                       </div>
                       <Separator />
                     </>
@@ -285,14 +285,14 @@ export function StationTable() {
                     <span className="text-[--roam-gray-mid] flex items-center gap-1">
                       <Sun className="h-3.5 w-3.5 text-[--roam-orange]" /> Solar Powered
                     </span>
-                    <span className="font-semibold text-[--roam-gray-dark] dark:text-zinc-200">{currentDetail.solarPowered ? 'Yes' : 'No'}</span>
+                    <span className="font-semibold text-[--roam-gray-dark]">{currentDetail.solarPowered ? 'Yes' : 'No'}</span>
                   </div>
                   <Separator />
                   <div className="flex items-center justify-between">
                     <span className="text-[--roam-gray-mid] flex items-center gap-1">
                       <Clock className="h-3.5 w-3.5 text-[--roam-orange]" /> Operating Hours
                     </span>
-                    <span className="font-semibold text-[--roam-gray-dark] dark:text-zinc-200">{currentDetail.operatingHours || 'Not set'}</span>
+                    <span className="font-semibold text-[--roam-gray-dark]">{currentDetail.operatingHours || 'Not set'}</span>
                   </div>
                   <Separator />
                   {paymentMethods.length > 0 && (
@@ -303,7 +303,7 @@ export function StationTable() {
                         </span>
                         <div className="flex gap-1 flex-wrap justify-end">
                           {paymentMethods.map((m: string) => (
-                            <Badge key={m} className="text-[9px] bg-[--roam-gray-light] dark:bg-zinc-800 text-[--roam-gray-dark] dark:text-zinc-300 border-none px-1.5 py-0.5">{m.replace(/_/g, ' ')}</Badge>
+                            <Badge key={m} className="text-[9px] bg-[--roam-gray-light] text-[--roam-gray-dark] border-none px-1.5 py-0.5">{m.replace(/_/g, ' ')}</Badge>
                           ))}
                         </div>
                       </div>
@@ -316,7 +316,7 @@ export function StationTable() {
                     </span>
                     <div className="flex gap-1 flex-wrap justify-end">
                       {services.map((s: string) => (
-                        <Badge key={s} className="text-[9px] bg-[--roam-orange-light] dark:bg-[--roam-orange]/10 text-[--roam-orange] border-none px-1.5 py-0.5">{s.replace(/_/g, ' ')}</Badge>
+                        <Badge key={s} className="text-[9px] bg-[--roam-orange-light] text-[--roam-orange] border-none px-1.5 py-0.5">{s.replace(/_/g, ' ')}</Badge>
                       ))}
                     </div>
                   </div>
@@ -325,7 +325,7 @@ export function StationTable() {
                       <Separator />
                       <div className="flex justify-between">
                         <span className="text-[--roam-gray-mid]">Launched</span>
-                        <span className="font-semibold text-[--roam-gray-dark] dark:text-zinc-200">
+                        <span className="font-semibold text-[--roam-gray-dark]">
                           {new Date(currentDetail.launchDate).toLocaleDateString('en-KE', { year: 'numeric', month: 'short', day: 'numeric' })}
                         </span>
                       </div>
@@ -334,8 +334,8 @@ export function StationTable() {
                 </CardContent>
               </Card>
 
-              <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-[#141414] shadow-none">
-                <CardHeader className="pb-2 border-b border-zinc-100 dark:border-zinc-800">
+              <Card className="border border-zinc-200 rounded-lg bg-white shadow-none">
+                <CardHeader className="pb-2 border-b border-zinc-100">
                   <CardTitle className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid]">Quick Analytics</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4 pt-3">
@@ -344,7 +344,7 @@ export function StationTable() {
                       <p className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid]">Vehicle Types</p>
                       <div className="space-y-2">
                         {vehicleTypeData.map((d) => (
-                          <div key={d.type} className="flex items-center justify-between text-xs text-[--roam-gray-dark] dark:text-zinc-350">
+                          <div key={d.type} className="flex items-center justify-between text-xs text-[--roam-gray-dark]">
                             <span>{d.type}</span>
                             <span className="font-semibold">{d.count} sessions</span>
                           </div>
@@ -356,7 +356,7 @@ export function StationTable() {
                   {currentDetail.notes && (
                     <>
                       <p className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid]">Notes</p>
-                      <p className="text-xs leading-relaxed text-[--roam-gray-dark] dark:text-zinc-350">{currentDetail.notes}</p>
+                      <p className="text-xs leading-relaxed text-[--roam-gray-dark]">{currentDetail.notes}</p>
                     </>
                   )}
                 </CardContent>
@@ -366,8 +366,8 @@ export function StationTable() {
 
           <TabsContent value="sessions" className="space-y-4 pr-2 mt-0">
             {sessionChartData.length > 0 && (
-              <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-[#141414] shadow-none">
-                <CardHeader className="pb-2 border-b border-zinc-100 dark:border-zinc-800">
+              <Card className="border border-zinc-200 rounded-lg bg-white shadow-none">
+                <CardHeader className="pb-2 border-b border-zinc-100">
                   <CardTitle className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid] flex items-center gap-2">
                     <TrendingUp className="h-4 w-4 text-[--roam-orange]" /> Daily Sessions
                   </CardTitle>
@@ -394,8 +394,8 @@ export function StationTable() {
             )}
 
             {vehicleTypeData.length > 0 && (
-              <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-[#141414] shadow-none">
-                <CardHeader className="pb-2 border-b border-zinc-100 dark:border-zinc-800">
+              <Card className="border border-zinc-200 rounded-lg bg-white shadow-none">
+                <CardHeader className="pb-2 border-b border-zinc-100">
                   <CardTitle className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid]">Sessions by Vehicle Type</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-3">
@@ -420,8 +420,8 @@ export function StationTable() {
             )}
 
             {/* Recent Sessions */}
-            <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-[#141414] shadow-none">
-              <CardHeader className="pb-2 border-b border-zinc-100 dark:border-zinc-800">
+            <Card className="border border-zinc-200 rounded-lg bg-white shadow-none">
+              <CardHeader className="pb-2 border-b border-zinc-100">
                 <CardTitle className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid]">Recent Sessions</CardTitle>
               </CardHeader>
               <CardContent className="p-0">
@@ -477,7 +477,7 @@ export function StationTable() {
                       )}
                     </div>
                     <div className="pb-4">
-                      <p className="font-semibold text-xs text-[--roam-gray-dark] dark:text-zinc-200">{act.title}</p>
+                      <p className="font-semibold text-xs text-[--roam-gray-dark]">{act.title}</p>
                       <p className="text-[11px] text-[--roam-gray-mid] mt-0.5 leading-relaxed">{act.description}</p>
                       <p className="text-[10px] text-muted-foreground/60 mt-1">
                         {new Date(act.createdAt).toLocaleDateString('en-KE', {
@@ -501,10 +501,10 @@ export function StationTable() {
 
   return (
     <>
-      <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden bg-white dark:bg-[#141414] shadow-none">
-        <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800">
+      <Card className="border border-zinc-200 rounded-lg overflow-hidden bg-white shadow-none">
+        <CardHeader className="pb-3 border-b border-zinc-100">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <CardTitle className="text-sm font-bold uppercase tracking-widest text-[--roam-gray-dark] dark:text-zinc-200 font-display">Charging Stations</CardTitle>
+            <CardTitle className="text-sm font-bold uppercase tracking-widest text-[--roam-gray-dark] font-display">Charging Stations</CardTitle>
             <Select value={filter} onValueChange={setFilter}>
               <SelectTrigger className="w-[160px] h-8 text-xs rounded-full cursor-pointer">
                 <SelectValue placeholder="Filter" />
@@ -561,13 +561,13 @@ export function StationTable() {
                                   station.type === 'hub'
                                     ? 'text-[--roam-orange]'
                                     : station.type === 'point'
-                                      ? 'text-[--roam-black] dark:text-white'
+                                      ? 'text-[--roam-black]'
                                       : 'text-[--roam-gray-mid]'
                                 }`}
                               />
                             </div>
                             <div>
-                              <p className="font-semibold text-xs leading-none text-[--roam-black] dark:text-white mb-1">{station.name}</p>
+                              <p className="font-semibold text-xs leading-none text-[--roam-black] mb-1">{station.name}</p>
                               <p className="text-[10px] text-[--roam-gray-mid] leading-none">
                                 {station.neighborhood}
                               </p>
@@ -584,10 +584,10 @@ export function StationTable() {
                             {sc.label}
                           </Badge>
                         </TableCell>
-                        <TableCell className="hidden md:table-cell text-xs text-[--roam-gray-dark] dark:text-zinc-350">
+                        <TableCell className="hidden md:table-cell text-xs text-[--roam-gray-dark]">
                           {station.city}, {station.country}
                         </TableCell>
-                        <TableCell className="text-right font-bold text-xs text-[--roam-black] dark:text-white">{station.chargerCount}</TableCell>
+                        <TableCell className="text-right font-bold text-xs text-[--roam-black]">{station.chargerCount}</TableCell>
                         <TableCell className="hidden sm:table-cell text-right text-xs text-[--roam-gray-mid]">
                           {station._count.sessions}
                         </TableCell>
@@ -604,7 +604,7 @@ export function StationTable() {
       {/* Conditionally render Sheet for Mobile, Dialog for Desktop */}
       {isMobile ? (
         <Sheet open={!!selectedStation} onOpenChange={(open) => !open && setSelectedStation(null)}>
-          <SheetContent side="bottom" className="h-[95vh] w-full p-4 overflow-y-auto pt-8 border-t-[3px] border-t-[--roam-orange] rounded-t-2xl bg-white dark:bg-[#0D0D0D]">
+          <SheetContent side="bottom" className="h-[95vh] w-full p-4 overflow-y-auto pt-8 border-t-[3px] border-t-[--roam-orange] rounded-t-2xl bg-white">
             <SheetHeader className="sr-only">
               <SheetTitle>Station Details</SheetTitle>
             </SheetHeader>
@@ -613,7 +613,7 @@ export function StationTable() {
         </Sheet>
       ) : (
         <Dialog open={!!selectedStation} onOpenChange={(open) => !open && setSelectedStation(null)}>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden bg-white dark:bg-[#0D0D0D] border border-gray-100 dark:border-zinc-800 rounded-2xl">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden bg-white border border-gray-100 rounded-2xl">
             {dialogContent}
           </DialogContent>
         </Dialog>

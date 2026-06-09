@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
@@ -27,12 +27,12 @@ interface Milestone {
 }
 
 const categoryConfig: Record<string, { icon: React.ElementType; colorClass: string; label: string }> = {
-  hub: { icon: BatteryCharging, colorClass: 'text-[--roam-orange] bg-[--roam-orange-light] dark:bg-[--roam-orange]/10', label: 'Roam Hub' },
-  point: { icon: Zap, colorClass: 'text-[--roam-orange] bg-[--roam-orange-light] dark:bg-[--roam-orange]/10', label: 'Roam Point' },
-  expansion: { icon: Globe, colorClass: 'text-[--roam-black] dark:text-zinc-200 bg-[--roam-gray-light] dark:bg-zinc-800', label: 'Expansion' },
-  partnership: { icon: Handshake, colorClass: 'text-[--roam-orange] bg-[--roam-orange-light] dark:bg-[--roam-orange]/10', label: 'Partnership' },
-  funding: { icon: Banknote, colorClass: 'text-[--roam-orange] bg-[--roam-orange-light] dark:bg-[--roam-orange]/10', label: 'Funding' },
-  product: { icon: Package, colorClass: 'text-[--roam-black] dark:text-zinc-200 bg-[--roam-gray-light] dark:bg-zinc-800', label: 'Product' },
+  hub: { icon: BatteryCharging, colorClass: 'text-[--roam-orange] bg-[--roam-orange-light]', label: 'Roam Hub' },
+  point: { icon: Zap, colorClass: 'text-[--roam-orange] bg-[--roam-orange-light]', label: 'Roam Point' },
+  expansion: { icon: Globe, colorClass: 'text-[--roam-black] bg-[--roam-gray-light]', label: 'Expansion' },
+  partnership: { icon: Handshake, colorClass: 'text-[--roam-orange] bg-[--roam-orange-light]', label: 'Partnership' },
+  funding: { icon: Banknote, colorClass: 'text-[--roam-orange] bg-[--roam-orange-light]', label: 'Funding' },
+  product: { icon: Package, colorClass: 'text-[--roam-black] bg-[--roam-gray-light]', label: 'Product' },
 };
 
 export function MilestonesTimeline() {
@@ -59,8 +59,8 @@ export function MilestonesTimeline() {
 
   if (isLoading) {
     return (
-      <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-[#141414] shadow-none">
-        <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800">
+      <Card className="border border-zinc-200 rounded-lg bg-white shadow-none">
+        <CardHeader className="pb-3 border-b border-zinc-100">
           <Skeleton className="h-5 w-40" />
         </CardHeader>
         <CardContent className="space-y-4 pt-4">
@@ -73,15 +73,15 @@ export function MilestonesTimeline() {
   }
 
   return (
-    <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-[#141414] shadow-none">
-      <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800">
+    <Card className="border border-zinc-200 rounded-lg bg-white shadow-none">
+      <CardHeader className="pb-3 border-b border-zinc-100">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-          <CardTitle className="text-sm font-bold uppercase tracking-widest text-[--roam-gray-dark] dark:text-zinc-200 flex items-center gap-2 font-display">
+          <CardTitle className="text-sm font-bold uppercase tracking-widest text-[--roam-gray-dark] flex items-center gap-2 font-display">
             <MilestoneIcon className="h-4 w-4 text-[--roam-orange]" /> Infrastructure Milestones
           </CardTitle>
           <div className="flex items-center gap-2">
             <span className="text-xs font-semibold text-[--roam-gray-mid] uppercase tracking-wider">{progress}% complete</span>
-            <div className="w-24 h-2 rounded-full bg-muted dark:bg-zinc-800 overflow-hidden">
+            <div className="w-24 h-2 rounded-full bg-muted overflow-hidden">
               <motion.div
                 className="h-full bg-[--roam-orange] rounded-full"
                 initial={{ width: 0 }}
@@ -112,30 +112,30 @@ export function MilestonesTimeline() {
                 <div className="flex flex-col items-center">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 border-2 ${
                     isCompleted
-                      ? 'border-[--roam-orange] bg-[--roam-orange-light] dark:bg-[--roam-orange]/10'
+                      ? 'border-[--roam-orange] bg-[--roam-orange-light]'
                       : isInProgress
-                        ? 'border-amber-500 bg-amber-50 dark:bg-amber-950/20'
-                        : 'border-zinc-300 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900'
+                        ? 'border-amber-500 bg-amber-50'
+                        : 'border-zinc-300 bg-zinc-50'
                   }`}>
                     {isCompleted ? (
                       <svg className="w-3.5 h-3.5 text-[--roam-orange]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                       </svg>
                     ) : isInProgress ? (
-                      <TrendingUp className="w-3.5 h-3.5 text-amber-600 dark:text-amber-500" />
+                      <TrendingUp className="w-3.5 h-3.5 text-amber-600" />
                     ) : (
-                      <Icon className="w-3.5 h-3.5 text-zinc-450 dark:text-zinc-500" />
+                      <Icon className="w-3.5 h-3.5 text-zinc-450" />
                     )}
                   </div>
                   {index < allMilestones.length - 1 && (
-                    <div className={`w-0.5 flex-1 min-h-[16px] ${isCompleted ? 'bg-[--roam-orange]/40' : 'bg-zinc-200 dark:bg-zinc-800'}`} />
+                    <div className={`w-0.5 flex-1 min-h-[16px] ${isCompleted ? 'bg-[--roam-orange]/40' : 'bg-zinc-200'}`} />
                   )}
                 </div>
 
                 {/* Content */}
                 <div className="pb-4 -mt-0.5 flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
-                    <p className={`text-sm font-semibold text-[--roam-gray-dark] dark:text-zinc-200 ${!isCompleted && !isInProgress ? 'opacity-70' : ''}`}>
+                    <p className={`text-sm font-semibold text-[--roam-gray-dark] ${!isCompleted && !isInProgress ? 'opacity-70' : ''}`}>
                       {milestone.title}
                     </p>
                     <Badge

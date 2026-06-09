@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState, useEffect, useRef } from 'react';
@@ -208,22 +208,22 @@ function StationMapInner() {
     const createPopupHtml = (station: Station) => {
       const statusColorClass = 
         station.status === 'operational'
-          ? 'bg-[#FFF0E8] text-[#E8621A] dark:bg-[--roam-orange]/20 dark:text-[--roam-orange]'
+          ? 'bg-[#FFF0E8] text-[#E8621A]'
           : station.status === 'construction'
-            ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-405'
+            ? 'bg-amber-50 text-amber-700'
             : station.status === 'blocked'
-              ? 'bg-red-50 text-red-650 dark:bg-red-950/20 dark:text-red-450'
-              : 'bg-zinc-100 text-zinc-650 dark:bg-zinc-800 dark:text-zinc-400';
+              ? 'bg-red-50 text-red-650'
+              : 'bg-zinc-100 text-zinc-650';
 
       return `
         <div class="p-1 min-w-[160px] font-sans">
-          <h4 class="font-bold text-xs uppercase tracking-wider text-stone-900 dark:text-white mb-0.5">${station.name}</h4>
-          <p class="text-[10px] text-stone-500 dark:text-stone-400 mb-1.5">${station.neighborhood || station.city}</p>
+          <h4 class="font-bold text-xs uppercase tracking-wider text-stone-900 mb-0.5">${station.name}</h4>
+          <p class="text-[10px] text-stone-500 mb-1.5">${station.neighborhood || station.city}</p>
           <div class="flex items-center gap-1.5 mt-1">
             <span class="text-[9px] font-bold px-2 py-0.5 rounded-full ${statusColorClass}">
               ${station.status}
             </span>
-            <span class="text-[10px] text-stone-600 dark:text-stone-300 font-semibold">
+            <span class="text-[10px] text-stone-600 font-semibold">
               ${station.chargerCount} chargers
             </span>
           </div>
@@ -268,10 +268,10 @@ function StationMapInner() {
   const isLoading = queryLoading || !L;
 
   return (
-    <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden bg-white dark:bg-[#141414] shadow-none">
-      <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800">
+    <Card className="border border-zinc-200 rounded-lg overflow-hidden bg-white shadow-none">
+      <CardHeader className="pb-3 border-b border-zinc-100">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <CardTitle className="text-sm font-semibold uppercase tracking-widest text-[--roam-gray-dark] dark:text-zinc-200 flex items-center gap-2 font-display">
+          <CardTitle className="text-sm font-semibold uppercase tracking-widest text-[--roam-gray-dark] flex items-center gap-2 font-display">
             <MapPin className="h-4 w-4 text-[--roam-orange]" /> Station Map
           </CardTitle>
           <div className="flex items-center w-full overflow-x-auto scrollbar-none flex-nowrap gap-1.5 pb-2 sm:pb-0 sm:w-auto">
@@ -293,7 +293,7 @@ function StationMapInner() {
           </div>
         </div>
       </CardHeader>
-      <CardContent className="p-0 relative bg-zinc-50 dark:bg-zinc-950">
+      <CardContent className="p-0 relative bg-zinc-50">
         {isLoading ? (
           <Skeleton className="h-[300px] md:h-[450px] w-full rounded-none" />
         ) : (
@@ -306,7 +306,7 @@ function StationMapInner() {
         {/* Station count badge overlay */}
         {!isLoading && (
           <div className="absolute top-3 right-3 z-10 pointer-events-none">
-            <Badge className="bg-[--roam-orange-light] text-[--roam-orange] dark:bg-[--roam-orange]/20 hover:bg-[--roam-orange-light] border-none text-xs font-semibold px-2.5 py-1">
+            <Badge className="bg-[--roam-orange-light] text-[--roam-orange] hover:bg-[--roam-orange-light] border-none text-xs font-semibold px-2.5 py-1">
               {filteredStations.length} stations
             </Badge>
           </div>
@@ -314,11 +314,11 @@ function StationMapInner() {
 
         {/* Map Legend Overlay for Point status */}
         {!isLoading && (
-          <div className="absolute bottom-3 left-3 z-10 bg-white/95 dark:bg-zinc-900/95 border border-zinc-200 dark:border-zinc-800 rounded-xl p-2.5 shadow-md text-[10px] space-y-1.5 pointer-events-auto backdrop-blur-xs max-w-[180px]">
-            <p className="font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-0.5">Roam Point Status</p>
-            <div className="grid grid-cols-2 gap-x-2 gap-y-1 font-semibold text-zinc-700 dark:text-zinc-300">
+          <div className="absolute bottom-3 left-3 z-10 bg-white/95 border border-zinc-200 rounded-xl p-2.5 shadow-md text-[10px] space-y-1.5 pointer-events-auto backdrop-blur-xs max-w-[180px]">
+            <p className="font-bold text-zinc-500 uppercase tracking-wider mb-0.5">Roam Point Status</p>
+            <div className="grid grid-cols-2 gap-x-2 gap-y-1 font-semibold text-zinc-700">
               <div className="flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-full bg-[#0D0D0D] dark:bg-white" />
+                <span className="h-2 w-2 rounded-full bg-[#0D0D0D]" />
                 <span>Active</span>
               </div>
               <div className="flex items-center gap-1.5">

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,8 +28,8 @@ export function ActivityFeed() {
 
   if (isLoading) {
     return (
-      <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-[#141414] shadow-none">
-        <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800">
+      <Card className="border border-zinc-200 rounded-lg bg-white shadow-none">
+        <CardHeader className="pb-3 border-b border-zinc-100">
           <Skeleton className="h-5 w-40" />
         </CardHeader>
         <CardContent className="space-y-3 pt-4">
@@ -42,9 +42,9 @@ export function ActivityFeed() {
   }
 
   return (
-    <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-[#141414] shadow-none">
-      <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800">
-        <CardTitle className="text-sm font-bold uppercase tracking-widest text-[--roam-gray-dark] dark:text-zinc-200 flex items-center gap-2 font-display">
+    <Card className="border border-zinc-200 rounded-lg bg-white shadow-none">
+      <CardHeader className="pb-3 border-b border-zinc-100">
+        <CardTitle className="text-sm font-bold uppercase tracking-widest text-[--roam-gray-dark] flex items-center gap-2 font-display">
           <Newspaper className="h-4 w-4 text-[--roam-orange]" /> Activity Feed
         </CardTitle>
       </CardHeader>
@@ -67,15 +67,15 @@ export function ActivityFeed() {
               return (
                 <div
                   key={activity.id}
-                  className="flex gap-3 py-3 border-b last:border-0 border-gray-100 dark:border-zinc-850"
+                  className="flex gap-3 py-3 border-b last:border-0 border-gray-100"
                 >
                   <div className="flex flex-col items-center mt-0.5">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
                       isHub
                         ? 'bg-[--roam-orange]/10 text-[--roam-orange]'
                         : activity.station
-                          ? 'bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200'
-                          : 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400'
+                          ? 'bg-zinc-100 text-zinc-800'
+                          : 'bg-zinc-100 text-zinc-500'
                     }`}>
                       {isHub ? (
                         <BatteryCharging className="h-4 w-4" />
@@ -88,17 +88,17 @@ export function ActivityFeed() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
-                      <p className="text-xs font-semibold text-[--roam-black] dark:text-white leading-tight">{activity.title}</p>
+                      <p className="text-xs font-semibold text-[--roam-black] leading-tight">{activity.title}</p>
                       <span className="text-[10px] text-[--roam-gray-mid] whitespace-nowrap flex-shrink-0">
                         {timeAgo}
                       </span>
                     </div>
-                    <p className="text-xs text-[--roam-gray-dark] dark:text-zinc-350 mt-1 leading-relaxed">
+                    <p className="text-xs text-[--roam-gray-dark] mt-1 leading-relaxed">
                       {activity.description}
                     </p>
                     {activity.station && (
                       <div className="mt-1.5">
-                        <Badge className="text-[9px] font-semibold bg-[--roam-gray-light] dark:bg-zinc-800 text-[--roam-gray-dark] dark:text-zinc-300 border-none px-1.5 py-0.5 rounded-full hover:bg-[--roam-gray-light]">
+                        <Badge className="text-[9px] font-semibold bg-[--roam-gray-light] text-[--roam-gray-dark] border-none px-1.5 py-0.5 rounded-full hover:bg-[--roam-gray-light]">
                           {activity.station.name}
                         </Badge>
                       </div>

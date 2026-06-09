@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -127,53 +127,53 @@ export function AnalyticsDashboard() {
     <div className="space-y-4">
       {/* Summary Cards Row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-[#141414] shadow-none">
+        <Card className="border border-zinc-200 rounded-lg bg-white shadow-none">
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
               <div className="rounded-lg p-2 bg-[--roam-orange]/10 flex-shrink-0">
                 <BatteryCharging className="h-4 w-4 text-[--roam-orange]" />
               </div>
               <div>
-                <p className="text-lg font-black text-[--roam-black] dark:text-white leading-tight">{overview?.hubCount || 0}</p>
+                <p className="text-lg font-black text-[--roam-black] leading-tight">{overview?.hubCount || 0}</p>
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid] mt-0.5">Roam Hubs</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-[#141414] shadow-none">
+        <Card className="border border-zinc-200 rounded-lg bg-white shadow-none">
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
-              <div className="rounded-lg p-2 bg-[--roam-black]/10 dark:bg-white/10 flex-shrink-0">
-                <Zap className="h-4 w-4 text-[--roam-black] dark:text-white" />
+              <div className="rounded-lg p-2 bg-[--roam-black]/10 flex-shrink-0">
+                <Zap className="h-4 w-4 text-[--roam-black]" />
               </div>
               <div>
-                <p className="text-lg font-black text-[--roam-black] dark:text-white leading-tight">{overview?.pointCount || 0}</p>
+                <p className="text-lg font-black text-[--roam-black] leading-tight">{overview?.pointCount || 0}</p>
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid] mt-0.5">Roam Points</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-[#141414] shadow-none">
+        <Card className="border border-zinc-200 rounded-lg bg-white shadow-none">
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
-              <div className="rounded-lg p-2 bg-zinc-100 dark:bg-zinc-800 flex-shrink-0">
-                <Radio className="h-4 w-4 text-zinc-500 dark:text-zinc-400" />
+              <div className="rounded-lg p-2 bg-zinc-100 flex-shrink-0">
+                <Radio className="h-4 w-4 text-zinc-500" />
               </div>
               <div>
-                <p className="text-lg font-black text-[--roam-black] dark:text-white leading-tight">{kioskCount}</p>
+                <p className="text-lg font-black text-[--roam-black] leading-tight">{kioskCount}</p>
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid] mt-0.5">Roam Kiosks</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-[#141414] shadow-none">
+        <Card className="border border-zinc-200 rounded-lg bg-white shadow-none">
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
               <div className="rounded-lg p-2 bg-[--roam-orange]/10 flex-shrink-0">
                 <MapPin className="h-4 w-4 text-[--roam-orange]" />
               </div>
               <div>
-                <p className="text-lg font-black text-[--roam-black] dark:text-white leading-tight">{overview?.activeStations || 0}</p>
+                <p className="text-lg font-black text-[--roam-black] leading-tight">{overview?.activeStations || 0}</p>
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid] mt-0.5">Operational</p>
               </div>
             </div>
@@ -184,9 +184,9 @@ export function AnalyticsDashboard() {
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Daily Sessions Trend */}
-        <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-[#141414] shadow-none">
-          <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800">
-            <CardTitle className="text-sm font-bold uppercase tracking-widest text-[--roam-gray-dark] dark:text-zinc-200 flex items-center gap-2 font-display">
+        <Card className="border border-zinc-200 rounded-lg bg-white shadow-none">
+          <CardHeader className="pb-3 border-b border-zinc-100">
+            <CardTitle className="text-sm font-bold uppercase tracking-widest text-[--roam-gray-dark] flex items-center gap-2 font-display">
               <TrendingUp className="h-4 w-4 text-[--roam-orange]" /> Daily Charging Sessions (30 Days)
             </CardTitle>
           </CardHeader>
@@ -232,9 +232,9 @@ export function AnalyticsDashboard() {
         </Card>
 
         {/* Station Type Breakdown */}
-        <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-[#141414] shadow-none">
-          <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800">
-            <CardTitle className="text-sm font-bold uppercase tracking-widest text-[--roam-gray-dark] dark:text-zinc-200 flex items-center gap-2 font-display">
+        <Card className="border border-zinc-200 rounded-lg bg-white shadow-none">
+          <CardHeader className="pb-3 border-b border-zinc-100">
+            <CardTitle className="text-sm font-bold uppercase tracking-widest text-[--roam-gray-dark] flex items-center gap-2 font-display">
               <MapPin className="h-4 w-4 text-[--roam-orange]" /> Station Type Distribution
             </CardTitle>
           </CardHeader>
@@ -274,18 +274,18 @@ export function AnalyticsDashboard() {
                     <entry.icon className="h-4 w-4" style={{ color: entry.color === '#0D0D0D' ? undefined : entry.color }} />
                   </div>
                   <div className="flex-1">
-                    <p className="text-xs font-bold text-[--roam-black] dark:text-white leading-tight">{entry.name}</p>
+                    <p className="text-xs font-bold text-[--roam-black] leading-tight">{entry.name}</p>
                     <p className="text-[10px] text-[--roam-gray-mid] leading-none mt-0.5">{entry.value} stations</p>
                   </div>
-                  <p className="text-base font-black text-[--roam-black] dark:text-white">{entry.value}</p>
+                  <p className="text-base font-black text-[--roam-black]">{entry.value}</p>
                 </div>
               ))}
               <div className="border-t pt-3 mt-2 text-xs">
-                <div className="flex items-center justify-between text-[--roam-gray-dark] dark:text-zinc-300">
+                <div className="flex items-center justify-between text-[--roam-gray-dark]">
                   <span className="text-[10px] uppercase font-semibold text-[--roam-gray-mid]">Total Stations</span>
                   <span className="font-bold">{overview?.totalStations || 0}</span>
                 </div>
-                <div className="flex items-center justify-between mt-1 text-[--roam-gray-dark] dark:text-zinc-300">
+                <div className="flex items-center justify-between mt-1 text-[--roam-gray-dark]">
                   <span className="text-[10px] uppercase font-semibold text-[--roam-gray-mid]">Total Chargers</span>
                   <span className="font-bold">{overview?.totalChargers || 0}</span>
                 </div>
@@ -295,9 +295,9 @@ export function AnalyticsDashboard() {
         </Card>
 
         {/* Sessions by Station - Top 12 */}
-        <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-[#141414] shadow-none">
-          <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800">
-            <CardTitle className="text-sm font-bold uppercase tracking-widest text-[--roam-gray-dark] dark:text-zinc-200 flex items-center gap-2 font-display">
+        <Card className="border border-zinc-200 rounded-lg bg-white shadow-none">
+          <CardHeader className="pb-3 border-b border-zinc-100">
+            <CardTitle className="text-sm font-bold uppercase tracking-widest text-[--roam-gray-dark] flex items-center gap-2 font-display">
               <BarChart3 className="h-4 w-4 text-[--roam-orange]" /> Top Stations by Sessions
             </CardTitle>
           </CardHeader>
@@ -332,9 +332,9 @@ export function AnalyticsDashboard() {
         </Card>
 
         {/* Vehicle Type Distribution */}
-        <Card className="border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-[#141414] shadow-none">
-          <CardHeader className="pb-3 border-b border-zinc-100 dark:border-zinc-800">
-            <CardTitle className="text-sm font-bold uppercase tracking-widest text-[--roam-gray-dark] dark:text-zinc-200 flex items-center gap-2 font-display">
+        <Card className="border border-zinc-200 rounded-lg bg-white shadow-none">
+          <CardHeader className="pb-3 border-b border-zinc-100">
+            <CardTitle className="text-sm font-bold uppercase tracking-widest text-[--roam-gray-dark] flex items-center gap-2 font-display">
               <Zap className="h-4 w-4 text-[--roam-orange]" /> Vehicle Type Distribution
             </CardTitle>
           </CardHeader>
@@ -381,7 +381,7 @@ export function AnalyticsDashboard() {
                             backgroundColor: VEHICLE_COLORS[entry.name.replace(' ', '_')] || COLORS[index % COLORS.length],
                           }}
                         />
-                        <span className="text-xs font-bold capitalize text-[--roam-black] dark:text-white leading-tight">{entry.name}</span>
+                        <span className="text-xs font-bold capitalize text-[--roam-black] leading-tight">{entry.name}</span>
                       </div>
                       <p className="text-[10px] text-[--roam-gray-mid] leading-tight ml-4.5">{entry.value} sessions</p>
                       {vehicleData[index] && (
@@ -392,7 +392,7 @@ export function AnalyticsDashboard() {
                     </div>
                   ))}
                   <div className="border-t pt-3 mt-2 text-xs">
-                    <div className="flex items-center justify-between text-[--roam-gray-dark] dark:text-zinc-300">
+                    <div className="flex items-center justify-between text-[--roam-gray-dark]">
                       <span className="text-[10px] uppercase font-semibold text-[--roam-gray-mid]">Total Sessions</span>
                       <span className="font-bold">{overview?.totalSessions || 0}</span>
                     </div>
