@@ -28,13 +28,20 @@ export async function GET() {
       _sum: { chargingMinutes: true, energyKwh: true, costKes: true },
     });
 
-    // Daily session counts (last 30 days)
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    // Daily session counts — anchored to the most recent session date so
+    // periodic batch uploads (e.g. every 3 months) always appear in charts.
+    const latestSession = await db.chargingSession.findFirst({
+      orderBy: { date: 'desc' },
+      select: { date: true },
+    });
+    const windowEnd = latestSession?.date ?? new Date();
+    const windowStart = new Date(windowEnd.getTime() - 30 * 24 * 60 * 60 * 1000);
     const dailySessions = await db.chargingSession.groupBy({
       by: ['date'],
-      where: { date: { gte: thirtyDaysAgo } },
+      where: { date: { gte: windowStart, lte: windowEnd } },
       _count: { id: true },
       _sum: { energyKwh: true, costKes: true },
+      orderBy: { date: 'asc' },
     });
 
     // Sessions by station

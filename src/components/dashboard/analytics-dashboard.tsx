@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { BarChart3, TrendingUp, Zap, BatteryCharging, Radio, MapPin } from 'lucide-react';
+import { BarChart3, TrendingUp, Zap, BatteryCharging, Radio, MapPin, Activity, DollarSign, Clock, Trophy } from 'lucide-react';
 import {
   BarChart,
   Bar,
@@ -100,6 +100,12 @@ export function AnalyticsDashboard() {
       type: s.type,
     }));
 
+  // Session KPIs derived from vehicle data
+  const totalRevenue = (data?.sessionsByVehicle || []).reduce((sum, v) => sum + (v._sum.costKes || 0), 0);
+  const totalMinutes = (data?.sessionsByVehicle || []).reduce((sum, v) => sum + (v._sum.chargingMinutes || 0), 0);
+  const avgChargeMin = overview?.totalSessions ? Math.round(totalMinutes / overview.totalSessions) : 0;
+  const topHub = stationSessionData[0];
+
   const pieData = (data?.sessionsByVehicle || []).map((v) => ({
     name: v.vehicleType.replace(/_/g, ' '),
     value: v._count.id,
@@ -181,13 +187,79 @@ export function AnalyticsDashboard() {
         </Card>
       </div>
 
+      {/* Session KPI Cards Row */}
+      {(overview?.totalSessions || 0) > 0 && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <Card className="border border-zinc-200 rounded-lg bg-white shadow-none">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2">
+                <div className="rounded-lg p-2 bg-[--roam-orange]/10 flex-shrink-0">
+                  <Activity className="h-4 w-4 text-[--roam-orange]" />
+                </div>
+                <div>
+                  <p className="text-lg font-black text-[--roam-black] leading-tight">{(overview?.totalSessions || 0).toLocaleString()}</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid] mt-0.5">Total Sessions</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border border-zinc-200 rounded-lg bg-white shadow-none">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2">
+                <div className="rounded-lg p-2 bg-emerald-50 flex-shrink-0">
+                  <DollarSign className="h-4 w-4 text-emerald-600" />
+                </div>
+                <div>
+                  <p className="text-lg font-black text-[--roam-black] leading-tight">
+                    {totalRevenue >= 1_000_000
+                      ? `${(totalRevenue / 1_000_000).toFixed(1)}M`
+                      : totalRevenue >= 1_000
+                      ? `${Math.round(totalRevenue / 1_000)}K`
+                      : Math.round(totalRevenue).toLocaleString()}
+                  </p>
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid] mt-0.5">Revenue (KES)</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border border-zinc-200 rounded-lg bg-white shadow-none">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2">
+                <div className="rounded-lg p-2 bg-blue-50 flex-shrink-0">
+                  <Clock className="h-4 w-4 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-lg font-black text-[--roam-black] leading-tight">{avgChargeMin}m</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid] mt-0.5">Avg Charge Time</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border border-zinc-200 rounded-lg bg-white shadow-none">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2">
+                <div className="rounded-lg p-2 bg-amber-50 flex-shrink-0">
+                  <Trophy className="h-4 w-4 text-amber-600" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-black text-[--roam-black] leading-tight truncate">{topHub?.name || '—'}</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid] mt-0.5">
+                    {topHub ? `${topHub.sessions.toLocaleString()} sessions` : 'Busiest Hub'}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Daily Sessions Trend */}
         <Card className="border border-zinc-200 rounded-lg bg-white shadow-none">
           <CardHeader className="pb-3 border-b border-zinc-100">
             <CardTitle className="text-sm font-bold uppercase tracking-widest text-[--roam-gray-dark] flex items-center gap-2 font-display">
-              <TrendingUp className="h-4 w-4 text-[--roam-orange]" /> Daily Charging Sessions (30 Days)
+              <TrendingUp className="h-4 w-4 text-[--roam-orange]" /> Daily Charging Sessions
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-4">
