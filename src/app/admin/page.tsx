@@ -1,12 +1,13 @@
 ﻿'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { signOut, useSession } from 'next-auth/react';
 import {
   Shield, LogOut, RefreshCw, CheckCircle2,
   ChevronDown, AlertTriangle, Sparkles, Activity, RotateCcw,
   Radio, MapPin, Building2, X, Target, Pencil, History,
   Check, Minus, Phone, User, ChevronRight, Save, Search,
+  Upload, FileText, BarChart2, AlertCircle,
 } from 'lucide-react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -748,11 +749,217 @@ function EditTab({ showToast }: { showToast: (msg: string, type?: 'success' | 'e
   );
 }
 
+// ─── Upload Result type ───────────────────────────────────────────────────────
+
+interface UploadResult {
+  success: boolean;
+  fileName: string;
+  totalRows: number;
+  inserted: number;
+  skipped: { csvDuplicate: number; noStation: number; badDate: number; dbDuplicate: number; total: number };
+  dateRange: { from: string | null; to: string | null };
+  hubBreakdown: Record<string, number>;
+  unknownHubs: Record<string, number> | null;
+  durationMs: number;
+}
+
+// ─── Upload CSV Modal ─────────────────────────────────────────────────────────
+
+function UploadCSVModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () => void }) {
+  const [file, setFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [result, setResult] = useState<UploadResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleUpload = async () => {
+    if (!file) return;
+    setUploading(true);
+    setError(null);
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      const res = await fetch('/api/admin/upload-sessions', { method: 'POST', body: form });
+      const data = await res.json() as UploadResult & { error?: string };
+      if (!res.ok) throw new Error(data.error ?? 'Upload failed');
+      setResult(data);
+      onSuccess();
+    } catch (err) {
+      setError(String(err));
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+      <div className="bg-white border border-zinc-200 rounded-2xl w-full max-w-lg shadow-2xl">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-100">
+          <div className="flex items-center gap-2">
+            <Upload className="w-4 h-4 text-[#E8621A]" />
+            <h3 className="text-sm font-bold text-zinc-900">Upload Charging Data</h3>
+          </div>
+          <button onClick={onClose} className="text-zinc-400 hover:text-zinc-600 transition-colors">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div className="p-5 space-y-4">
+          {!result ? (
+            <>
+              {/* File picker */}
+              <div>
+                <p className="text-zinc-500 text-xs mb-3">
+                  Upload a monthly charging sessions CSV exported from the Roam system.
+                  Required columns: <code className="bg-zinc-100 px-1 rounded text-[11px]">service_id</code>,{' '}
+                  <code className="bg-zinc-100 px-1 rounded text-[11px]">paymentDate</code>,{' '}
+                  <code className="bg-zinc-100 px-1 rounded text-[11px]">pickupLocationProjectCode</code>, etc.
+                </p>
+                <label className={`flex flex-col items-center justify-center gap-2 w-full h-28 border-2 border-dashed rounded-xl cursor-pointer transition-colors ${
+                  file ? 'border-[#E8621A]/40 bg-[#E8621A]/5' : 'border-zinc-200 bg-zinc-50 hover:border-zinc-300'
+                }`}>
+                  <input
+                    type="file"
+                    accept=".csv"
+                    className="hidden"
+                    onChange={e => { setFile(e.target.files?.[0] ?? null); setError(null); }}
+                  />
+                  {file ? (
+                    <>
+                      <FileText className="w-6 h-6 text-[#E8621A]" />
+                      <span className="text-xs font-semibold text-zinc-700 text-center px-4 truncate max-w-full">{file.name}</span>
+                      <span className="text-[11px] text-zinc-400">{(file.size / 1024 / 1024).toFixed(1)} MB — click to change</span>
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-6 h-6 text-zinc-300" />
+                      <span className="text-xs text-zinc-400">Click to select CSV file</span>
+                    </>
+                  )}
+                </label>
+              </div>
+
+              {error && (
+                <div className="flex items-start gap-2 bg-red-50 border border-red-200 rounded-xl p-3">
+                  <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
+                  <p className="text-red-600 text-xs">{error}</p>
+                </div>
+              )}
+
+              <div className="flex justify-end gap-2">
+                <button onClick={onClose}
+                  className="px-4 py-2 text-xs font-semibold text-zinc-500 hover:text-zinc-700 transition-colors">
+                  Cancel
+                </button>
+                <button
+                  onClick={handleUpload}
+                  disabled={!file || uploading}
+                  className="flex items-center gap-2 px-4 py-2 bg-[#E8621A] text-white text-xs font-bold rounded-xl hover:bg-[#E8621A]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {uploading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
+                  {uploading ? 'Uploading…' : 'Upload & Import'}
+                </button>
+              </div>
+            </>
+          ) : (
+            /* Result view */
+            <div className="space-y-4">
+              <div className={`flex items-center gap-2 px-3 py-2 rounded-xl ${
+                result.skipped.noStation > 0 ? 'bg-amber-50 border border-amber-200' : 'bg-emerald-50 border border-emerald-200'
+              }`}>
+                {result.skipped.noStation > 0
+                  ? <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0" />
+                  : <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                }
+                <p className={`text-xs font-semibold ${result.skipped.noStation > 0 ? 'text-amber-700' : 'text-emerald-700'}`}>
+                  {result.inserted.toLocaleString()} sessions imported from {result.totalRows.toLocaleString()} rows
+                  {result.skipped.total > 0 && ` · ${result.skipped.total} skipped`}
+                </p>
+              </div>
+
+              {/* Stats grid */}
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { label: 'Imported', value: result.inserted.toLocaleString(), color: 'text-emerald-600' },
+                  { label: 'Duplicates', value: (result.skipped.csvDuplicate + result.skipped.dbDuplicate).toString(), color: 'text-zinc-400' },
+                  { label: 'Unmatched', value: result.skipped.noStation.toString(), color: result.skipped.noStation > 0 ? 'text-amber-600' : 'text-zinc-400' },
+                ].map(s => (
+                  <div key={s.label} className="bg-zinc-50 border border-zinc-100 rounded-xl p-3 text-center">
+                    <p className={`text-lg font-black ${s.color}`}>{s.value}</p>
+                    <p className="text-[10px] text-zinc-400 uppercase tracking-wider mt-0.5">{s.label}</p>
+                  </div>
+                ))}
+              </div>
+
+              {result.dateRange.from && (
+                <p className="text-xs text-zinc-400">
+                  Date range: <span className="text-zinc-600 font-semibold">{result.dateRange.from}</span> → <span className="text-zinc-600 font-semibold">{result.dateRange.to}</span>
+                  <span className="ml-2 text-zinc-300">·</span>
+                  <span className="ml-2">{(result.durationMs / 1000).toFixed(1)}s</span>
+                </p>
+              )}
+
+              {/* Hub breakdown */}
+              {Object.keys(result.hubBreakdown).length > 0 && (
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 mb-2">Sessions per hub</p>
+                  <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
+                    {Object.entries(result.hubBreakdown)
+                      .sort((a, b) => b[1] - a[1])
+                      .map(([hub, count]) => {
+                        const max = Math.max(...Object.values(result.hubBreakdown));
+                        return (
+                          <div key={hub} className="flex items-center gap-2">
+                            <span className="text-[11px] text-zinc-500 w-32 flex-shrink-0 truncate">{hub}</span>
+                            <div className="flex-1 h-1.5 bg-zinc-100 rounded-full overflow-hidden">
+                              <div className="h-full bg-[#E8621A] rounded-full" style={{ width: `${(count / max) * 100}%` }} />
+                            </div>
+                            <span className="text-[11px] font-semibold text-zinc-600 w-12 text-right flex-shrink-0">
+                              {count.toLocaleString()}
+                            </span>
+                          </div>
+                        );
+                      })}
+                  </div>
+                </div>
+              )}
+
+              {/* Unknown hubs */}
+              {result.unknownHubs && Object.keys(result.unknownHubs).length > 0 && (
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-600 mb-1.5">
+                    Unmatched hub codes (sessions skipped)
+                  </p>
+                  {Object.entries(result.unknownHubs).map(([code, count]) => (
+                    <p key={code} className="text-xs text-amber-700">
+                      <code className="font-mono">{code}</code> — {count} sessions
+                    </p>
+                  ))}
+                  <p className="text-[10px] text-amber-500 mt-1.5">Add this hub to the database to import these sessions.</p>
+                </div>
+              )}
+
+              <div className="flex justify-end">
+                <button onClick={onClose}
+                  className="px-4 py-2 bg-zinc-900 text-white text-xs font-bold rounded-xl hover:bg-zinc-700 transition-colors">
+                  Done
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Sync Log Tab ─────────────────────────────────────────────────────────────
 
 function SyncLogTab() {
   const [data, setData] = useState<SyncHistoryResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showUpload, setShowUpload] = useState(false);
+  const [expandedLog, setExpandedLog] = useState<string | null>(null);
 
   const fetchLogs = useCallback(async () => {
     setLoading(true);
@@ -779,11 +986,33 @@ function SyncLogTab() {
 
   return (
     <div>
+      {showUpload && (
+        <UploadCSVModal
+          onClose={() => setShowUpload(false)}
+          onSuccess={() => { fetchLogs(); }}
+        />
+      )}
+
+      {/* Upload + refresh header */}
+      <div className="flex items-center justify-between mb-5">
+        <div>
+          <h2 className="text-sm font-bold text-zinc-900">Charging Data Uploads</h2>
+          <p className="text-zinc-400 text-xs mt-0.5">Import monthly CSV exports from the Roam system.</p>
+        </div>
+        <button
+          onClick={() => setShowUpload(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-[#E8621A] text-white text-xs font-bold rounded-xl hover:bg-[#E8621A]/90 transition-colors"
+        >
+          <Upload className="w-3.5 h-3.5" />
+          Upload CSV
+        </button>
+      </div>
+
       {/* Summary stats */}
       {s && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
           {[
-            { label: 'Total Syncs', value: s.totalSyncs,   color: 'text-zinc-900'       },
+            { label: 'Total Syncs', value: s.totalSyncs,   color: 'text-zinc-900'    },
             { label: 'Successful',  value: s.totalSuccess, color: 'text-emerald-600' },
             { label: 'Partial',     value: s.totalPartial, color: 'text-amber-600'   },
             { label: 'Errors',      value: s.totalErrors,  color: 'text-red-600'     },
@@ -824,6 +1053,7 @@ function SyncLogTab() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-zinc-100">
+                  <th className="text-left px-4 py-2.5 text-zinc-400 text-[10px] font-semibold uppercase tracking-wider w-6"></th>
                   <th className="text-left px-4 py-2.5 text-zinc-400 text-[10px] font-semibold uppercase tracking-wider">Time</th>
                   <th className="text-left px-4 py-2.5 text-zinc-400 text-[10px] font-semibold uppercase tracking-wider hidden sm:table-cell">File / Source</th>
                   <th className="text-left px-4 py-2.5 text-zinc-400 text-[10px] font-semibold uppercase tracking-wider">Status</th>
@@ -838,55 +1068,149 @@ function SyncLogTab() {
               <tbody>
                 {data.logs.map(log => {
                   const cfg = SYNC_STATUS_CONFIG[log.status] ?? SYNC_STATUS_CONFIG.success;
+                  const isCsvUpload = log.source === 'csv_sessions';
+                  const isExpanded = expandedLog === log.id;
+                  let details: {
+                    dateRange?: { from: string; to: string };
+                    hubBreakdown?: Record<string, number>;
+                    unknownHubs?: Record<string, number>;
+                    skippedDuplicate?: number;
+                    skippedNoStation?: number;
+                    totalRows?: number;
+                  } | null = null;
+                  if (isCsvUpload && log.details) {
+                    try { details = JSON.parse(log.details); } catch { /* ignore */ }
+                  }
+
                   return (
-                    <tr key={log.id} className="border-b border-zinc-100 hover:bg-zinc-50 transition-colors">
-                      <td className="px-4 py-3">
-                        <p className="text-zinc-700 text-xs">
-                          {new Date(log.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
-                        </p>
-                        <p className="text-zinc-400 text-[10px]">
-                          {new Date(log.createdAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
-                        </p>
-                      </td>
-                      <td className="px-4 py-3 hidden sm:table-cell">
-                        <p className="text-zinc-500 text-xs truncate max-w-[160px]">
-                          {log.fileName || <span className="text-zinc-300">no file</span>}
-                        </p>
-                        <p className="text-zinc-400 text-[10px]">{log.source}</p>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-semibold ${cfg.color} ${cfg.bg}`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
-                          {cfg.label}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 hidden md:table-cell">
-                        <span className={`text-xs font-semibold ${log.created > 0 ? 'text-emerald-600' : 'text-zinc-300'}`}>
-                          {log.created > 0 ? `+${log.created}` : '—'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 hidden md:table-cell">
-                        <span className={`text-xs font-semibold ${log.updated > 0 ? 'text-blue-600' : 'text-zinc-300'}`}>
-                          {log.updated > 0 ? `~${log.updated}` : '—'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 hidden lg:table-cell">
-                        <span className="text-zinc-400 text-xs">{log.unchanged > 0 ? log.unchanged : '—'}</span>
-                      </td>
-                      <td className="px-4 py-3 hidden md:table-cell">
-                        <span className={`text-xs font-semibold ${log.errors > 0 ? 'text-red-600' : 'text-zinc-300'}`}>
-                          {log.errors > 0 ? log.errors : '—'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 hidden lg:table-cell">
-                        <span className="text-zinc-400 text-xs">
-                          {log.durationMs > 0 ? `${(log.durationMs / 1000).toFixed(1)}s` : '—'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 hidden sm:table-cell">
-                        <span className="text-zinc-400 text-xs truncate max-w-[100px] block">{log.triggerBy ?? '—'}</span>
-                      </td>
-                    </tr>
+                    <React.Fragment key={log.id}>
+                      <tr
+                        className={`border-b border-zinc-100 transition-colors ${isCsvUpload ? 'cursor-pointer hover:bg-zinc-50' : 'hover:bg-zinc-50'}`}
+                        onClick={() => isCsvUpload && setExpandedLog(isExpanded ? null : log.id)}
+                      >
+                        <td className="px-4 py-3">
+                          {isCsvUpload && (
+                            <ChevronRight className={`w-3.5 h-3.5 text-zinc-400 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
+                          )}
+                        </td>
+                        <td className="px-4 py-3">
+                          <p className="text-zinc-700 text-xs">
+                            {new Date(log.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' })}
+                          </p>
+                          <p className="text-zinc-400 text-[10px]">
+                            {new Date(log.createdAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+                          </p>
+                        </td>
+                        <td className="px-4 py-3 hidden sm:table-cell">
+                          <div className="flex items-center gap-1.5">
+                            {isCsvUpload && <BarChart2 className="w-3 h-3 text-[#E8621A] flex-shrink-0" />}
+                            <div>
+                              <p className="text-zinc-500 text-xs truncate max-w-[140px]">
+                                {log.fileName || <span className="text-zinc-300">no file</span>}
+                              </p>
+                              <p className="text-zinc-400 text-[10px]">{isCsvUpload ? 'Charging Sessions CSV' : log.source}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-semibold ${cfg.color} ${cfg.bg}`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
+                            {cfg.label}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 hidden md:table-cell">
+                          <span className={`text-xs font-semibold ${log.created > 0 ? 'text-emerald-600' : 'text-zinc-300'}`}>
+                            {log.created > 0 ? `+${log.created.toLocaleString()}` : '—'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 hidden md:table-cell">
+                          <span className={`text-xs font-semibold ${log.updated > 0 ? 'text-blue-600' : 'text-zinc-300'}`}>
+                            {log.updated > 0 ? `~${log.updated}` : '—'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 hidden lg:table-cell">
+                          <span className="text-zinc-400 text-xs">{log.unchanged > 0 ? log.unchanged.toLocaleString() : '—'}</span>
+                        </td>
+                        <td className="px-4 py-3 hidden md:table-cell">
+                          <span className={`text-xs font-semibold ${log.errors > 0 ? 'text-red-600' : 'text-zinc-300'}`}>
+                            {log.errors > 0 ? log.errors : '—'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 hidden lg:table-cell">
+                          <span className="text-zinc-400 text-xs">
+                            {log.durationMs > 0 ? `${(log.durationMs / 1000).toFixed(1)}s` : '—'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 hidden sm:table-cell">
+                          <span className="text-zinc-400 text-xs truncate max-w-[100px] block">{log.triggerBy ?? '—'}</span>
+                        </td>
+                      </tr>
+
+                      {/* Expanded detail row for CSV uploads */}
+                      {isExpanded && details && (
+                        <tr key={`${log.id}-detail`} className="bg-zinc-50 border-b border-zinc-100">
+                          <td colSpan={10} className="px-6 py-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                              {/* Date range + counts */}
+                              <div className="space-y-2">
+                                {details.dateRange && (
+                                  <div className="text-xs text-zinc-500">
+                                    <span className="font-semibold text-zinc-700">Date range: </span>
+                                    {details.dateRange.from} → {details.dateRange.to}
+                                  </div>
+                                )}
+                                <div className="flex flex-wrap gap-3 text-xs">
+                                  <span><span className="font-semibold text-zinc-600">{details.totalRows?.toLocaleString()}</span> <span className="text-zinc-400">total rows</span></span>
+                                  <span><span className="font-semibold text-emerald-600">+{log.created.toLocaleString()}</span> <span className="text-zinc-400">inserted</span></span>
+                                  {(details.skippedDuplicate ?? 0) > 0 && (
+                                    <span><span className="font-semibold text-zinc-400">{details.skippedDuplicate}</span> <span className="text-zinc-400">duplicates</span></span>
+                                  )}
+                                  {(details.skippedNoStation ?? 0) > 0 && (
+                                    <span><span className="font-semibold text-amber-600">{details.skippedNoStation}</span> <span className="text-zinc-400">unmatched</span></span>
+                                  )}
+                                </div>
+                                {/* Unknown hubs */}
+                                {details.unknownHubs && Object.keys(details.unknownHubs).length > 0 && (
+                                  <div className="mt-2">
+                                    <p className="text-[10px] font-semibold text-amber-600 uppercase tracking-wider mb-1">Unmatched hub codes</p>
+                                    {Object.entries(details.unknownHubs).map(([code, count]) => (
+                                      <p key={code} className="text-xs text-amber-700">
+                                        <code className="font-mono text-[11px]">{code}</code> — {count} sessions skipped
+                                      </p>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                              {/* Hub breakdown mini bar chart */}
+                              {details.hubBreakdown && Object.keys(details.hubBreakdown).length > 0 && (
+                                <div>
+                                  <p className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider mb-2">Sessions per hub</p>
+                                  <div className="space-y-1.5">
+                                    {Object.entries(details.hubBreakdown)
+                                      .sort((a, b) => b[1] - a[1])
+                                      .slice(0, 8)
+                                      .map(([hub, count]) => {
+                                        const max = Math.max(...Object.values(details.hubBreakdown!));
+                                        return (
+                                          <div key={hub} className="flex items-center gap-2">
+                                            <span className="text-[10px] text-zinc-500 w-24 flex-shrink-0 truncate">{hub}</span>
+                                            <div className="flex-1 h-1.5 bg-zinc-200 rounded-full overflow-hidden">
+                                              <div className="h-full bg-[#E8621A]/60 rounded-full" style={{ width: `${(count / max) * 100}%` }} />
+                                            </div>
+                                            <span className="text-[10px] font-semibold text-zinc-500 w-10 text-right flex-shrink-0">
+                                              {count.toLocaleString()}
+                                            </span>
+                                          </div>
+                                        );
+                                      })}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
                   );
                 })}
               </tbody>
