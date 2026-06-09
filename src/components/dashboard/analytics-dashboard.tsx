@@ -242,7 +242,7 @@ export function AnalyticsDashboard() {
                   <Trophy className="h-4 w-4 text-amber-600" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm font-black text-[--roam-black] leading-tight truncate">{topHub?.name || '—'}</p>
+                  <p className="text-sm font-black text-[--roam-black] leading-tight truncate">{topHub?.name || '-'}</p>
                   <p className="text-[10px] font-semibold uppercase tracking-widest text-[--roam-gray-mid] mt-0.5">
                     {topHub ? `${topHub.sessions.toLocaleString()} sessions` : 'Busiest Hub'}
                   </p>

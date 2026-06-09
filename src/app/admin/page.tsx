@@ -207,7 +207,7 @@ function OverrideDropdown({ station, onUpdate }: {
       )}
 
       {station.hasOverride && (
-        <button onClick={handleClear} disabled={loading} title="Clear override — revert to smart sync"
+        <button onClick={handleClear} disabled={loading} title="Clear override - revert to smart sync"
           className="p-1.5 rounded-lg border border-zinc-200 text-zinc-400 hover:text-[#E8621A] hover:border-[#E8621A]/30 transition-all">
           <RotateCcw className="w-3 h-3" />
         </button>
@@ -294,12 +294,12 @@ function StationTable({ stations, onUpdate }: {
               <span className="text-zinc-400 text-xs">
                 {station.launchDate
                   ? new Date(station.launchDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' })
-                  : <span className="text-zinc-300">—</span>}
+                  : <span className="text-zinc-300">-</span>}
               </span>
             </td>
             <td className="px-3 sm:px-4 py-3 hidden sm:table-cell">
               <span className="text-zinc-400 text-xs">
-                {station.chargerCount > 0 ? `${station.chargerCount} · ${station.totalKw.toFixed(1)}kW` : '—'}
+                {station.chargerCount > 0 ? `${station.chargerCount} · ${station.totalKw.toFixed(1)}kW` : '-'}
               </span>
             </td>
             <td className="px-3 sm:px-4 py-3">
@@ -455,7 +455,7 @@ function PipelineTab({ showToast }: { showToast: (msg: string, type?: 'success' 
                   </div>
                   <div className="bg-zinc-50 rounded-xl p-2">
                     <p className="text-[10px] text-zinc-400 mb-0.5">Bucket</p>
-                    <p className="text-zinc-900 font-medium text-[11px] leading-tight truncate">{site.priorityBucket || '—'}</p>
+                    <p className="text-zinc-900 font-medium text-[11px] leading-tight truncate">{site.priorityBucket || '-'}</p>
                   </div>
                 </div>
 
@@ -469,7 +469,7 @@ function PipelineTab({ showToast }: { showToast: (msg: string, type?: 'success' 
                   ].map(d => (
                     <div key={d.label} className="flex items-center gap-1 text-[11px]">
                       <span className="text-zinc-400 flex-shrink-0">{d.label}:</span>
-                      <span className="text-zinc-500 truncate">{d.value || '—'}</span>
+                      <span className="text-zinc-500 truncate">{d.value || '-'}</span>
                     </div>
                   ))}
                 </div>
@@ -828,7 +828,7 @@ function UploadCSVModal({ onClose, onSuccess }: { onClose: () => void; onSuccess
                     <>
                       <FileText className="w-6 h-6 text-[#E8621A]" />
                       <span className="text-xs font-semibold text-zinc-700 text-center px-4 truncate max-w-full">{file.name}</span>
-                      <span className="text-[11px] text-zinc-400">{(file.size / 1024 / 1024).toFixed(1)} MB — click to change</span>
+                      <span className="text-[11px] text-zinc-400">{(file.size / 1024 / 1024).toFixed(1)} MB - click to change</span>
                     </>
                   ) : (
                     <>
@@ -932,7 +932,7 @@ function UploadCSVModal({ onClose, onSuccess }: { onClose: () => void; onSuccess
                   </p>
                   {Object.entries(result.unknownHubs).map(([code, count]) => (
                     <p key={code} className="text-xs text-amber-700">
-                      <code className="font-mono">{code}</code> — {count} sessions
+                      <code className="font-mono">{code}</code>: {count} sessions
                     </p>
                   ))}
                   <p className="text-[10px] text-amber-500 mt-1.5">Add this hub to the database to import these sessions.</p>
@@ -1120,29 +1120,29 @@ function SyncLogTab() {
                         </td>
                         <td className="px-4 py-3 hidden md:table-cell">
                           <span className={`text-xs font-semibold ${log.created > 0 ? 'text-emerald-600' : 'text-zinc-300'}`}>
-                            {log.created > 0 ? `+${log.created.toLocaleString()}` : '—'}
+                            {log.created > 0 ? `+${log.created.toLocaleString()}` : '-'}
                           </span>
                         </td>
                         <td className="px-4 py-3 hidden md:table-cell">
                           <span className={`text-xs font-semibold ${log.updated > 0 ? 'text-blue-600' : 'text-zinc-300'}`}>
-                            {log.updated > 0 ? `~${log.updated}` : '—'}
+                            {log.updated > 0 ? `~${log.updated}` : '-'}
                           </span>
                         </td>
                         <td className="px-4 py-3 hidden lg:table-cell">
-                          <span className="text-zinc-400 text-xs">{log.unchanged > 0 ? log.unchanged.toLocaleString() : '—'}</span>
+                          <span className="text-zinc-400 text-xs">{log.unchanged > 0 ? log.unchanged.toLocaleString() : '-'}</span>
                         </td>
                         <td className="px-4 py-3 hidden md:table-cell">
                           <span className={`text-xs font-semibold ${log.errors > 0 ? 'text-red-600' : 'text-zinc-300'}`}>
-                            {log.errors > 0 ? log.errors : '—'}
+                            {log.errors > 0 ? log.errors : '-'}
                           </span>
                         </td>
                         <td className="px-4 py-3 hidden lg:table-cell">
                           <span className="text-zinc-400 text-xs">
-                            {log.durationMs > 0 ? `${(log.durationMs / 1000).toFixed(1)}s` : '—'}
+                            {log.durationMs > 0 ? `${(log.durationMs / 1000).toFixed(1)}s` : '-'}
                           </span>
                         </td>
                         <td className="px-4 py-3 hidden sm:table-cell">
-                          <span className="text-zinc-400 text-xs truncate max-w-[100px] block">{log.triggerBy ?? '—'}</span>
+                          <span className="text-zinc-400 text-xs truncate max-w-[100px] block">{log.triggerBy ?? '-'}</span>
                         </td>
                       </tr>
 
@@ -1175,7 +1175,7 @@ function SyncLogTab() {
                                     <p className="text-[10px] font-semibold text-amber-600 uppercase tracking-wider mb-1">Unmatched hub codes</p>
                                     {Object.entries(details.unknownHubs).map(([code, count]) => (
                                       <p key={code} className="text-xs text-amber-700">
-                                        <code className="font-mono text-[11px]">{code}</code> — {count} sessions skipped
+                                        <code className="font-mono text-[11px]">{code}</code>: {count} sessions skipped
                                       </p>
                                     ))}
                                   </div>
@@ -1362,7 +1362,7 @@ export default function AdminPage() {
       </header>
 
       <main className="relative max-w-6xl mx-auto px-4 sm:px-6 py-6">
-        {/* Summary strip — always visible */}
+        {/* Summary strip - always visible */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
           {[
             { label: 'Operational',      value: stations.filter(s => s.status === 'operational').length,  color: 'text-emerald-600', dot: 'bg-emerald-400' },
@@ -1375,7 +1375,7 @@ export default function AdminPage() {
                 <span className={`w-2 h-2 rounded-full ${stat.dot}`} />
                 <span className="text-zinc-400 text-xs">{stat.label}</span>
               </div>
-              <p className={`text-2xl font-black ${stat.color}`}>{loadingStations ? '—' : stat.value}</p>
+              <p className={`text-2xl font-black ${stat.color}`}>{loadingStations ? '-' : stat.value}</p>
             </div>
           ))}
         </div>
@@ -1430,7 +1430,7 @@ export default function AdminPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
               <div>
                 <h1 className="text-base font-bold text-zinc-900">
-                  {TYPE_CONFIG[activeTab].label} — {tabStations.filter(s => s.status === 'operational').length} operational
+                  {TYPE_CONFIG[activeTab].label}: {tabStations.filter(s => s.status === 'operational').length} operational
                   {tabStations.filter(s => s.status === 'construction').length > 0 &&
                     `, ${tabStations.filter(s => s.status === 'construction').length} in construction`}
                 </h1>
@@ -1501,7 +1501,7 @@ export default function AdminPage() {
             <div className="mb-4">
               <h1 className="text-base font-bold text-zinc-900">Sync Log</h1>
               <p className="text-zinc-400 text-xs mt-0.5">
-                History of all database syncs — uploads, rescans and scheduled imports.
+                History of all database syncs - uploads, rescans and scheduled imports.
               </p>
             </div>
             <SyncLogTab />

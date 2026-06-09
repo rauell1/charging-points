@@ -8,9 +8,7 @@ import { LogOut } from 'lucide-react';
 import { OverviewCards } from '@/components/dashboard/overview-cards';
 import { StationTable } from '@/components/dashboard/station-table';
 import { StationMap } from '@/components/dashboard/station-map';
-import { MilestonesTimeline } from '@/components/dashboard/milestones-timeline';
 import { AnalyticsDashboard } from '@/components/dashboard/analytics-dashboard';
-import { ActivityFeed } from '@/components/dashboard/activity-feed';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
@@ -22,8 +20,6 @@ import {
   LayoutDashboard,
   Map,
   BarChart3,
-  Milestone as MilestoneIcon,
-  Rss,
   ExternalLink,
   Phone,
   Mail,
@@ -191,20 +187,6 @@ export default function Dashboard() {
                   <BarChart3 className={`h-3.5 w-3.5 ${activeTab === 'analytics' ? 'text-[--roam-orange]' : 'text-[--roam-gray-mid]'}`} />
                   <span>Analytics</span>
                 </TabsTrigger>
-                <TabsTrigger
-                  value="milestones"
-                  className="text-xs gap-1.5 px-0 py-2.5 rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] hover:text-[--roam-black] font-bold uppercase tracking-wider transition-all cursor-pointer font-display"
-                >
-                  <MilestoneIcon className={`h-3.5 w-3.5 ${activeTab === 'milestones' ? 'text-[--roam-orange]' : 'text-[--roam-gray-mid]'}`} />
-                  <span>Milestones</span>
-                </TabsTrigger>
-                <TabsTrigger
-                  value="activity"
-                  className="text-xs gap-1.5 px-0 py-2.5 rounded-none data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-[--roam-orange] data-[state=active]:text-[--roam-orange] text-[--roam-gray-mid] hover:text-[--roam-black] font-bold uppercase tracking-wider transition-all cursor-pointer font-display"
-                >
-                  <Rss className={`h-3.5 w-3.5 ${activeTab === 'activity' ? 'text-[--roam-orange]' : 'text-[--roam-gray-mid]'}`} />
-                  <span>Activity</span>
-                </TabsTrigger>
               </TabsList>
 
               {/* Info Badges - Dynamic */}
@@ -215,20 +197,8 @@ export default function Dashboard() {
 
             {/* Overview Tab */}
             <TabsContent value="overview" className="space-y-4 md:space-y-6 mt-0">
-              <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 md:gap-6">
-                {/* Map - takes 3 columns */}
-                <div className="lg:col-span-3">
-                  <StationMap />
-                </div>
-
-                {/* Activity Feed - takes 2 columns */}
-                <div className="lg:col-span-2">
-                  <ActivityFeed />
-                </div>
-              </div>
-
+              <StationMap />
               <Separator className="hidden" />
-
               {/* Station Table */}
               <StationTable />
             </TabsContent>
@@ -250,20 +220,11 @@ export default function Dashboard() {
               <AnalyticsDashboard />
             </TabsContent>
 
-            {/* Milestones Tab */}
-            <TabsContent value="milestones" className="mt-0">
-              <MilestonesTimeline />
-            </TabsContent>
-
             {/* Site Acquisition Tab */}
             <TabsContent value="pipeline" className="mt-0">
               <PipelineTracker />
             </TabsContent>
 
-            {/* Activity Tab */}
-            <TabsContent value="activity" className="mt-0">
-              <ActivityFeed />
-            </TabsContent>
           </Tabs>
         </main>
 

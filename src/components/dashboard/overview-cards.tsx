@@ -87,7 +87,7 @@ export function OverviewCards() {
   const plPoints  = sb?.plannedPoints      ?? EMPTY_CELL;
   const plKiosks  = sb?.plannedKiosks      ?? EMPTY_CELL;
 
-  // All three types contribute to every total — matches admin panel exactly
+  // All three types contribute to every total - matches admin panel exactly
   const totalOperational  = opHubs.count  + opPoints.count  + opKiosks.count;
   const totalConstruction = conHubs.count + conPoints.count + conKiosks.count;
   const totalPlanned      = plHubs.count  + plPoints.count  + plKiosks.count;

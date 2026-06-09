@@ -76,7 +76,7 @@ const REQUIRED_COLS = [
 export async function POST(req: NextRequest) {
   const adminSession = await requireAdmin();
   if (!adminSession) {
-    return NextResponse.json({ error: 'Unauthorized — admin only' }, { status: 403 });
+    return NextResponse.json({ error: 'Unauthorized - admin only' }, { status: 403 });
   }
 
   const start = Date.now();

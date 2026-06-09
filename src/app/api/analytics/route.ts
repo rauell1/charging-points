@@ -28,7 +28,7 @@ export async function GET() {
       _sum: { chargingMinutes: true, energyKwh: true, costKes: true },
     });
 
-    // Daily session counts — anchored to the most recent session date so
+    // Daily session counts - anchored to the most recent session date so
     // periodic batch uploads (e.g. every 3 months) always appear in charts.
     const latestSession = await db.chargingSession.findFirst({
       orderBy: { date: 'desc' },

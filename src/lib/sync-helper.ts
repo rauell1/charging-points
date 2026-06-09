@@ -951,7 +951,7 @@ export async function resolveStation(chargerId: string): Promise<{
     }
   }
 
-  // 3. Nothing found – new station, use incoming ID as-is
+  // 3. Nothing found - new station, use incoming ID as-is
   return { existing: null, canonicalId: chargerId };
 }
 
