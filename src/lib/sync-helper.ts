@@ -162,7 +162,7 @@ async function processLiveData(rows: Record<string, unknown>[], result: SyncResu
       const openTime = extractString(row, ['openTime']);
       const closeTime = extractString(row, ['closeTime']);
 
-      const existing = await db.chargingStation.findUnique({ where: { chargerId } });
+      const { existing, canonicalId } = await resolveStation(chargerId);
       const smartStatus = computeSmartStatus(type, type === 'hub' ? 'planned' : 'operational', null);
       const status = applyOverride(existing?.statusOverride, smartStatus);
       const data = {
@@ -178,12 +178,12 @@ async function processLiveData(rows: Record<string, unknown>[], result: SyncResu
       if (existing) {
         const changes = detectChanges(existing, data);
         if (changes.length > 0) {
-          await db.chargingStation.update({ where: { chargerId }, data });
+          await db.chargingStation.update({ where: { chargerId: canonicalId }, data });
           result.summary.updated++;
           changes.forEach(c => {
             result.summary.changes.push({
               action: 'updated',
-              chargerId,
+              chargerId: canonicalId,
               name,
               field: c.field,
               oldVal: String(c.oldVal ?? ''),
@@ -194,9 +194,9 @@ async function processLiveData(rows: Record<string, unknown>[], result: SyncResu
           result.summary.unchanged++;
         }
       } else {
-        await db.chargingStation.create({ data: { chargerId, ...data } });
+        await db.chargingStation.create({ data: { chargerId: canonicalId, ...data } });
         result.summary.created++;
-        result.summary.changes.push({ action: 'created', chargerId, name });
+        result.summary.changes.push({ action: 'created', chargerId: canonicalId, name });
       }
     } catch {
       result.summary.errors++;
@@ -303,7 +303,7 @@ async function processMultiRowSheet(
         }
       }
 
-      const existing = await db.chargingStation.findUnique({ where: { chargerId: normalizedId } });
+      const { existing, canonicalId: resolvedId } = await resolveStation(normalizedId);
       const rawParsedStatus = parseStatus(statusRaw, 'planned');
       const smartStatus = computeSmartStatus(type, rawParsedStatus, launchDate);
       const status = applyOverride(existing?.statusOverride, smartStatus);
@@ -348,12 +348,12 @@ async function processMultiRowSheet(
       if (existing) {
         const changes = detectChanges(existing, data);
         if (changes.length > 0) {
-          await db.chargingStation.update({ where: { chargerId: normalizedId }, data });
+          await db.chargingStation.update({ where: { chargerId: resolvedId }, data });
           result.summary.updated++;
           changes.forEach(c => {
             result.summary.changes.push({
               action: 'updated',
-              chargerId: normalizedId,
+              chargerId: resolvedId,
               name,
               field: c.field,
               oldVal: String(c.oldVal ?? ''),
@@ -364,9 +364,9 @@ async function processMultiRowSheet(
           result.summary.unchanged++;
         }
       } else {
-        await db.chargingStation.create({ data: { chargerId: normalizedId, ...data } });
+        await db.chargingStation.create({ data: { chargerId: resolvedId, ...data } });
         result.summary.created++;
-        result.summary.changes.push({ action: 'created', chargerId: normalizedId, name });
+        result.summary.changes.push({ action: 'created', chargerId: resolvedId, name });
       }
     } catch (e) {
       console.error('Row error:', e);
@@ -400,7 +400,7 @@ async function processRoamPoints(rows: Record<string, unknown>[], result: SyncRe
       const address = extractString(row, ['Address', 'Location', 'address', 'location']);
       const neighborhood = extractString(row, ['Neighborhood', 'Area', 'Landmark', 'neighborhood']);
       const smartStatus = computeSmartStatus('point', parseStatus(statusRaw, 'planned'), null);
-      const existing2 = await db.chargingStation.findUnique({ where: { chargerId: normalizedId } });
+      const { existing: existing2, canonicalId: resolvedPointId } = await resolveStation(normalizedId);
       const status = applyOverride(existing2?.statusOverride, smartStatus);
 
       const partner = extractString(row, ['Partner', 'Host', 'Partner Name', 'partner', 'host_name']);
@@ -437,12 +437,12 @@ async function processRoamPoints(rows: Record<string, unknown>[], result: SyncRe
       if (existing) {
         const changes = detectChanges(existing, data);
         if (changes.length > 0) {
-          await db.chargingStation.update({ where: { chargerId: normalizedId }, data });
+          await db.chargingStation.update({ where: { chargerId: resolvedPointId }, data });
           result.summary.updated++;
           changes.forEach(c => {
             result.summary.changes.push({
               action: 'updated',
-              chargerId: normalizedId,
+              chargerId: resolvedPointId,
               name,
               field: c.field,
               oldVal: String(c.oldVal ?? ''),
@@ -453,9 +453,9 @@ async function processRoamPoints(rows: Record<string, unknown>[], result: SyncRe
           result.summary.unchanged++;
         }
       } else {
-        await db.chargingStation.create({ data: { chargerId: normalizedId, ...data } });
+        await db.chargingStation.create({ data: { chargerId: resolvedPointId, ...data } });
         result.summary.created++;
-        result.summary.changes.push({ action: 'created', chargerId: normalizedId, name });
+        result.summary.changes.push({ action: 'created', chargerId: resolvedPointId, name });
       }
     } catch (error) {
       console.error('Error processing legacy row:', error);
@@ -489,7 +489,7 @@ async function processRoamHubs(rows: Record<string, unknown>[], result: SyncResu
       const address = extractString(row, ['Address', 'Location', 'address']);
       const neighborhood = extractString(row, ['Neighborhood', 'Area', 'Landmark']);
 
-      const existing = await db.chargingStation.findUnique({ where: { chargerId: normalizedId } });
+      const { existing, canonicalId: resolvedHubId } = await resolveStation(normalizedId);
       const smartStatus = computeSmartStatus('hub', parseStatus(statusRaw, 'planned'), null);
       const status = applyOverride(existing?.statusOverride, smartStatus);
 
@@ -526,12 +526,12 @@ async function processRoamHubs(rows: Record<string, unknown>[], result: SyncResu
       if (existing) {
         const changes = detectChanges(existing, data);
         if (changes.length > 0) {
-          await db.chargingStation.update({ where: { chargerId: normalizedId }, data });
+          await db.chargingStation.update({ where: { chargerId: resolvedHubId }, data });
           result.summary.updated++;
           changes.forEach(c => {
             result.summary.changes.push({
               action: 'updated',
-              chargerId: normalizedId,
+              chargerId: resolvedHubId,
               name,
               field: c.field,
               oldVal: String(c.oldVal ?? ''),
@@ -542,9 +542,9 @@ async function processRoamHubs(rows: Record<string, unknown>[], result: SyncResu
           result.summary.unchanged++;
         }
       } else {
-        await db.chargingStation.create({ data: { chargerId: normalizedId, ...data } });
+        await db.chargingStation.create({ data: { chargerId: resolvedHubId, ...data } });
         result.summary.created++;
-        result.summary.changes.push({ action: 'created', chargerId: normalizedId, name });
+        result.summary.changes.push({ action: 'created', chargerId: resolvedHubId, name });
       }
     } catch (error) {
       console.error('Error processing legacy hub row:', error);
@@ -834,7 +834,7 @@ async function processGenericSheet(rows: Record<string, unknown>[], result: Sync
       const address = extractString(row, ['Address', 'Location']);
       const neighborhood = extractString(row, ['Neighborhood', 'Area']);
 
-      const existing = await db.chargingStation.findUnique({ where: { chargerId: normalizedId } });
+      const { existing, canonicalId: resolvedGenericId } = await resolveStation(normalizedId);
 
       const data = {
         name,
@@ -850,15 +850,15 @@ async function processGenericSheet(rows: Record<string, unknown>[], result: Sync
       if (existing) {
         const changes = detectChanges(existing, data);
         if (changes.length > 0) {
-          await db.chargingStation.update({ where: { chargerId: normalizedId }, data });
+          await db.chargingStation.update({ where: { chargerId: resolvedGenericId }, data });
           result.summary.updated++;
         } else {
           result.summary.unchanged++;
         }
       } else {
-        await db.chargingStation.create({ data: { chargerId: normalizedId, ...data } });
+        await db.chargingStation.create({ data: { chargerId: resolvedGenericId, ...data } });
         result.summary.created++;
-        result.summary.changes.push({ action: 'created', chargerId: normalizedId, name });
+        result.summary.changes.push({ action: 'created', chargerId: resolvedGenericId, name });
       }
     } catch {
       result.summary.errors++;
@@ -916,6 +916,43 @@ function detectChanges(existing: Record<string, unknown>, newData: Record<string
 // ─── Post-Sync Cleanup & Status Adjustments ──────────────────────────────────
 async function postSyncCleanup() {
   // Disabled status override to ensure point station statuses align strictly with the Locations Database Excel source of truth.
+}
+
+// ─── Canonical ID Resolution ──────────────────────────────────────────────────
+/**
+ * Resolve a station lookup, handling old-format vs new-format charger IDs.
+ *
+ * Google Sheets stores hub IDs as bare suffixes like `#RH-KE-A-07`, but the
+ * canonical DB entry may be `FO-NBI-01#RH-KE-A-07`.  If an exact match isn't
+ * found we try an `endsWith` suffix search so the sync always UPDATE the
+ * canonical row instead of creating a duplicate.
+ *
+ * Returns the existing row (or null) and the canonical chargerId to use for
+ * all subsequent create/update operations.
+ */
+export async function resolveStation(chargerId: string): Promise<{
+  existing: { id: string; chargerId: string; statusOverride: string | null; [key: string]: unknown } | null;
+  canonicalId: string;
+}> {
+  // 1. Exact match first (covers all new-format IDs and any legacy ID that was
+  //    deliberately kept, e.g. Banana #RH-KE-A-25, Oryx Ruai #RH-KE-A-09)
+  const exact = await db.chargingStation.findUnique({ where: { chargerId } });
+  if (exact) return { existing: exact as any, canonicalId: chargerId };
+
+  // 2. Suffix fallback: only for bare `#RH-KE-A-XX` IDs (no FO- / FO-NBI prefix).
+  //    Finds the canonical `FO-NBI-XX#RH-KE-A-XX` entry so we UPDATE it, not
+  //    create a second row at the same physical location.
+  if (chargerId.startsWith('#') && !chargerId.includes('FO-')) {
+    const canonical = await db.chargingStation.findFirst({
+      where: { chargerId: { endsWith: chargerId } },
+    });
+    if (canonical) {
+      return { existing: canonical as any, canonicalId: canonical.chargerId };
+    }
+  }
+
+  // 3. Nothing found – new station, use incoming ID as-is
+  return { existing: null, canonicalId: chargerId };
 }
 
 function findActiveStationMatch(site: any, stations: any[]) {

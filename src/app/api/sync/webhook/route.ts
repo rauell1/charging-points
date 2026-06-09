@@ -1,4 +1,5 @@
 import { db } from '@/lib/db';
+import { resolveStation } from '@/lib/sync-helper';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
@@ -115,22 +116,20 @@ export async function POST(request: Request) {
           notes,
         };
 
-        const existing = await db.chargingStation.findUnique({
-          where: { chargerId },
-        });
+        const { existing, canonicalId } = await resolveStation(chargerId);
 
         if (existing) {
-          const fieldChanges = detectChanges(existing, updateData);
+          const fieldChanges = detectChanges(existing as Record<string, unknown>, updateData);
           if (fieldChanges.length > 0) {
             await db.chargingStation.update({
-              where: { chargerId },
+              where: { chargerId: canonicalId },
               data: updateData,
             });
             updated++;
             fieldChanges.forEach((c) => {
               changes.push({
                 action: 'updated',
-                chargerId,
+                chargerId: canonicalId,
                 name,
                 field: c.field,
                 oldVal: String(c.oldVal ?? ''),
@@ -142,10 +141,10 @@ export async function POST(request: Request) {
           }
         } else {
           await db.chargingStation.create({
-            data: { chargerId, ...updateData },
+            data: { chargerId: canonicalId, ...updateData },
           });
           created++;
-          changes.push({ action: 'created', chargerId, name });
+          changes.push({ action: 'created', chargerId: canonicalId, name });
         }
       } catch (err) {
         console.error('Error processing webhook station:', err);
