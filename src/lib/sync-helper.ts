@@ -939,9 +939,9 @@ export async function resolveStation(chargerId: string): Promise<{
   const exact = await db.chargingStation.findUnique({ where: { chargerId } });
   if (exact) return { existing: exact as any, canonicalId: chargerId };
 
-  // 2. Suffix fallback: only for bare `#RH-KE-A-XX` IDs (no FO- / FO-NBI prefix).
-  //    Finds the canonical `FO-NBI-XX#RH-KE-A-XX` entry so we UPDATE it, not
-  //    create a second row at the same physical location.
+  // 2. Suffix fallback: for bare `#RH-KE-A-XX` or `#RP-KE-A-XX` IDs (no FO- prefix).
+  //    Finds the canonical `FO-NBI-XX#RH-KE-A-XX` / `FO-NBI-XX#RP-KE-A-XX` entry
+  //    so we UPDATE it instead of creating a duplicate row at the same location.
   if (chargerId.startsWith('#') && !chargerId.includes('FO-')) {
     const canonical = await db.chargingStation.findFirst({
       where: { chargerId: { endsWith: chargerId } },

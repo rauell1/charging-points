@@ -10,11 +10,14 @@ This applies to: JSX/TSX string literals, comments, template literals, error mes
 - Use a colon `:` as a label separator in UI text (e.g. `Hub: 5 operational`)
 - Use `-` as an empty/null placeholder in tables and UI cells
 
-### Hub Charger ID Format
-Canonical format: `FO-NBI-XX#RH-KE-A-XX` (e.g. `FO-NBI-01#RH-KE-A-07`)
-- Never create or accept bare `#RH-KE-A-XX` entries for deployed hubs
-- Use `resolveStation()` from `src/lib/sync-helper.ts` in all sync paths to map old-format IDs to canonical ones
-- Exceptions (no FO-NBI counterpart, keep as-is): `#RH-KE-A-09` (Oryx Ruai), `#RH-KE-A-22` (Ngong Center), `#RH-KE-A-25` (Banana)
+### Charger ID Canonical Formats
+**Roam Hubs**: `FO-NBI-XX#RH-KE-A-XX` (e.g. `FO-NBI-01#RH-KE-A-07`)
+**Roam Points**: `FO-NBI-XX#RP-KE-A-XX` (e.g. `FO-NBI-06#RP-KE-A-03`)
+
+- Never create or accept bare `#RH-KE-A-XX` or `#RP-KE-A-XX` entries
+- Use `resolveStation()` from `src/lib/sync-helper.ts` in all sync paths - it handles both hub and point suffix fallback automatically
+- Hub exceptions (no FO-NBI counterpart, keep bare IDs): `#RH-KE-A-09` (Oryx Ruai), `#RH-KE-A-22` (Ngong Center), `#RH-KE-A-25` (Banana)
+- Point canonical source: column I of the Roam Points Google Sheet (48 entries, RP-01 through RP-48)
 
 ### Duplicate Prevention
 - Google Sheets sync must always call `resolveStation()` before create/update operations
