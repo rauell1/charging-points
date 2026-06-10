@@ -24,6 +24,32 @@ This applies to: JSX/TSX string literals, comments, template literals, error mes
 - CSV uploads use a dual-index station map (canonical + bare-suffix) for tolerance
 - DB inserts use `createMany({ skipDuplicates: true })` for idempotency
 
+## Google Sheets Deployment Tracking
+
+Sheet ID: `1zGATzRj-1Uq_mewuTVd9rBGo_C7l5z4QaS9rj6z_5_w`, GID: `1236440355`
+This sheet is the source of truth for all planned and deployed charging sites.
+
+### Env Vars Required
+- `SHEETS_DEPLOY_URL` - full CSV export URL:
+  `https://docs.google.com/spreadsheets/d/1zGATzRj-1Uq_mewuTVd9rBGo_C7l5z4QaS9rj6z_5_w/export?format=csv&gid=1236440355`
+- `CRON_SECRET` - secret matching Vercel cron Authorization header
+- `SYNC_API_KEY` - secret for manual POST to `/api/sync/sheets`
+
+### Sheet Access Requirement
+The Google Sheet MUST be set to "Anyone with the link - Viewer" so the Vercel server
+can fetch its CSV export without credentials.
+
+### Sync Routes
+- `POST /api/sync/sheets` - manual trigger (requires `x-api-key` header)
+- `GET /api/cron/sync-sheets` - Vercel cron trigger (every 6 hours via vercel.json)
+
+### Column Auto-Detection
+The sync auto-detects columns by:
+1. Header keywords: "project code", "charger id", "dynamics" for the ID column
+2. Content scan: first data row cells matching `FO-NBI-XX#R[PH]-KE-XX` pattern
+3. Fallback: column index 8 (matches Roam Points sheet layout)
+All results are upserted through `resolveStation()` - no duplicates possible.
+
 ## Architecture
 
 - **Framework**: Next.js 16 App Router, Vercel SSR (`output: "standalone"`)
