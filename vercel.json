@@ -6,10 +6,5 @@
       "includeFiles": "upload/**"
     }
   },
-  "crons": [
-    {
-      "path": "/api/cron/sync-sheets",
-      "schedule": "0 */6 * * *"
-    }
-  ]
+  "crons": []
 }
