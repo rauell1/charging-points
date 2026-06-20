@@ -5,5 +5,11 @@
     "src/app/api/sync/rescan/route.ts": {
       "includeFiles": "upload/**"
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/sync/rescan",
+      "schedule": "0 0 * * 0"
+    }
+  ]
 }

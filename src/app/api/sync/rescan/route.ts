@@ -1,16 +1,40 @@
 import { db } from '@/lib/db';
 import { NextResponse } from 'next/server';
 import * as XLSX from 'xlsx';
-import { readdir } from 'fs/promises';
+import { readdir, readFile } from 'fs/promises';
 import { join } from 'path';
-import { syncWorkbook } from '@/lib/sync-helper';
+import { syncWorkbook, pruneSyncLogs } from '@/lib/sync-helper';
 
 const UPLOAD_DIR = join(process.cwd(), 'upload');
+
+export async function GET() {
+  return POST();
+}
 
 export async function POST() {
   const startTime = Date.now();
 
   try {
+    // Check if auto-sync is enabled in config
+    const configPath = join(process.cwd(), 'db', 'sync-config.json');
+    let enabled = true;
+    try {
+      const raw = await readFile(configPath, 'utf-8');
+      const parsed = JSON.parse(raw);
+      if (parsed.enabled !== undefined) {
+        enabled = parsed.enabled;
+      }
+    } catch {
+      // Default to true
+    }
+
+    if (!enabled) {
+      return NextResponse.json({
+        message: 'Sync is disabled in configuration',
+        timestamp: new Date().toISOString(),
+      });
+    }
+
     const files = await readdir(UPLOAD_DIR);
     const excelFiles = files.filter(f => /\.(xlsx|xls|csv)$/i.test(f));
 
@@ -89,6 +113,8 @@ export async function POST() {
           durationMs,
         },
       });
+      // Keep DB size under control
+      await pruneSyncLogs();
     } catch (logErr) {
       console.error('Failed to write sync log:', logErr);
     }
@@ -119,6 +145,7 @@ export async function POST() {
           durationMs,
         },
       });
+      await pruneSyncLogs();
     } catch { /* ignore log failures */ }
 
     return NextResponse.json(

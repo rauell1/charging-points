@@ -6,7 +6,7 @@ const CONFIG_PATH = join(process.cwd(), 'db', 'sync-config.json');
 const DEFAULT_CONFIG = {
   apiKey: 'roam-sync-key-2025',
   enabled: true,
-  schedule: 'every 6 hours',
+  schedule: 'weekly',
   webhookUrl: '',
   lastSync: null,
   lastSyncStatus: null,

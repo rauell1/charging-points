@@ -10,11 +10,9 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: process.cwd(),
   },
-  experimental: {
-    outputFileTracingIncludes: {
-      '/api/sync/rescan': ['./upload/**/*'],
-    },
-  } as any,
+  outputFileTracingIncludes: {
+    '/api/sync/rescan': ['./upload/**/*'],
+  },
 };
 
 export default nextConfig;

@@ -1,5 +1,6 @@
 import { db } from '@/lib/db';
 import { NextResponse } from 'next/server';
+import { pruneSyncLogs } from '@/lib/sync-helper';
 
 export async function POST(request: Request) {
   const startTime = Date.now();
@@ -151,6 +152,7 @@ export async function POST(request: Request) {
         durationMs,
       },
     });
+    await pruneSyncLogs();
 
     return NextResponse.json({
       message: `Sync complete: ${created} created, ${updated} updated, ${unchanged} unchanged, ${errors} errors`,
@@ -178,6 +180,7 @@ export async function POST(request: Request) {
           durationMs,
         },
       });
+      await pruneSyncLogs();
     } catch {
       // Ignore log failures
     }

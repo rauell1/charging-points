@@ -1,7 +1,7 @@
 import { db } from '@/lib/db';
 import { NextResponse } from 'next/server';
 import * as XLSX from 'xlsx';
-import { syncWorkbook } from '@/lib/sync-helper';
+import { syncWorkbook, pruneSyncLogs } from '@/lib/sync-helper';
 
 export async function POST(request: Request) {
   const startTime = Date.now();
@@ -39,6 +39,7 @@ export async function POST(request: Request) {
           durationMs,
         },
       });
+      await pruneSyncLogs();
     } catch (logErr) {
       console.error('Failed to write sync log:', logErr);
     }
@@ -62,6 +63,7 @@ export async function POST(request: Request) {
           durationMs,
         },
       });
+      await pruneSyncLogs();
     } catch { /* ignore log failures */ }
 
     return NextResponse.json(

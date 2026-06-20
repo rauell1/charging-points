@@ -957,3 +957,29 @@ function findActiveStationMatch(site: any, stations: any[]) {
   });
 }
 
+export async function pruneSyncLogs() {
+  try {
+    const keepCount = 100;
+    const oldestToKeep = await db.syncLog.findMany({
+      orderBy: { createdAt: 'desc' },
+      skip: keepCount - 1,
+      take: 1,
+      select: { createdAt: true }
+    });
+
+    if (oldestToKeep.length > 0) {
+      const cutoffDate = oldestToKeep[0].createdAt;
+      await db.syncLog.deleteMany({
+        where: {
+          createdAt: {
+            lt: cutoffDate
+          }
+        }
+      });
+      console.log(`Pruned sync logs older than ${cutoffDate.toISOString()}`);
+    }
+  } catch (err) {
+    console.error('Failed to prune sync logs:', err);
+  }
+}
+

@@ -184,7 +184,7 @@ export function SyncDialog() {
 
   // Sync config state
   const [configEnabled, setConfigEnabled] = useState(true);
-  const [configSchedule, setConfigSchedule] = useState('every 6 hours');
+  const [configSchedule, setConfigSchedule] = useState('weekly');
   const [testLoading, setTestLoading] = useState(false);
   const [testResult, setTestResult] = useState<string | null>(null);
   const [testError, setTestError] = useState<string | null>(null);
@@ -199,6 +199,14 @@ export function SyncDialog() {
     }),
     enabled: open,
   });
+
+  // Sync fetched config to local component states
+  useEffect(() => {
+    if (config) {
+      setConfigEnabled(config.enabled);
+      setConfigSchedule(config.schedule);
+    }
+  }, [config]);
 
   // Fetch sync history
   const { data: historyData, refetch: refetchHistory } = useQuery<{
@@ -217,7 +225,7 @@ export function SyncDialog() {
   const resolvedConfig = config || {
     apiKey: 'roam-****-2025',
     enabled: true,
-    schedule: 'every 6 hours',
+    schedule: 'weekly',
     webhookUrl: '',
     lastSync: null,
     lastSyncStatus: null,
@@ -820,6 +828,7 @@ export function SyncDialog() {
                         <SelectItem value="every 6 hours">Every 6h</SelectItem>
                         <SelectItem value="every 12 hours">Every 12h</SelectItem>
                         <SelectItem value="every 24 hours">Every 24h</SelectItem>
+                        <SelectItem value="weekly">Weekly</SelectItem>
                         <SelectItem value="disabled">Disabled</SelectItem>
                       </SelectContent>
                     </Select>
