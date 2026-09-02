@@ -1,19 +1,10 @@
 import type { Metadata } from 'next';
-import { getServerSession } from 'next-auth';
-import { authOptions, ADMIN_EMAIL } from '@/lib/auth';
-import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const session = await getServerSession(authOptions);
-
-  // Triple-lock: middleware handles cookie check, here we verify exact email
-  if (!session?.user?.email || session.user.email !== ADMIN_EMAIL) {
-    redirect('/login?error=AccessDenied');
-  }
-
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  // The admin panel is open to everyone - no login or sign up required.
   return <>{children}</>;
 }
