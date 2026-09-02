@@ -1,22 +1,7 @@
 import { db } from '@/lib/db';
-import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
-import { authOptions, ADMIN_EMAIL } from '@/lib/auth';
-
-async function requireAdmin() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.email || session.user.email !== ADMIN_EMAIL) {
-    return null;
-  }
-  return session;
-}
 
 export async function GET() {
-  const session = await requireAdmin();
-  if (!session) {
-    return NextResponse.json({ error: 'Unauthorized - admin only' }, { status: 403 });
-  }
-
   const stations = await db.chargingStation.findMany({
     orderBy: [{ type: 'asc' }, { status: 'asc' }, { name: 'asc' }],
     select: {

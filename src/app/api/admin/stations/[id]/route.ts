@@ -1,7 +1,5 @@
 import { db } from '@/lib/db';
-import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
-import { authOptions, ADMIN_EMAIL } from '@/lib/auth';
 
 const EDITABLE_FIELDS = [
   'name', 'status', 'address', 'neighborhood', 'partner', 'siteManager',
@@ -13,21 +11,10 @@ const NUMERIC_FIELDS = new Set(['chargerCount', 'totalKw', 'latitude', 'longitud
 const DATE_FIELDS = new Set(['launchDate']);
 const VALID_STATUSES = ['operational', 'construction', 'planned', 'blocked', 'archived'];
 
-async function requireAdmin() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.email || session.user.email !== ADMIN_EMAIL) return null;
-  return session;
-}
-
 export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const session = await requireAdmin();
-  if (!session) {
-    return NextResponse.json({ error: 'Unauthorized - admin only' }, { status: 403 });
-  }
-
   const { id } = await params;
   const body = await request.json() as Record<string, unknown>;
 

@@ -1,7 +1,5 @@
 import { db } from '@/lib/db';
-import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
-import { authOptions, ADMIN_EMAIL } from '@/lib/auth';
 
 const VALID_STATUSES = ['operational', 'construction', 'planned', 'blocked', 'archived'];
 
@@ -9,11 +7,6 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.email || session.user.email !== ADMIN_EMAIL) {
-    return NextResponse.json({ error: 'Unauthorized - admin only' }, { status: 403 });
-  }
-
   const { id } = await params;
   const body = await request.json() as { status: string | null; note?: string };
   const { status, note } = body;
@@ -37,7 +30,7 @@ export async function POST(
       // If clearing override, reset status to what smart rule computed last sync
       // Just clear the override fields - next sync will recompute
       statusOverride: status,
-      statusOverrideBy: status ? session.user.email : null,
+      statusOverrideBy: status ? 'public' : null,
       statusOverrideAt: status ? new Date() : null,
       statusOverrideNote: status ? (note ?? null) : null,
       // Immediately apply override to the live status field

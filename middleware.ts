@@ -1,32 +1,8 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
-
-  // Allow public paths through without any check
-  if (
-    pathname.startsWith('/login') ||
-    pathname.startsWith('/api/') ||
-    pathname.startsWith('/_next/') ||
-    pathname.startsWith('/favicon') ||
-    pathname.startsWith('/robots') ||
-    /\.(png|jpg|jpeg|gif|svg|ico)$/i.test(pathname)
-  ) {
-    return NextResponse.next();
-  }
-
-  // Check for session cookie - NextAuth v4 uses __Secure- prefix on HTTPS
-  const sessionToken =
-    req.cookies.get('__Secure-next-auth.session-token') ??
-    req.cookies.get('next-auth.session-token');
-
-  if (!sessionToken) {
-    const loginUrl = new URL('/login', req.url);
-    loginUrl.searchParams.set('callbackUrl', pathname);
-    return NextResponse.redirect(loginUrl);
-  }
-
+export function middleware(_req: NextRequest) {
+  // The dashboard is open to everyone - no login or sign up required.
   return NextResponse.next();
 }
 

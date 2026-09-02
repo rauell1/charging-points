@@ -1,17 +1,8 @@
 import { db } from '@/lib/db';
-import { getServerSession } from 'next-auth';
 import { NextRequest, NextResponse } from 'next/server';
-import { authOptions, ADMIN_EMAIL } from '@/lib/auth';
 
 // Allow larger uploads (up to 16 MB for big CSVs)
 export const config = { api: { bodyParser: false } };
-
-// ─── Auth helper ──────────────────────────────────────────────────────────────
-async function requireAdmin() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.email || session.user.email !== ADMIN_EMAIL) return null;
-  return session;
-}
 
 // ─── Simple CSV parser ────────────────────────────────────────────────────────
 function parseCSV(text: string): Record<string, string>[] {
@@ -74,11 +65,6 @@ const REQUIRED_COLS = [
 
 // ─── POST /api/admin/upload-sessions ─────────────────────────────────────────
 export async function POST(req: NextRequest) {
-  const adminSession = await requireAdmin();
-  if (!adminSession) {
-    return NextResponse.json({ error: 'Unauthorized - admin only' }, { status: 403 });
-  }
-
   const start = Date.now();
 
   // Parse multipart
@@ -245,7 +231,7 @@ export async function POST(req: NextRequest) {
       errors: skippedNoStation,
       details,
       fileName,
-      triggerBy: adminSession.user?.email ?? 'admin',
+      triggerBy: 'public upload',
       durationMs,
     },
   });

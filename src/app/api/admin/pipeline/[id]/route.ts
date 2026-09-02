@@ -1,25 +1,12 @@
 import { db } from '@/lib/db';
-import { getServerSession } from 'next-auth';
 import { NextResponse } from 'next/server';
-import { authOptions, ADMIN_EMAIL } from '@/lib/auth';
 
 const VALID_STATUSES = ['new', 'approved', 'on_hold', 'rejected', 'deployed'];
-
-async function requireAdmin() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.email || session.user.email !== ADMIN_EMAIL) return null;
-  return session;
-}
 
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const session = await requireAdmin();
-  if (!session) {
-    return NextResponse.json({ error: 'Unauthorized - admin only' }, { status: 403 });
-  }
-
   const { id } = await params;
   const body = await request.json() as { status?: string };
   const { status } = body;
